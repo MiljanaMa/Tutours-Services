@@ -1,0 +1,46 @@
+<div class="back-panel">
+    <div class="cover"></div>
+    <div class="title-panel">
+        <div class="profile-pic">
+            <img [src]="club.image" width="100%" height="100%" alt="">
+        </div>
+        <div class="name-and-description">
+            <p style="font-size: 30px; font-weight: bold;">{{club.name}}</p>
+            <p style="margin-top: 2.5rex; font-size: 20px; line-height: 25px;">{{club.description}}</p>
+        </div>
+        <div class="quick-actions-panel">
+            <button class="quick-action-btn" color="primary" style="background-color: #74C69D;" mat-raised-button>
+                <span>Send join request</span>
+            </button>
+            <button class="quick-action-btn" color="primary" style="background-color: #6260A6;" mat-raised-button>
+                <span>Leave the club</span>
+            </button>
+        </div>
+    </div>
+    <br>
+    <br>
+    <p class="achievement-text">Achievements:</p>
+    <div class="achievements-panel">
+      <ul class="achievements-inline">
+        <li *ngFor="let achievement of club.achievements">
+          <img src="assets/images/achievement_{{ achievement.type }}.png" class="achievement-img" alt="{{ achievement.name }}" title="{{ achievement.description }}" />
+          <p class="achievement-text">{{ achievement.name }}</p>
+        </li>
+      </ul>
+    </div>
+    <hr>
+    <div class="other-panel">
+        <div class="tab-menu">
+            <div class="tab" (click)="switchTab('members')" [ngClass]="{'active':(selectedTab === 'members')}">List of members</div>
+            <div class="tab" (click)="switchTab('statistics')" [ngClass]="{'active':(selectedTab === 'statistics')}">Club statistics</div>
+            <div class="tab" (click)="switchTab('challenges')" [ngClass]="{'active':(selectedTab === 'challenges')}">Challenges</div>
+            <div class="tab" (click)="switchTab('fights')" [ngClass]="{'active':(selectedTab === 'fights')}">All Fights</div>
+        </div>
+        <div class="tab-selection">
+            <xp-club-members *ngIf="selectedTab === 'members'" [ownerId]="user?.id" [members]="club.members" [ownerPanel]="club.ownerId === user?.id"></xp-club-members>
+            <img *ngIf="selectedTab === 'statistics'" src="../../../../assets/images/club-stats.jpg" width="100%" height="100%" alt="">
+            <xp-club-challenge-requests *ngIf="selectedTab === 'challenges'" [requests]="requests" [ownerPanel]="club.ownerId === user?.id"></xp-club-challenge-requests>
+            <xp-club-fight-list *ngIf="selectedTab === 'fights'" [fights]="fights" [club]="club"></xp-club-fight-list>
+        </div>
+    </div>
+</div>

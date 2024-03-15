@@ -1,0 +1,66 @@
+.cont{
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.somediv {
+    width: 400px;
+    display:flex;
+    gap: 10px;
+    flex-direction: column;
+    border: 1px solid black;
+    padding: 0.5rem;
+}
+
+.mat-icon {
+    vertical-align: middle;
+}
+
+.tag-list {
+    display: flex;
+    gap: 10px;
+}
+
+.tag {
+    background-color: lightblue;
+    padding: 5px;
+    border-radius: 2px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.green{
+    background-color: green;
+}
+
+.yellow{
+    background-color: darkgoldenrod;
+}
+
+
+.popup {
+    display: none;
+    position: fixed;
+    width: 70vw;
+    height: 70vh;
+    left: 15vw;
+    top: 15vh;
+    background-color: white;
+    padding: 20px;
+    z-index: 9999;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .popup.show {
+    display: block;
+  }
+  
+  .popup .exit {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+  }

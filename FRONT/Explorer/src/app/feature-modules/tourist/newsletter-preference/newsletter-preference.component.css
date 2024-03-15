@@ -1,0 +1,31 @@
+.center{
+    margin: auto auto;
+}
+
+.preference{
+    width: 400px;
+}
+
+.rows-centered{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center; 
+}
+
+.radios{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-items: center;
+    width: 100%;
+}
+
+.button-bar{
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: space-evenly;
+    width: 100%;
+    margin-left: -15px;
+}

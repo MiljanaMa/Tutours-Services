@@ -1,0 +1,36 @@
+<form class="preferences-form" [formGroup]="tourPreferenceForm">
+    <!-- Update radio buttons to get possible from server? -->
+    <h2 *ngIf="mode == 'edit'">Edit your preferences</h2>
+    <h2 *ngIf="mode == 'add'">Add your preference</h2>
+    <p>Select preferred tour difficulty</p>
+    <mat-radio-group aria-label="Select preferred tour difficulty" formControlName="difficulty">
+        <mat-radio-button value="EASY">Easy</mat-radio-button>
+        <mat-radio-button value="MEDIUM">Medium</mat-radio-button>
+        <mat-radio-button value="HARD">Hard</mat-radio-button>
+        <mat-radio-button value="EXTREME">Extreme</mat-radio-button>
+    </mat-radio-group>
+    <p>Select preferred transport type</p>
+    <mat-radio-group aria-label="Select preferred transport type" formControlName="transportType">
+        <mat-radio-button value="WALK">Walk</mat-radio-button>
+        <mat-radio-button value="BIKE">Bike</mat-radio-button>
+        <mat-radio-button value="CAR">Car</mat-radio-button>
+        <mat-radio-button value="BOAT">Boat</mat-radio-button>
+    </mat-radio-group>
+    <div>
+        <mat-form-field>
+            <mat-label>New Tag</mat-label>
+            <input matInput type="text" formControlName="newTag"/>
+        </mat-form-field>
+        <button color="primary" type="submit" (click)="addTag()" mat-raised-button>Add Tag</button>
+    </div>
+    <p>Selected tags:</p>
+    <div class="tag-list">
+        <div class="tag" *ngFor="let tag of tags">{{ tag }}
+            <button (click)="removeTag(tag)">X</button>
+        </div>
+    </div>
+    <div class="button-container">
+        <button color="basic" type="submit" (click)="cancelChanges()" mat-raised-button>Cancel</button>
+        <button color="primary" type="submit" (click)="confirmChanges()" mat-raised-button>Confirm</button>
+    </div>
+</form>

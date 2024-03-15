@@ -1,0 +1,35 @@
+<div class="cont">
+    <div>
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Xp</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th *ngIf="showActions"></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let e of encounters">
+                    <td>{{e.name}}</td>
+                    <td>{{e.description}}</td>
+                    <td>{{e.latitude}}</td>
+                    <td>{{e.longitude}}</td>
+                    <td>{{e.xp}}</td>
+                    <td>{{e.status}}</td>
+                    <td>{{e.type}}</td>
+                    <td *ngIf="showActions">
+                        <button color="accent" mat-icon-button (click)="deleteEncounter(e.id || 0)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <button color="primary" mat-icon-button (click)="editEncounter(e)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

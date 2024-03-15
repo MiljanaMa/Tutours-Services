@@ -1,0 +1,18 @@
+.wallet-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  h2 {
+    color: #1565c0;
+  }
+  
+  p {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  

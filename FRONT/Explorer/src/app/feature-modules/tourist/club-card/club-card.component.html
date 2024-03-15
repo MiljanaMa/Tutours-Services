@@ -1,0 +1,11 @@
+<div class="club-card">
+    <div class="title-box">
+        <img [src]="club.image" alt="" width="100px" height="100px">
+        <h2>{{club.name}}</h2>
+    </div>
+    <p><strong>Owner:</strong> {{club.owner?.name}} {{club.owner?.surname}}</p>
+    <p><strong>Fights won:</strong> {{club.fightsWon}}</p>
+    <hr>
+    <button class="button button-primary" (click)="openDetails(club.id)">Details</button>
+    <button class="button button-primary" (click)="challenge(club.id)">Challenge</button>
+</div>

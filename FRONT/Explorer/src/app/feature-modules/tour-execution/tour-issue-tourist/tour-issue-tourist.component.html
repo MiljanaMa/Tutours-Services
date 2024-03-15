@@ -1,0 +1,111 @@
+<div id="page">
+    <div id="createTourIssue">
+        <div id="tourslist">
+            <p class="description">Choose a tour for report an issue</p>
+            <table class="tourtable">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">Choose</th>
+                        <th style="width: 100px;">Name</th>
+                        <th style="width: 100px;">Description</th>
+                        <th style="width: 80px;">Price</th>
+                        <th style="width: 80px;">Transport type</th>
+                        <th style="width: 80px;">Difficulty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor = "let t of tours">
+                        <td>
+                            <input type="radio" name="tour" style="height: 20px; width: 20px;" (click)="radioClicked(t)">
+                        </td>
+                        <td>{{t.name}}</td>
+                        <td>{{t.description}}</td>
+
+                        <td>
+                            <i *ngIf="t.price <= 20" class="fa-solid fa-piggy-bank fa-2xl" style="color: #5bd643;" matTooltip="{{t.price}} €"></i>
+                            <i *ngIf="t.price < 55 && t.price > 20" class="fa-solid fa-piggy-bank fa-2xl" style="color: #d6d143;" matTooltip="{{t.price}} €"></i>
+                            <i *ngIf="t.price >= 55" class="fa-solid fa-piggy-bank fa-2xl" style="color: #d64343;" matTooltip="{{t.price}} €"></i>
+                        </td>
+                        <td>
+                            <i *ngIf="t.transportType == 'WALK'" class="fa-solid fa-person-walking fa-2xl" style="color: #000000;" matTooltip="{{t.transportType}}"></i>
+                            <i *ngIf="t.transportType == 'BIKE'" class="fa-solid fa-bicycle fa-2xl" style="color: #000000;" matTooltip="{{t.transportType}}"></i>
+                            <i *ngIf="t.transportType == 'CAR'" class="fa-solid fa-car-side fa-2xl" style="color: #000000;" matTooltip="{{t.transportType}}"></i>
+                            <i *ngIf="t.transportType == 'BOAT'" class="fa-solid fa-sailboat fa-2xl" style="color: #000000;" matTooltip="{{t.transportType}}"></i>
+                        </td>
+                        <td>
+                            <i *ngIf="t.difficulty == 'EASY'" class="fa-solid fa-weight-hanging fa-2xl" style="color: #5bd643;" matTooltip="{{t.difficulty}}"></i>
+                            <i *ngIf="t.difficulty == 'MEDIUM'" class="fa-solid fa-weight-hanging fa-2xl" style="color: #d6d143;" matTooltip="{{t.difficulty}}"></i>
+                            <i *ngIf="t.difficulty == 'HARD'" class="fa-solid fa-weight-hanging fa-2xl" style="color: #ff9500;" matTooltip="{{t.difficulty}}"></i>
+                            <i *ngIf="t.difficulty == 'EXTREME'" class="fa-solid fa-weight-hanging fa-2xl" style="color: #d64343;" matTooltip="{{t.difficulty}}"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="formcontainer">
+            <p class="titleReport">Report an issue</p>
+            <form [formGroup]="tourIssueForm" id="tourissueform">
+                <mat-form-field>
+                    <mat-label>Category:</mat-label>
+                    <input matInput type="text" formControlName="category">
+                </mat-form-field>
+                <mat-form-field style="width: 100px;">
+                    <mat-label>Priority:</mat-label>
+                    <input matInput type="number" min="1" max="5" formControlName="priority">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Description:</mat-label>
+                    <textarea matInput cdkTextareaAutosize
+                    cdkAutosizeMinRows="1"
+                    formControlName="description"
+                    cdkAutosizeMaxRows="5"></textarea>
+                </mat-form-field>
+                <div id="buttonsPrimary">
+                    <button style="width: 200px;" class="button button-secondary" (click)="addTourIssue()">Report</button>
+                    <button style="width: 200px;" class="button button-secondary" (click)="updateTourIssue()">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="tourissueslist">
+        <p class="description">Your reported issues</p>
+        <table class="tourissuetable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tour ID</th>
+                    <th style="width: 60px;">Category</th>
+                    <th style="width: 20px;">Priority</th>
+                    <th style="width: 180px;">Description</th>
+                    <th>Creation date and time</th>
+                    <th colspan="3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor = "let ti of tourIssues">
+                    <td>{{ti.id}}</td>
+                    <td>{{ti.tourId}}</td>
+                    <td>{{ti.category}}</td>
+                    <td>{{ti.priority}}</td>
+                    <td>{{ti.description}}</td>
+                    <td>{{ti.creationDateTime | date:'short'}}</td>
+                    <td>
+                        <button id="buttonsAction" color="primary" (click)="onUpdateClicked(ti)" mat-icon-button>
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                    <td>
+                        <button id="buttonsAction" color="accent" (click)="onDeleteClicked(ti)" mat-icon-button>
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                    <td>
+                        <button id="buttonsAction" class="button button-secondary" (click)="onViewClicked(ti)">View</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

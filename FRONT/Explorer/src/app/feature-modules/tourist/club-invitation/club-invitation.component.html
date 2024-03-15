@@ -1,0 +1,53 @@
+<div id="clubInvitations">
+  <div id="clubInvitations-details">
+    <div>
+      <p *ngIf="clubs.length !== 0">Clubs Info</p>
+      <p *ngIf="clubs.length === 0">You don't have club</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Club Id</th>
+            <th>Club Owner Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Invited Users (Ids)</th>
+            <th>Members (Ids)</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let c of clubs">
+            <td>{{c.id}}</td>
+            <td>{{c.ownerId}}</td>
+            <td>{{c.name}}</td>
+            <td>{{c.description}}</td>
+
+            <td>
+              <div *ngFor="let inv of getInvitationsByClub(c.id)">
+                {{inv.userId}}
+              </div>
+            </td>
+
+            <!-- <td>
+              <div *ngFor="let m of c.memberIds">
+                {{m}}
+                <button color="primary" mat-raised-button class="mat-button-spacing" (click)="removeMember(c, m)">Remove member</button>
+              </div>
+            </td> -->
+
+            <td><button color="primary" mat-raised-button (click)="onAddClicked(c)">Add new member</button></td>
+            <td><button color="primary" mat-raised-button (click)="showRequests(c)">Show requests</button></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div>
+    <xp-club-invitation-form *ngIf="shouldRenderClubInvitationForm" (clubInvitationsUpdated)="getAllInvitations()" [club]="selectedClub"></xp-club-invitation-form>
+  </div>
+  <div>
+    <xp-club-owner-requests *ngIf="shouldRenderClubRequestView" [club]="selectedClub"></xp-club-owner-requests>
+  </div>
+  <br>
+</div>

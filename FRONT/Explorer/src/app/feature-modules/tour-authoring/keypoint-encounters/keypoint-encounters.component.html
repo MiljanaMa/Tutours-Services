@@ -1,0 +1,39 @@
+<div class="cont">
+    <div>
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Xp</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Range</th>
+                <th>People count</th>
+                <th>Image</th>
+                <th>Is required?</th>
+                <th *ngIf="showActions"></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let kpe of encounters">
+                    <td>{{kpe.encounter.name}}</td>
+                    <td>{{kpe.encounter.description}}</td>
+                    <td>{{kpe.encounter.xp}}</td>
+                    <td>{{kpe.encounter.status}}</td>
+                    <td>{{kpe.encounter.type}}</td>
+                    <td>{{kpe.encounter.range}}</td>
+                    <td>{{kpe.encounter.type === 'SOCIAL' ? kpe.encounter.peopleCount : ''}}</td>
+                    <td>{{kpe.encounter.type === 'LOCATION' ? kpe.encounter.image : ''}}</td>
+                    <td>{{kpe.isRequired === false ? 'NO' : 'YES'}}</td>
+                    <td *ngIf="showActions">
+                        <button color="accent" mat-icon-button (click)="deleteEncounter(kpe.id || 0)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <button color="primary" mat-icon-button (click)="editEncounter(kpe)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,10 @@
+<div class="centered-content">
+    <div *ngIf="!toggleOff">
+        <p>Toggle key point/object</p>
+        <button (click)="handleButtonClick()"> {{ markType }} </button>
+    </div>
+    
+    <div class="map-frame">
+        <div id="map"></div>      
+    </div>
+</div>

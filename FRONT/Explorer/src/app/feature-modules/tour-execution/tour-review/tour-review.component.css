@@ -1,0 +1,58 @@
+#tourReviewPage {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    float: left;
+}
+
+h1 {
+    font-size: 25px;
+    font-family: sans-serif;
+    font-style: oblique;
+    color: black;
+    font-weight: bold;
+    margin-top: 25px;
+    margin-left: 20px;
+}
+
+.textWrap {
+    flex-wrap: wrap;
+    max-width: 100px;
+    max-height: fit-content;
+    white-space: normal;
+    overflow: hidden;
+}
+
+table {
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    font-family: sans-serif;
+    font-size: 15px;
+    max-width: 700px;
+    word-wrap: break-word;
+    table-layout: fixed;
+}
+
+thead tr {
+    background-color: #d0b8ac;
+    color: black;
+    text-align: center;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+#buttonsAction {
+    justify-content: center;
+    align-items: center;
+    color: #bb886f;
+}

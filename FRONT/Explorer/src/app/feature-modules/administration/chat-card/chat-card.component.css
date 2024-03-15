@@ -1,0 +1,36 @@
+h2{
+    margin-bottom: 0.1rem;
+}
+
+p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+            line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.container {
+    padding: 0.5rem;
+    display: flex;
+    border-bottom: 1px solid black;
+}
+
+.container:hover{
+    background-color: lightcoral;
+}
+
+.contentContainer {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+}
+.read-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    margin-left: 5px; /* Adjust this value to control the spacing between the name and the indicator. */
+}

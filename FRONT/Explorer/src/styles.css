@@ -1,0 +1,258 @@
+/* You can add global styles to this file, and also import other style files */
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+:root {
+  /* blue color scheme */
+  --blue-light: #DAEAF1;
+  --blue-medium: #A7CDE3;
+  --blue-dark: #5989DF;
+  --blue-contrast: #262F44;
+
+  /* [NOT USED YET] green shades */
+  --green-not-so-green: #F5EFE7;
+  --green-light: #E9F5DB;
+  --green-medium: #CFE1B9;
+  --green-dark: #74C69D;
+  --green-contrast: #97A97C;
+
+  /* [NOT USED YET] purple color scheme */
+  --purple-light: #d7d1ee;
+  --purple-medium: #6e64b1;
+  --purple-dark: #4d41a7;
+  --purple-contrast: #ff9500;
+
+
+  --color-background: var(--blue-light);
+  --color-foreground: #ffffff;
+  --color-accent-light: var(--blue-medium);
+  --color-accent-dark: var(--blue-dark);
+  --color-accent-contrast: var(--blue-contrast);
+  --color-text: var(--color-accent-contrast);
+
+  --color-button-primary: var(--color-foreground);
+  --color-button-secondary: var(--color-accent-dark);
+  --color-button-ternary: var(--color-accent-contrast);
+
+  --font-body-size: 16px;
+  --font-heading-size: 32px;
+
+  --border-radius: 2px;
+  --content-top-padding: 80px;
+
+  --max-page-width: 1440px;
+  --min-page-height: 1080px;
+
+  --heading-height: 70px;
+  --heading-mobile-height: 50px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* */
+html,
+body {
+  height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text);
+}
+
+.btn {
+  padding: 1rem;
+}
+
+/* ReviewsDialogComponent styles */
+.reviews-dialog-container {
+  background-color: beige;
+  border-radius: 15px;
+  width: 30%;
+  max-width: 500px;
+  text-align: center;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.keypoints-map-dialog {
+  background-color: beige;
+  border-radius: 15px;
+  width: 90%;
+  height: 90%;
+  text-align: center;
+  color: brown;
+}
+
+.map-container {
+  width: 100%;
+  height: 90%;
+  z-index: 1;
+}
+
+.main-content {
+    max-width: var(--max-page-width);
+    min-height: var(--min-page-height);
+    width: 100%;
+    /*height: 95%;*/
+    font-size: var(--font-body-size);
+    margin: 0 auto;
+}
+
+.link-underline, .link-underline:visited, .link-underline:focus {
+    text-decoration: none;
+    color: var(--color-text);
+    position: relative;
+    cursor: pointer;
+}
+
+.link-underline:hover {
+    color: var(--color-accent-contrast);
+    opacity: 0.7;
+}
+
+.link-underline::before {
+    content: "";
+    position: absolute;
+    background-color: var(--color-text);
+    width: 0;
+    height: 3px;
+    border-radius: 5px;
+    bottom: -2px;
+    left: 0;
+    transition: width .3s ease-in-out;
+}
+
+.link-underline:hover::before {
+    width: 100%;
+}
+
+.link-underline--light {
+    color: var(--color-foreground);
+}
+
+.link-underline--light::before {
+    background-color: var(--color-foreground);
+}
+
+.link-underline--light:hover {
+    color: var(--color-accent-foreground);
+}
+
+/* BUTTONS */
+.button {
+    border-radius: var(--border-radius);
+    border-width: 0;
+    padding: 3px 20px;
+    text-transform: uppercase;
+    transition: 0.25s all ease-in-out;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 35px;
+}
+
+.button-primary {
+    background-color: var(--color-button-primary);
+    color: var(--color-button-secondary);
+}
+
+.button-secondary {
+    background-color: var(--color-button-secondary);
+    color: var(--color-button-primary);
+}
+
+.button-ternary {
+    background-color: var(--color-button-ternary);
+    color: var(--color-button-primary);
+}
+
+.button-primary:hover {
+    background-color: var(--color-button-secondary);
+    color: var(--color-button-primary);
+}
+
+.button-secondary:hover {
+    background-color: var(--color-button-primary);
+    color: var(--color-button-ternary);
+}
+
+.button-ternary:hover {
+    background-color: var(--color-button-primary);
+    color: var(--color-button-ternary);
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* FORM */
+
+/* ICONS */
+.icon {
+    line-height: 0;
+    transition: ease-in-out 0.1s;
+    width: 32px;
+    height: 32px;
+    color: var(--color-text);
+}
+
+.icon .mat-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 32px;
+}
+
+.icon:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+/* PSEUDO-ELEMENTS */
+
+::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar
+{
+	width: 8px;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+	border-radius: 8px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: var(--color-accent-dark);
+}
+
+
+
+
+/* BAD, ONLY WORKS IF HERE */
+.bottom-panel--newsletter .mat-mdc-text-field-wrapper {
+    background-color: white !important;
+    border-radius: 5px !important;
+}
+
+.bottom-panel--newsletter .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+}
+
+.bottom-panel--newsletter button {
+    height: 100%;
+}
+
+.bottom-panel--newsletter form {
+    display: flex;
+}

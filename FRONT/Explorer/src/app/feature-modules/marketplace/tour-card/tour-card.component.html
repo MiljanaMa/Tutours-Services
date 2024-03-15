@@ -1,0 +1,35 @@
+<div class="tour-card">
+    <h2 style="align-self: center;">{{tour.name}}</h2>
+    <p><strong>Description:</strong> {{tour.description}}</p>
+    <p><strong>Price:</strong> {{tour.price}} AC</p>
+    <p><strong>Type:</strong> {{tour.transportType}}</p>
+    <p><strong>Difficulty:</strong> {{tour.difficulty}}</p>    
+    <p><strong>Travel distance:</strong> {{tour.distance | number:'1.2-2'}} km</p>
+    <p><strong>Tour duration:</strong> {{tour.duration || 0 | time}}</p>
+    <div class="tag-list">
+        <strong>Tags:</strong><div class="tag" *ngFor="let tag of tour.tags">{{ tag }}</div>
+    </div>
+    <p><strong>Keypoints:</strong></p>
+    <table>
+        <thead>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Image</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{firstKp.name}}</td>
+                <td>{{firstKp.description}}</td>
+                <td>
+                    <img [src]="firstKp.image" alt="kp image" width="30px" height="30px">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6"><strong style="color: green;">Buy tour to see all of its keypoints!</strong></td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="button button-primary" (click)="addToCart()">Add to cart</button>
+    <button class="button button-primary" (click)="startTour(tour.id)">Start tour</button>
+    <button *ngIf="isInWishList"  class="button button-primary" (click)="removeFromWishList()">Remove from wish list</button>
+</div>

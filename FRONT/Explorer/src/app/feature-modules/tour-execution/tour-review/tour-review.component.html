@@ -1,0 +1,49 @@
+<h1>Tour review</h1>
+<hr>
+<div id="tourReviewPage">
+    <table id="tourReviews">
+        <thead>
+            <tr>
+                <th>Tour id</th>
+                <th>Rating</th>
+                <th style="width: 100px;">Comment</th>
+                <th>Visit date</th>
+                <th>Rating date</th>
+                <th>Images</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let rev of tourReview">
+                <td>{{rev.tourId}}</td>
+                <td>{{rev.rating}}</td>
+                <td class="textWrap">{{rev.comment}}</td>
+                <td>{{rev.visitDate |  date:'MM/dd/yyyy'}}</td>
+                <td>{{rev.ratingDate | date:'MM/dd/yyyy'}}</td>
+                <td>
+                    <div class="review-img">
+                        <img *ngFor="let i of rev.imageLinks" src="{{i}}" height="100" width="100">
+                    </div>
+                </td>
+                <td>
+                    <button id="buttonsAction" (click)="deleteTourReview(rev)" color="accent" mat-icon-button>
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+                <td>
+                    <button id="buttonsAction" style="color: #bb886f;" (click)="onEditClicked(rev)" color="primary" mat-icon-button>
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <button id="buttonsAction" (click)="onAddClicked()" color="primary" mat-icon-button>
+                    <mat-icon>add</mat-icon>
+                </button>
+            </tr>
+        </tbody>
+    </table>
+    <xp-tour-review-form *ngIf="shouldRenderTourReviewForm" (tourReviewUpdated)="getTourReviews()" [tourReview]="selectedTourReview" [shouldEdit]="shouldEdit"></xp-tour-review-form>
+</div>
+    

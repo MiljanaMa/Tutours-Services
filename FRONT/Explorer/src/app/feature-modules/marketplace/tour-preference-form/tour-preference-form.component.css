@@ -1,0 +1,36 @@
+.preferences-container {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    max-width: 700px;
+}
+
+.preferences-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.preferences-form p {
+    margin: 20px 0 0;
+}
+
+.tag-list {
+    display: flex;
+    gap: 10px;
+}
+
+.tag {
+    background-color: lightblue;
+    padding: 5px;
+    border-radius: 2px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.tag > button {
+    background: none;
+    border: none;
+    border-left: 1px solid black;
+    cursor: pointer;
+    padding-right: 0;
+}

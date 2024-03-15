@@ -1,0 +1,29 @@
+<div class="cont">
+    <h1>Shopping Cart</h1>
+</div>
+<div class="cont">
+    <div class="preferences-container">
+        <ng-container *ngIf="orders.length > 0; else emptyCart">
+            <ng-container *ngFor="let orderIdx of orders; index as i">
+                <xp-shopping-cart [order]="orders[i]"></xp-shopping-cart>
+                <mat-form-field class="couponField">
+                    <mat-label>Coupons</mat-label>
+                    <mat-select (valueChange)="selectCoupon(i, $event,orders[i].tourId!)" formControlName="couponId" matInput>
+                        <mat-option *ngFor="let coupon of coupons[i]" [value]="coupon.id" [disabled]="isCouponSelected(coupon.id)">{{coupon.code}} {{coupon.expiryDate}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+            </ng-container>
+        </ng-container>
+        <ng-template #emptyCart class="empty-cart">
+            <p>You don't have any items in your shopping cart!</p>
+        </ng-template>
+    </div>
+    <div class="total-price">
+        Total Price: {{ calculateTotalPrice() }} AC
+    </div>
+
+    <div class="checkout-button">
+        <td><button color="accent" mat-raised-button (click)="checkout()">Checkout</button></td>
+    </div>
+</div>

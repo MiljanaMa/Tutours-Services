@@ -1,0 +1,42 @@
+<div class="cont">
+    <button color="primary" class="btn" (click)="navigateToTourManagement(0)">
+        Create new tour
+    </button>
+</div>
+<div class="cont">
+    <div>
+        <h2>Tours</h2>
+        <table>
+            <thead>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Difficulty</th>
+                <th>Transport type</th>
+                <th>Status</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let t of tours">
+                    <td>{{t.id}}</td>
+                    <td>{{t.name}}</td>
+                    <td>{{t.description}}</td>
+                    <td>{{t.price}}</td>
+                    <td>{{t.difficulty}}</td>
+                    <td>{{t.transportType}}</td>
+                    <td>{{t.status}}</td>
+                    
+                    <td>
+                        <button color="accent" mat-icon-button (click)="deleteTour(t.id || 0)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <button color="primary" mat-icon-button (click)="navigateToTourManagement(t.id || 0)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

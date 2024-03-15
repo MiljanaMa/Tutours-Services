@@ -1,0 +1,27 @@
+.container {
+    display: flex;
+    padding: 0.5rem;
+    height: 80vh;
+}
+
+.chatPreview {
+    width: 40%;
+    height: 100%;
+    overflow-y:auto;
+    border: 5px solid #fff;
+    border-radius: 25px;
+    background-color: #f8f8f8;
+    padding: 15px;
+    margin: 5px;
+}
+
+.chatMessages {
+    width: 75%;
+    border: 1px solid #f8f8f8;
+    height: 100%;
+    border: 5px solid #fff;
+    border-radius: 25px;
+    padding: 15px;
+    background-color: #f8f8f8;
+    margin: 5px;
+}

@@ -1,0 +1,26 @@
+<div class="cont">
+    <div>
+        <h2 *ngIf="joinRequests.length !== 0">Join Requests</h2>
+        <h2 *ngIf="joinRequests.length === 0">You don't have join requests</h2>
+        <table>
+            <thead>
+                <th>ClubId</th>
+                <th>Status</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let jr of joinRequests">
+                    <td>{{jr.clubId}}</td>
+                    <td *ngIf="jr.status==0">Accepted</td>
+                    <td *ngIf="jr.status==1">Rejected</td>
+                    <td *ngIf="jr.status==2">Pending</td>
+                    <td *ngIf="jr.status==3">Canceled</td>
+                    <td>
+                        <button *ngIf="jr.status==2" aria-label="Cancel Request" type="submit" 
+                        (click)="cancelRequest(jr)" color="primary" mat-raised-button>cancel</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

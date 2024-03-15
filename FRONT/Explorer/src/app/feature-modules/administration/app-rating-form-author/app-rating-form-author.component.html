@@ -1,0 +1,19 @@
+<form [formGroup]="appRatingForm">
+    <div>
+        <mat-form-field>
+            <mat-label>Rate app(1-5)</mat-label>
+            <input matInput formControlName="rating" type="number">
+        </mat-form-field>
+        
+        <mat-form-field>
+            <mat-label>Comment:</mat-label>
+            <textarea matInput
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="1"
+            formControlName="comment"
+            cdkAutosizeMaxRows="5"></textarea>        
+        </mat-form-field>
+        <button class="button button-primary" type="submit" (click)="saveAppRating()">submit</button>
+    </div>
+   
+</form>

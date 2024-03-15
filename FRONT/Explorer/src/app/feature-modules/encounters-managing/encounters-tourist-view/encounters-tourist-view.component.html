@@ -1,0 +1,177 @@
+
+<button mat-button color="primary" class="stats-button" (click)="openStatisticsModal()" mat-raised-button>See Statistics</button>
+
+<div class="split">
+<div class="cont">   
+
+    <div class="menu">
+        <button mat-raised-button (click)="showTableAndSetMarkers('showAll')">All active</button>
+        <button mat-raised-button (click)="showTableAndSetMarkers('showStarted')">Started</button>
+        <button mat-raised-button (click)="showTableAndSetMarkers('showCompleted')">Completed</button>
+        <button mat-raised-button (click)="showTableAndSetMarkers('showFailed')">Failed</button>
+        <button mat-raised-button (click)="showTableAndSetMarkers('showMy')">My</button>
+    </div> 
+    <div *ngIf="showContent === 'showAll'">
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Xp</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let e of allEncounters">
+                    <td>{{e.name}}</td>
+                    <td>{{e.description}}</td>
+                    <td>{{e.latitude}}</td>
+                    <td>{{e.longitude}}</td>
+                    <td>{{e.xp}}</td>
+                    <td>{{e.status}}</td>
+                    <td>{{e.type}}</td>
+                    <td>
+                        <button *ngIf="e.type !== 'SOCIAL'" aria-label="Start" type="submit" 
+                        (click)="startEncounter(e)" color="primary" mat-raised-button>Start</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="showContent === 'showStarted'">
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Xp</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let e of startedEncounters">
+                    <td>{{e.encounter.name}}</td>
+                    <td>{{e.encounter.description}}</td>
+                    <td>{{e.encounter.latitude}}</td>
+                    <td>{{e.encounter.longitude}}</td>
+                    <td>{{e.xp}}</td>
+                    <td>{{e.status}}</td>
+                    <td>{{e.encounter.type}}</td>
+                    <td>{{e.lastUpdatedAt | date:'medium'}}</td>
+                    <td>
+                        <button *ngIf="e.encounter.type === 'MISC'" aria-label="Finish" type="submit" 
+                        (click)="finishEncounter(e.encounter)" color="primary" mat-raised-button>Finish</button>
+                    </td>
+                    <td>{{e.lastUpdatedAt | date:'medium'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="showContent === 'showCompleted'">
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Xp</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Date</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let e of completedEncounters">
+                    <td>{{e.encounter.name}}</td>
+                    <td>{{e.encounter.description}}</td>
+                    <td>{{e.encounter.latitude}}</td>
+                    <td>{{e.encounter.longitude}}</td>
+                    <td>{{e.xp}}</td>
+                    <td>{{e.status}}</td>
+                    <td>{{e.encounter.type}}</td>
+                    <td>{{e.lastUpdatedAt | date:'medium'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="showContent === 'showFailed'">
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Xp</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Date</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let e of failedEncounters">
+                    <td>{{e.encounter.name}}</td>
+                    <td>{{e.encounter.description}}</td>
+                    <td>{{e.encounter.latitude}}</td>
+                    <td>{{e.encounter.longitude}}</td>
+                    <td>{{e.xp}}</td>
+                    <td>{{e.status}}</td>
+                    <td>{{e.encounter.type}}</td>
+                    <td>{{e.lastUpdatedAt | date:'medium'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="showContent === 'showMy'">
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Xp</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Approval status</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let e of touristEncounters">
+                    <td>{{e.name}}</td>
+                    <td>{{e.description}}</td>
+                    <td>{{e.latitude}}</td>
+                    <td>{{e.longitude}}</td>
+                    <td>{{e.xp}}</td>
+                    <td>{{e.status}}</td>
+                    <td>{{e.type}}</td>
+                    <td>{{e.approvalStatus}}</td>
+                    <td>
+                        <button color="accent" mat-icon-button (click)="deleteEncounter(e.id || 0)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <button color="primary" mat-icon-button (click)="selectEncounterForUpdate(e)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button *ngIf="canCreateEncounters" color="primary" type="submit" (click)="addEncounter()" mat-raised-button>Add new</button>   
+        
+        <xp-encounter-form class="form-container" *ngIf="showForm" [selectedEncounter]="selectedEncounter" (encounterUpdated)="encounterUpdated()" [mode]="formMode"></xp-encounter-form>
+
+    </div>
+</div>
+
+<div class="map-container">
+    <app-map [enableClicks]="false" [toggleOff]="true"
+        [allowMultipleMarkers]="false" [markerPositions]="pointsOfInterest"></app-map>
+</div>
+
+</div>

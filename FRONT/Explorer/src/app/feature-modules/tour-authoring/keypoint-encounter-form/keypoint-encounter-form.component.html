@@ -1,0 +1,70 @@
+<div class="cont">
+    <form [formGroup]="encounterForm">
+        <div class="form-fields-container">
+            <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" type="text"/>
+            </mat-form-field>
+                
+            <mat-form-field>
+                <mat-label>Description</mat-label>
+                <textarea matInput
+                cdkTextareaAutosize
+                cdkAutosizeMinRows="1"
+                formControlName="description"
+                cdkAutosizeMaxRows="5"></textarea>
+              </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Xp</mat-label>
+                <input matInput formControlName="xp" type="number" min="1"/>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Range</mat-label>
+                <input matInput formControlName="range" type="number" min="1"/>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="mode=='edit'">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status" matInput required>
+                    <mat-option value="ACTIVE">Active</mat-option>
+                    <mat-option value="DRAFT">Draft</mat-option>
+                    <mat-option value="ARCHIVED">Archived</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="mode!=='edit'">
+                <mat-label>Type</mat-label>
+                <mat-select formControlName="type" matInput required>
+                    <mat-option value="SOCIAL">Social</mat-option>
+                    <mat-option value="LOCATION">Location</mat-option>
+                    <mat-option value="MISC">Misc</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="encounterForm.get('type')?.value === 'SOCIAL'">
+                <mat-label>People required number</mat-label>
+                <input matInput formControlName="peopleCount" type="number" min="1"/>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="encounterForm.get('type')?.value === 'LOCATION'">
+                <mat-label>Image</mat-label>
+                <input matInput formControlName="image" type="text"/>
+            </mat-form-field>
+            
+            <mat-form-field>
+                <mat-label>Is required for completion?</mat-label>
+                <mat-select formControlName="isRequired" matInput required>
+                    <mat-option value="YES">YES</mat-option>
+                    <mat-option value="NO">NO</mat-option>
+                </mat-select>
+            </mat-form-field>
+    
+            <button color="primary" type="submit" (click)="saveEncounter()" mat-raised-button [disabled]="!encounterForm.valid">
+                <span *ngIf="mode === 'add'">Add new encounter</span>
+                <span *ngIf="mode === 'edit'">Update encounter</span>
+            </button>
+        </div>
+    </form>
+</div>

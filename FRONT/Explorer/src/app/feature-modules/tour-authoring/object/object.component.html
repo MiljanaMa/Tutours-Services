@@ -1,0 +1,44 @@
+<div class="cont">
+    <div>
+        <h2>Objects</h2>
+        <table>
+            <thead>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th>Category</th>
+                <th></th>
+                <th>Request public status</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let t of objects">
+                    <td>{{t.id}}</td>
+                    <td>{{t.name}}</td>
+                    <td>{{t.description}}</td>
+                    <td>{{t.image}}</td>
+                    <td>{{t.category}}</td>
+                    <td>
+                        <button color="accent" mat-icon-button (click)="deleteObject(t.id || 0)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <button color="primary" mat-icon-button (click)="onEditClicked(t)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                    <td>
+                        <button color="primary" mat-icon-button (click)="onSendRequestClicked(t.id || 0)">
+                            <mat-icon>send request</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <button color="primary" mat-icon-button (click)="onAddClicked()">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <xp-object-form *ngIf="renderObject" [mode]="mode" [object]="selectedObject" (objectUpdated)="getObjects()"></xp-object-form>
+</div>

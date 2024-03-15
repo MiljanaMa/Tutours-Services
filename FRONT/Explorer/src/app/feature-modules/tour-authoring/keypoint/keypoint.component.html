@@ -1,0 +1,41 @@
+<div class="cont">
+    <div>
+        <table>
+            <thead>
+                <th *ngIf="!isCustom">Position</th>
+                <th>Name</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th *ngIf="!isCustom"></th>
+                <th *ngIf="!isCustom">Request public KP</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let kp of keypoints">
+                    <td *ngIf="!isCustom">{{kp.position}}</td>
+                    <td>{{kp.name}}</td>
+                    <td>{{kp.latitude}}</td>
+                    <td>{{kp.longitude}}</td>
+                    <td>{{kp.description}}</td>
+                    <td>
+                        <img [src]="kp.image" alt="kp image" width="30px" height="30px">
+                    </td>
+                    <td>
+                        <button color="accent" mat-icon-button (click)="deleteKeypoint(kp.id || 0)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <button *ngIf="!isCustom" color="primary" mat-icon-button (click)="onEditClicked(kp)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                    <td *ngIf="!isCustom">
+                        <button color="primary" mat-icon-button (click)="sendPublicEntityRequest(kp.id || 0)">
+                            <mat-icon>send request</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

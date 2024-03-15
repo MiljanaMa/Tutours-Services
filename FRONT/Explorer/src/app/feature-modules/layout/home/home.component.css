@@ -1,0 +1,387 @@
+#mainContainer {
+    height: 100%;
+    width: 100%;
+    background-color: #DAEAF1;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #F5EEC8;
+    color: #192655;
+    padding: 10px 20px;
+}
+
+.navbar-modules {
+    display: flex;
+    align-items: center;
+    font-family: 'Raleway', sans-serif;
+}
+
+.navbar-modules a {
+    text-decoration: none;
+    color: #192655;
+    margin-right: 20px;
+}
+
+.app-name {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.navbar-actions a {
+    text-decoration: none;
+    color: #192655;
+    margin-right: 20px;
+}
+
+header {
+    background: #F5EEC8;
+    padding: 10px;
+}
+nav ul {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+    display: inline;
+}
+nav ul li {
+    margin-right: 20px;
+}
+nav a {
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+}
+
+#toursContainer
+{
+    height: 450px;
+    width: 90%;
+    padding-top: 3%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.categoryName
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+}
+
+.p-card-label
+{
+    width: 55%;
+    height: 35px;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 1% 5% 1% 5% ;
+    border-radius: 25px;
+}
+
+.p-card-description
+{
+    font-size: 15px;
+    padding: 1% 5% 1% 5% ;
+}
+
+.p-header
+{
+    font-size: 25px;
+    font-weight: 400;
+}
+
+.p-regular
+{
+    font-size: 17px;
+    font-weight: 350;
+}
+
+#cardsContainer 
+{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    height: 950px;
+    width: 100%;
+    padding: 1%;
+}
+
+.card {
+    flex-basis: 23%;
+    max-width: 23%;
+    height: 40%;
+    border-radius: 7px;
+    background-color: #EBF3E8;
+}
+
+.cardText {
+    width: 99%;
+    height: 40%;
+    border-radius: 7px;
+}
+
+.cardImg {
+    width: 99%;
+    height: 60%;
+    object-fit: cover;
+    border-radius: 7px;
+}
+
+#otherContainer {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin-top: 3%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.panel {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #CEDEBD;
+    border-radius: 10px;
+    padding: 20px 10px
+}
+
+footer {
+    background: #F5EEC8;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+.fancyButton {
+    background: #186F65;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+.fancyButton:hover {
+    color: black;
+}
+
+.footerLink {
+    color: black;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #4942E4;
+}
+
+.center-container {
+    margin: 0 auto;
+    /* Center horizontally */
+    text-align: center;
+    /* Center the content within the container */
+    max-width: 70%;
+}
+
+#bottomContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+    height: 450px;
+    width: 90%;
+    margin: 1.5% auto 0px auto;
+    border-radius: 15px;
+}
+
+.bottom-panel {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    border-top: 2px solid black;
+    margin: 0.5% 0% 0% 3%;
+    padding-left: 2%;
+    flex-basis: 30%;
+    width: 30%;
+    height: 100%;
+}
+
+.p-footer {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.scam-button {
+    position: relative;
+    background-color: #FF0000;
+    border: none;
+    color: green;
+    font-size: 28px;
+    padding: 5px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+.scam-button:hover {
+    animation: flash 0.1s infinite;
+}
+
+@keyframes flash {
+    0% {
+        background-color: #FF0000;
+    }
+
+    50% {
+        background-color: #FFFF00;
+    }
+
+    100% {
+        background-color: #FF0000;
+    }
+}
+
+.popup {
+    visibility: hidden;
+    position: absolute;
+    background-color: #ffffff;
+    font-size: medium;
+    color: #000000;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.popup::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #ffffff transparent transparent transparent;
+}
+
+.cheapskate {
+    background-color: #FF0000;
+    color: #ffffff;
+    font-size: 28px;
+    padding: 5px 32px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+.hero-image {
+    position: relative;
+}
+
+.hero-image img {
+    width: 100%;
+    object-fit: cover;
+}
+
+.hero-image .welcome-text {
+    font-size: 42px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 80px;
+    animation: fadeIn 5s 5s;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.image-with-text {
+    display: flex;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 50px 10px;
+}
+
+.image-with-text > div, .image-with-text img {
+    border-radius: 15px;
+}
+
+.image-with-text .text {
+    padding: 20px;
+    font-size: 32px;
+    text-align: center;
+    background-color: var(--color-foreground);
+    line-height: initial;
+}
+
+.text .button {
+    margin-top: 100px; 
+    padding: 10px 30px;
+}
+
+.featured-blogs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.blog-card {
+    background-color: var(--color-foreground);
+    border-radius: 15px;
+    padding: 20px;
+    line-height: initial;
+    cursor: pointer;
+    text-decoration: none !important;
+    color: var(--color-text);
+}
+
+.blog-card:hover img{
+    transform: scale(1.05);
+}
+
+.blog-card .title {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.blog-card .date {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgb(80, 80, 80);
+    padding: 10px 0;
+}
+
+.blog-card .img {
+    height: 200px;
+}
+
+.blog-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 1s;
+}
+
+.blog-card .summary {
+    margin-top: 10px;
+}

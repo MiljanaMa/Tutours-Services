@@ -1,0 +1,90 @@
+<div class="cont">
+    <form [formGroup]="encounterForm">
+        <div class="form-fields-container">
+            <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" type="text"/>
+            </mat-form-field>
+                
+            <mat-form-field>
+                <mat-label>Description</mat-label>
+                <textarea matInput
+                cdkTextareaAutosize
+                cdkAutosizeMinRows="1"
+                formControlName="description"
+                cdkAutosizeMaxRows="5"></textarea>
+              </mat-form-field>
+    
+            <mat-form-field>
+                <mat-label>Latitude</mat-label>
+                <input matInput formControlName="latitude" type="number" min="-90" max="90"/>
+            </mat-form-field>
+    
+            <mat-form-field>
+                <mat-label>Longitude</mat-label>
+                <input matInput formControlName="longitude" type="number" min="-180" max="180"/>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Xp</mat-label>
+                <input matInput formControlName="xp" type="number" min="1"/>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Range</mat-label>
+                <input matInput formControlName="range" type="number" min="1"/>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="mode=='edit'">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status" matInput required>
+                    <mat-option value="ACTIVE">Active</mat-option>
+                    <mat-option value="DRAFT">Draft</mat-option>
+                    <mat-option value="ARCHIVED">Archived</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="mode!=='edit'">
+                <mat-label>Type</mat-label>
+                <mat-select formControlName="type" matInput required>
+                    <mat-option value="SOCIAL">Social</mat-option>
+                    <mat-option value="LOCATION">Location</mat-option>
+                    <mat-option value="MISC">Misc</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="encounterForm.get('type')?.value === 'SOCIAL'">
+                <mat-label>People required number</mat-label>
+                <input matInput formControlName="peopleCount" type="number" min="1"/>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="encounterForm.get('type')?.value === 'LOCATION'">
+                <mat-label>Image</mat-label>
+                <input matInput formControlName="image" type="text"/>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="encounterForm.get('type')?.value === 'LOCATION'">
+                <mat-label>Hidden location latitude</mat-label>
+                <input matInput formControlName="imageLatitude" type="text"/>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="encounterForm.get('type')?.value === 'LOCATION'">
+                <mat-label>Hidden location longitude</mat-label>
+                <input matInput formControlName="imageLongitude" type="text"/>
+            </mat-form-field>
+    
+            <button color="primary" type="submit" (click)="saveEncounter()" mat-raised-button [disabled]="!encounterForm.valid">
+                <span *ngIf="mode === 'add'">Add new encounter</span>
+                <span *ngIf="mode === 'edit'">Update encounter</span>
+            </button>
+        </div>
+    </form>
+
+    <div class="map-container">
+        <app-map [enableClicks]="true" [toggleOff]="true" [allowMultipleMarkers]="false" (clickEvent)="fillCoords($event)"></app-map>
+        <button (click)="toggleMapControl()" *ngIf="encounterForm.get('type')?.value === 'LOCATION'">
+            <span *ngIf="mapControl === 'encounterLocation'">Change to image location set</span>
+            <span *ngIf="mapControl === 'imageLocation'">Change to encounter location set</span>
+        </button>
+    </div>
+</div>

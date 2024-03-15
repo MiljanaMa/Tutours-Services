@@ -1,0 +1,37 @@
+<div class="container">
+    <h1>
+      <img src="assets/images/competition.png" />
+      Clubs rankings
+      <img src="assets/images/competition.png" />
+    </h1>
+
+    <select id="sortSelect" [(ngModel)]="sortOrder" (change)="updateSortOrder(sortOrder)" class="custom-select">
+      <option value="wins">Wins</option>
+      <option value="xp">XP</option>
+    </select>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Wins</th>
+          <th>Members</th>
+          <th>XP</th>
+          <th>Achievements</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let club of clubs; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td><img src="{{ club.image }}" class="img_table" /></td>
+          <td>{{ club.name }}</td>
+          <td>{{ club.fightsWon }}</td>
+          <td>{{ club.members?.length}}</td>
+          <td>{{ getXP(club)}}</td>
+          <td>{{ club.achievements?.length}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>

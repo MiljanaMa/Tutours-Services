@@ -1,0 +1,51 @@
+<form [formGroup]="objectForm">
+    <div>
+        <mat-form-field>
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" type="text"/>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Latitude</mat-label>
+            <input matInput formControlName="latitude" type="number" min="-90" max="90"/>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Longitude</mat-label>
+            <input matInput formControlName="longitude" type="number" min="-180" max="180"/>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Description</mat-label>
+            <textarea matInput
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="1"
+            formControlName="description"
+            cdkAutosizeMaxRows="5"></textarea>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Image</mat-label>
+            <textarea matInput
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="1"
+            formControlName="image"
+            cdkAutosizeMaxRows="5"></textarea>
+          </mat-form-field>
+  
+          <mat-form-field>
+              <mat-label>Category</mat-label>
+              <mat-select formControlName="category" matInput required>
+                  <mat-option value="RESTAURANT">RESTAURANT</mat-option>
+                  <mat-option value="PARKING">PARKING</mat-option>
+                  <mat-option value="WC">WC</mat-option>
+                  <mat-option value="OTHER">OTHER</mat-option>  
+              </mat-select>
+          </mat-form-field>
+
+          <button color="primary" type="submit" (click)="saveObject()" mat-raised-button>
+              <span *ngIf="mode === 'add'">Add new object</span>
+              <span *ngIf="mode === 'edit'">Update object</span>
+          </button>
+      </div>
+  </form>

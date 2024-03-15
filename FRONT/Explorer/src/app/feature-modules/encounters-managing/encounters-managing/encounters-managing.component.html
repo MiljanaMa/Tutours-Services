@@ -1,0 +1,20 @@
+<div>
+    <h2>Encounters</h2>
+    <div class="content-container">
+        <div>
+            <xp-encounters-preview [showActions]="true" [encounters]="encounters" (encounterSelected)="selectEncounter($event)" (encounterDeleted)="encounterDeleted()"></xp-encounters-preview>
+            <button color="primary" type="submit" (click)="addEncounter()" mat-raised-button>
+                Add new
+            </button>
+        </div>
+        
+        <div>
+            <xp-encounter-form class="form-container" *ngIf="showForm" [selectedEncounter]="selectedEncounter" (encounterUpdated)="encounterUpdated()" [mode]="formMode"></xp-encounter-form>
+        </div>
+
+        <div>
+            <xp-encounters-requests [encounterRequests]="encounterRequests" (approvalStatusChanged)="approvalStatusChanged()"></xp-encounters-requests>
+        </div>
+
+    </div>
+</div>

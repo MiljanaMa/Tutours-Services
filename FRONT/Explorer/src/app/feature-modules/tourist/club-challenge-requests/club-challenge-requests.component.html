@@ -1,0 +1,29 @@
+<div class="scrollbar">
+    <table>
+        <thead>
+            <th></th>
+            <th>Challenger name</th>
+            <th>Owner</th>
+            <th>FightsWon</th>
+            <th></th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let request of requests">
+                <td>
+                    <img [src]="request.challenger?.image" height="50px" width="50px">
+                </td>
+                <td>{{request.challenger?.name}}</td>
+                <td>{{request.challenger?.owner?.name}} {{request.challenger?.owner?.surname}}</td>
+                <td>{{request.challenger?.fightsWon}}</td>
+                <td *ngIf="ownerPanel && request.status === 'PENDING'">
+                    <button class="quick-action-btn" color="primary" style="background-color: darkgreen;" mat-raised-button (click)="acceptRequest(request)">
+                        <span>Accept</span>
+                    </button>
+                    <button class="quick-action-btn" color="primary" style="background-color: darkred;" mat-raised-button (click)="declineRequest(request)">
+                        <span>Decline</span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

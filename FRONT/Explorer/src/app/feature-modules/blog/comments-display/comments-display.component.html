@@ -1,0 +1,26 @@
+<div class="main">
+    <xp-comment-form *ngIf="blog.systemStatus !== 'CLOSED'" (commentAdded)="getComments()" [blog]="blog" [comment]="comment" [editMode]="editMode"
+    style="padding-top: 1em;"></xp-comment-form>
+    <div *ngFor="let c of comments" class="comment">
+        <div class="comment-header">
+            <p class="p-comment-header">{{c.username}}</p>
+            <p style="margin: 1% 0% 0% 75%; font-style: italic;" *ngIf="c.lastEditTime !== c.postTime">edited</p>
+            <button *ngIf="userId === c.userId" mat-icon-button [matMenuTriggerFor]="menu" style="margin-top: -1%; margin-left: auto;">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="onUpdateClicked(c)" color="accent">
+                  <mat-icon [ngStyle]="{'color':'#5989DF'}">edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item (click)="onDeleteClicked(c)">
+                  <mat-icon [ngStyle]="{'color':'#5989DF'}">delete</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+        </div>
+        <div class="comment-body">
+            <p class="p-comment-body">{{c.comment}}</p>
+        </div>
+    </div>
+</div>

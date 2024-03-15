@@ -1,0 +1,28 @@
+<div id="equipment">
+    <h1>My Equipment</h1>
+    <hr>
+    <div id="equipment-details">
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Selected</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let eq of equipment">
+                    <td>{{eq.name}}</td>
+                    <td>{{eq.description}}</td>
+                    <td>
+                        <input type="checkbox"  [checked]="eq.isSelected" (change)="selectEquipment(eq.id, eq.isSelected)">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+   
+    </div>
+</div>
+

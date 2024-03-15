@@ -1,0 +1,108 @@
+<div class="cont" *ngIf="tourId !== 0">
+    <div>
+        <h1>Tour information</h1>
+        <p><strong>Name:</strong> {{tour.name}}</p>
+        <p><strong>Description:</strong> {{tour.description}}</p>
+        <p><strong>Price:</strong> {{tour.price}} AC</p>
+        <p><strong>Type:</strong> {{tour.transportType}}</p>
+        <p><strong>Difficulty:</strong> {{tour.difficulty}}</p>
+        <p><strong>Status:</strong> {{tour.status}} (Last updated: {{tour.statusUpdateTime | date:'long'}})</p>
+        
+        <p *ngIf="tour.distance"><strong>Travel distance:</strong> {{tour.distance | number:'1.2-2'}} km</p>
+        <p *ngIf="tour.duration"><strong>Tour duration:</strong> {{tour.duration | time}}</p>
+        <div class="tag-list">
+            <strong>Tour tags: </strong><div class="tag" *ngFor="let tag of tour.tags">{{ tag }}</div>
+        </div>
+    </div>  
+    <div>
+        <h1>Keypoints information</h1>
+        <h4>(Edit keypoint to add encounter)</h4>
+        <xp-keypoint [keypoints]="keypoints" (keypointDeleted)="getTourKeypoints()" (keypointSelected)="selectKeypoint($event)"></xp-keypoint>
+    </div> 
+</div>
+<hr>
+<div class="cont">
+    <div>
+        <h1 *ngIf="tourId===0">1. step: create tour draft</h1>
+        <form [formGroup]="tourForm">
+            <div class="somediv">
+                <mat-form-field>
+                    <mat-label>Name</mat-label>
+                    <input matInput formControlName="name" type="text"/>
+                </mat-form-field>
+        
+                <mat-form-field>
+                  <mat-label>Description</mat-label>
+                  <textarea matInput
+                  cdkTextareaAutosize
+                  cdkAutosizeMinRows="1"
+                  formControlName="description"
+                  cdkAutosizeMaxRows="5"></textarea>
+                </mat-form-field>
+
+                <mat-form-field *ngIf="tourId !== 0">
+                    <mat-label>Price</mat-label>
+                    <input matInput formControlName="price" type="number" min="0"/>
+                </mat-form-field>
+        
+                <mat-form-field>
+                    <mat-label>Difficulty</mat-label>
+                    <mat-select formControlName="difficulty" matInput required>
+                        <mat-option value="EASY">Easy</mat-option>
+                        <mat-option value="MEDIUM">Medium</mat-option>
+                        <mat-option value="HARD">Hard</mat-option>
+                        <mat-option value="EXTREME">Extreme</mat-option>
+                    </mat-select>
+                </mat-form-field>
+        
+                <mat-form-field>
+                    <mat-label>Transport type</mat-label>
+                    <mat-select formControlName="transportType" matInput required>
+                        <mat-option value="WALK">Walk</mat-option>
+                        <mat-option value="BIKE">Bike</mat-option>
+                        <mat-option value="CAR">Car</mat-option>
+                        <mat-option value="BOAT">Boat</mat-option>
+                    </mat-select>
+                </mat-form-field>
+        
+                <div *ngIf="tourId !== 0">
+                    <div>
+                        <mat-form-field>
+                            <mat-label>Tags</mat-label>
+                            <input matInput type="text" formControlName="newTag"/>
+                        </mat-form-field>
+                        <button color="primary" type="submit" mat-raised-button (click)="addTag()">Add Tag</button>
+                    </div>
+                    <p>Selected tags:</p>
+                    <div class="tag-list">
+                        <div class="tag" *ngFor="let tag of tour.tags">{{ tag }}
+                            <button (click)="removeTag(tag)">X</button>
+                        </div>
+                    </div>
+                </div>
+        
+                <button color="primary" type="submit" (click)="saveTour()" mat-raised-button [disabled]="!tourForm.valid">
+                    <span>Save</span> <span *ngIf="tourId === 0 || tour.status === 'DRAFT'">(DRAFT)</span>
+                </button>
+                <button *ngIf="tour.id !== 0 && tour.status !== 'PUBLISHED'" class="btn green" color="primary" type="submit" (click)="saveTour('publish')" mat-raised-button
+                    [disabled]="!tourForm.valid || keypoints.length < 2">
+                    <span>Publish tour</span>
+                </button>
+                <button *ngIf="tour.status === 'PUBLISHED'" class="btn yellow" color="primary" type="submit" (click)="saveTour('archive')" mat-raised-button>
+                    <span>Archive tour</span>
+                </button>
+            </div>
+        </form>
+    </div>
+    <div *ngIf="tourId !== 0" style="width: 80%;">
+        <xp-keypoint-form [tourId]="tourId" [routeQuery]="routeQuery" [keypointsCount]="keypoints.length"
+        [mode]="mode" [selectedKeypoint]="selectedKeypoint" (keypointsUpdated)="getTourKeypoints()" (routeFound)="setTourRoute($event)"></xp-keypoint-form>
+        <br>
+        <div *ngIf="mode === 'edit'">
+            <xp-keypoint-encounters-managing [selectedKeypoint]="selectedKeypoint"></xp-keypoint-encounters-managing>
+        </div>
+    </div>
+</div>
+
+
+

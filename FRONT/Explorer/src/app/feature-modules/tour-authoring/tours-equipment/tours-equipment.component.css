@@ -1,0 +1,54 @@
+.equipment-list {
+  width: 300px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  float: right;
+  margin-top: -5%;
+}
+
+.equipment-list h2 {
+  text-align: left;
+}
+
+.equipment-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.equipment-list li {
+  margin-bottom: 10px;
+}
+
+.btn {
+  margin-left: 10px;
+}
+
+.add-button {
+  background-color: green;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: darkgreen;
+}
+
+.remove-button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.remove-button:hover {
+  background-color: darkred;
+}
+
+  

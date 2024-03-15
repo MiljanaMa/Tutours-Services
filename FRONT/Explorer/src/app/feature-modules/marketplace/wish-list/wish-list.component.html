@@ -1,0 +1,18 @@
+
+<div class="cont">
+    <h1>Wish list</h1>
+</div>
+<div class="cont">
+    <div class="cont">
+        <ng-container *ngIf="wishListItems.length > 0; else emptyWishList">
+            <!--xp-wish-list-items *ngFor="let item of wishListItems" [item]="item"></xp-wish-list-items-->
+            <xp-tour-card *ngFor="let tour of wishedTours" [tour]="tour"></xp-tour-card>
+
+        </ng-container>
+        <ng-template #emptyWishList class="empty-cart">
+            <p>You don't have any tours saved in your wish list!</p>
+        </ng-template>
+    </div>
+    
+
+</div>

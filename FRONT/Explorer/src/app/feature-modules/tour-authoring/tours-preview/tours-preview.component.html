@@ -1,0 +1,32 @@
+<div id="equipment">
+    <hr>
+    <div id="equipment-details">
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tour name</th>
+                    <th>Description</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let tour of tours">
+                    <td>{{tour.name}}</td>
+                    <td>{{tour.description}}</td>
+                    <td>
+                        <button color="primary"  mat-icon-button (click)="onEditClicked(tour)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+    </div>
+    </div>
+    <xp-tours-equipment *ngIf="renderTourEquipment" [tour]="selectedTour"></xp-tours-equipment>
+</div>
+

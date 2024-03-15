@@ -1,0 +1,58 @@
+textarea {
+    resize: none;
+ }
+
+.timestamp{
+    font-size: small;
+    color: gray;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2rem;
+    height: 80vh;
+}
+
+#messages {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 85%;
+    overflow-y:auto;
+    padding: 0.5rem;
+}
+
+.messageForm {
+    padding-top: 0.3rem;
+    display: flex;
+    height: 10%;
+}
+
+.message-bubble{
+    border: 2px solid #FFF;
+    background-color: #DAEAF1;
+    border-radius: 10px;
+    margin: 5px;
+    padding: 5px;
+}
+
+.custom-button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5989DF;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.textarea{
+    margin: 10px;
+    width: 85%; 
+    height: 80%; 
+    font-size: medium; 
+    padding: 0.7rem;
+}
+

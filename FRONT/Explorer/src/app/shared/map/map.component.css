@@ -1,0 +1,18 @@
+.map-frame {
+    border: 2px solid black;
+}
+
+#map {
+    height: 600px;
+}
+
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

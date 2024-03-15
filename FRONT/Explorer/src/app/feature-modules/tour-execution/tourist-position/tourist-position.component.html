@@ -1,0 +1,8 @@
+<div class="tourist-position-container">
+    <h2 *ngIf="touristPosition">Your current position: {{ touristPosition.longitude }}°, {{ touristPosition.latitude }}°</h2>
+    <h2 *ngIf="!touristPosition">Your position is not set, please click on the map and confirm: </h2>
+    <div class="map-container">
+        <app-map [enableClicks]="true" [toggleOff]="true" [markerPosition]="touristMapPosition" [allowMultipleMarkers]="false" (clickEvent)="updateTouristPosition($event)"></app-map>
+    </div>
+    <button color="primary" type="submit" (click)="confirmPosition()" mat-raised-button>Confirm</button>
+</div>

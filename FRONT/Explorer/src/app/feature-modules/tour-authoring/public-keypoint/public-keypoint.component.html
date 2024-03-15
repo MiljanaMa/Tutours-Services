@@ -1,0 +1,30 @@
+<div class="cont">
+    <div>
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th>Action</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let kp of publicKeypoints">
+                    <td>{{kp.name}}</td>
+                    <td>{{kp.latitude}}</td>
+                    <td>{{kp.longitude}}</td>
+                    <td>{{kp.description}}</td>
+                    <td>
+                        <img [src]="kp.image" alt="kp image" width="30px" height="30px">
+                    </td>
+                    <td>
+                        <button color="accent" mat-icon-button (click)="onSelectClicked(kp)">
+                            <mat-icon>add_circle</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

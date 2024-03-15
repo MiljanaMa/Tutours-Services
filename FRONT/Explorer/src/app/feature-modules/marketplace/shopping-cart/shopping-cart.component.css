@@ -1,0 +1,50 @@
+.somediv {
+  width: 665px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.somediv h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.somediv p {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.somediv p strong {
+  color: #333;
+}
+
+.somediv p span {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.somediv p span s {
+  color: #999;
+  margin-right: 10px;
+}
+
+.tag {
+  background-color: lightblue;
+  padding: 5px;
+  border-radius: 2px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.somediv button {
+  position:absolute;
+  bottom: 20px;
+  right: 15px;
+}

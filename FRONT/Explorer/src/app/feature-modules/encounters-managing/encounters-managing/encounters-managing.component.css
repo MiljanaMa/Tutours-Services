@@ -1,0 +1,14 @@
+.content-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 40px;
+    gap: 50px;
+}
+
+.content-container > .form-container {
+    width: 100%;
+}
+
+button { 
+    margin-top: 10px;
+}

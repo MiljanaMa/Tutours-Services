@@ -1,0 +1,25 @@
+<div class="preferences-container">
+    <div *ngIf="mode == 'preview' && !tourPreference">
+        <h2>You don't have any preferences</h2>
+        <div class="button-container">
+            <button color="primary" type="submit" (click)="addTourPreference()" mat-raised-button>Add Preference</button>
+        </div>
+    </div>
+    <div *ngIf="mode == 'preview' && tourPreference"> 
+        <div>
+            <h2>My Preferences</h2>
+            <p>Difficulty: {{ tourPreference.difficulty }}</p>
+            <p>Transport Type: {{ tourPreference.transportType }}</p>
+            <div class="tag-list">
+                <p>Tags: </p>
+                <div class="tag" *ngFor="let tag of tourPreference.tags">{{ tag }}</div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button color="primary" type="submit" (click)="editTourPreference()" mat-raised-button>Edit Preferences</button>
+            <button color="warn" type="submit" (click)="deleteTourPreference()" mat-raised-button>Delete Preferences</button>
+        </div>
+    </div>
+    <xp-tour-preference-form *ngIf="shouldRenderTourPreferencesForm" [mode]="mode" [tourPreference]="tourPreference" (tourPreferenceUpdated)="getTourPreference()"></xp-tour-preference-form>  
+</div>

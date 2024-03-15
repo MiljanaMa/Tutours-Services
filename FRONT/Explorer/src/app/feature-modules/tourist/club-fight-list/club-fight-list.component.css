@@ -1,0 +1,31 @@
+table {
+  border-collapse: collapse;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  width: 100%;
+  border: 1px solid black;
+}
+
+thead tr {
+  background-color: #3f51b5;
+  color: #ffffff;
+  text-align: left;
+}
+
+th,
+td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.5rem;
+}
+
+tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.scrollbar {
+  position: relative;
+  height: 100%;
+  overflow: auto;
+  display: block;
+}

@@ -1,0 +1,131 @@
+.fight-info {
+  max-width: 700px;
+  margin: 10px auto;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-accent-contrast);
+  color: var(--color-foreground);
+  border-radius: var(--border-radius);
+}
+
+.fight-info h2 {
+  font-weight: 700;
+}
+
+.club-heading {
+  display: flex;
+  gap: 10px;
+}
+
+@keyframes colorRotate {
+  from {
+    color: #6666ff;
+  }
+  10% {
+    color: #0099ff;
+  }
+  50% {
+    color: #00ff00;
+  }
+  75% {
+    color: #ff3399;
+  }
+  100% {
+    color: #6666ff;
+  }
+}
+
+.winner {
+  font-size: 28px;
+  line-height: initial;
+  animation: colorRotate 6s linear 0s infinite;
+}
+
+.timer {
+  text-transform: uppercase;
+}
+
+.clubs-info {
+  display: grid;
+  grid-template-columns: 1fr 50px 1fr;
+  padding: 10px;
+  gap: 30px;
+  border-radius: 12px;
+  background-color: var(--color-accent-contrast);
+}
+
+.clubs-info > .middle {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.club-info {
+  border-radius: 12px;
+  background-color: white;
+  padding: 30px;
+}
+
+.club-info > h5 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.participants {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 4px solid var(--color-accent-dark);
+  padding-top: 20px;
+  margin-top: 20px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.participant {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto 1fr 3fr;
+}
+
+.participant > .image-container {
+  width: 80px;
+  height: 80px;
+  position: relative;
+}
+
+.participant__level {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 15px;
+  bottom: 15px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: var(--color-accent-dark);
+  color: var(--color-foreground);
+}
+
+.participant__xp {
+  height: 20px;
+  width: calc(300px - (23px / 300));
+  padding-left: 30px;
+  border-radius: 12px;
+  background-color: var(--color-accent-contrast);
+  color: var(--color-foreground);
+}
+
+.participant__image {
+  width: 60px;
+  height: 60px;
+  object-fit: fill;
+  border-radius: 50%;
+  border: 1px black solid;
+}

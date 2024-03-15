@@ -1,0 +1,38 @@
+<div class="cont">
+    <div>
+        <h2>Requests</h2>
+        <table>
+            <thead>
+                <th>Id</th>
+                <th>User Id</th>
+                <th>Entity Id</th>
+                <th>entity Type</th>
+                <th>Status</th>
+                <th>Comment</th>
+                <th>Approve</th>
+                <th>Decline</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let r of requests">
+                    <td>{{r.id}}</td>
+                    <td>{{r.userId}}</td>
+                    <td>{{r.entityId}}</td>
+                    <td>{{getEntityTypeString(r.entityType)}}</td>
+                    <td>{{getStatusString(r.status)}}</td>
+                    <td>{{r.comment}}</td>
+                    <td>
+                        <button color="primary" mat-icon-button (click)="approveRequest(r)" [disabled]="r.status !== 0">
+                            <mat-icon>thumb_up</mat-icon>
+                        </button>
+                    </td>
+                    <td>
+                        <button color="accent" mat-icon-button (click)="declineRequest(r)" [disabled]="r.status !== 0">
+                            <mat-icon>thumb_down</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,40 @@
+<div id="tourissue"><br>
+    <div id="tourissue-details">
+        <p class="description">List of active tour issues</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tour ID</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Description</th>
+                    <th>Creation date and time</th>
+                    <th>Must be resolve by date</th>
+                    <th>New resolve date</th>
+                    <th>Disable tour</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor = "let ti of tourIssues; let i = index" [ngClass]="{'past-5-days': calculateDifference(ti.creationDateTime) >= 5}">
+                    <td>{{ti.id}}</td>
+                    <td>{{ti.tourId}}</td>
+                    <td>{{ti.category}}</td>
+                    <td>{{ti.priority}}</td>
+                    <td>{{ti.description}}</td>
+                    <td>{{ti.creationDateTime | date:'short'}}</td>
+                    <td>{{ti.resolveDateTime | date:'MM/dd/yy'}}</td>
+                    <td>
+                        <form>
+                            <input matInput type="date" style="font-size: 16px;" (change)="onChange($event, i)" />
+                            <button style="margin-left: 10px;" class="button button-secondary" (click)="setResolveDateTime(ti)">Set</button>
+                        </form>
+                    </td>
+                    <td><button class="buttondesign" color="accent" mat-raised-button (click)="disableTour(ti)" [disabled]="resolveButtonDisabled(ti)">Disable</button></td>
+                    <td><button class="button button-secondary" (click)="onViewClicked(ti)">View</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

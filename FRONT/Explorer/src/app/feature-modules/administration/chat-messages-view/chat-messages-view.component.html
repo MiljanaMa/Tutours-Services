@@ -1,0 +1,16 @@
+<div class="container">
+    <div id="messages">
+        <h2 *ngIf="messages.length === 0" style="text-align: center;">Wow, this chat is empty like your soul</h2>
+        <div *ngFor="let message of messages"> 
+            <div class="message-bubble"  [ngStyle]="{'background-color': message.receiverId == userId ? ' #AACCE1' : '#DAEAF1'}">                 
+                    <strong>{{message.sender.name}} {{message.sender.surname}}:</strong> {{message.content}}<br>
+                    <span class="timestamp">sent at: {{message.creationDateTime | date:'short'}}</span>    
+            </div>
+        </div>
+    </div>
+    <div class="messageForm">
+        <textarea name="" id="" cols="30" rows="10" class="textarea" [(ngModel)]="messageContent"></textarea>
+        <button class="custom-button" (click)="sendMessage()">Send</button>
+    </div>
+</div>
+

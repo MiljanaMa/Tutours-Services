@@ -1,0 +1,70 @@
+<div class="main">
+    <div class="status-container">
+        <h2>All tags:</h2>
+        <div class="status-sub-container">
+            <div *ngFor="let status of allBlogStatus">
+                <div class="status" (click)="modifyFilter(status)">
+                    <div class="circle" [ngStyle]="{'background-color':getColor(status.name)}"></div>
+                    {{status.name}}
+                </div>
+            </div>
+        </div>
+        <h2>Selected tags:</h2>
+        <div class="status-sub-container">
+            <div *ngFor="let status of selectedBlogStatus">
+                <div class="status" (click)="modifyFilter(status)">
+                    <div class="circle" [ngStyle]="{'background-color':getColor(status.name)}"></div>
+                    {{status.name}}
+                </div>
+            </div>
+        </div>
+    </div> 
+
+    <div class="blogs-container">
+        <table>
+            <thead>
+                <tr>
+                    <td><p class="p-header">Explore blogs</p></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let bl of blogs; let i = index;" style="background-color: #FFFBF5;">
+                  <td>
+                    <mat-accordion>
+                        <mat-expansion-panel hideToggle>
+                          <mat-expansion-panel-header style="height: 70px;">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td style="min-width: 20%; width: 20% ;max-width: 20%;background-color: #5989DF;"><a href="/blog/{{bl.id}}">{{bl.title}}</a></td>
+                                            <td style="min-width: 12%;width: 14%;max-width: 14%; background-color: #A7CDE3;"><p class="p-header" style="font-size: 1.5em;">{{bl.systemStatus}}</p></td>
+                                            <td *ngFor="let st of bl.blogStatuses" style="background-color: #F2F2F2;">
+                                                <div class="status">
+                                                    <div class="circle" [ngStyle]="{'background-color':getColor(st.name)}"></div> 
+                                                    {{st.name}}
+                                                </div>
+                                            </td>
+                                            <td style="min-width: 2%;max-width: 66% ;background-color: #F2F2F2;">
+                                                <button *ngIf="authService.user$.value.role == 'author'" (click)="onUpdateClicked(bl)" mat-icon-button>
+                                                    <mat-icon [ngStyle]="{'color':'#5989DF'}">edit</mat-icon>
+                                                </button>
+                                            </td>
+                                            <td style="min-width: 2%;max-width: 66% ;background-color: #F2F2F2;">
+                                                <button *ngIf="authService.user$.value.role == 'author'" (click)="onDeleteClicked(bl)" color="accent" mat-icon-button>
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                          </mat-expansion-panel-header>
+                            <p class="p-description"><markdown>{{bl.description}}</markdown></p>
+                        </mat-expansion-panel>
+                      </mat-accordion>
+                  </td>
+                </tr>
+              </tbody>
+        </table>
+        </div>
+    </div>
+    <!--<xp-blog-form id="blog-form-display" (blogUpdated)="getBlogs()" [selectedBlog]="selectedBlog"></xp-blog-form>-->

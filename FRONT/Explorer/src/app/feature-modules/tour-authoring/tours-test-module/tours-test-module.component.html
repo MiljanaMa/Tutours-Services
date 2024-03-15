@@ -1,0 +1,11 @@
+<div class="containter">
+    <div>
+        <h2>Click on tour to select it</h2>
+        <ul>
+            <li *ngFor="let t of tours" (click)="selectTour(t)">{{t.name}}</li>
+        </ul>
+    </div>
+    <div>
+        <app-map [selectedTour]="selectedTour"></app-map>
+    </div>
+</div>

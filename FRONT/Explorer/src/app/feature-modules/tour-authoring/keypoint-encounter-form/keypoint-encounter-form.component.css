@@ -1,0 +1,15 @@
+.cont {
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.form-fields-container {
+    width: 300px;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    border: 1px solid black;
+    padding: 1rem;
+}

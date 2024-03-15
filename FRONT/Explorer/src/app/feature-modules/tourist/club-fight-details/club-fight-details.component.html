@@ -1,0 +1,56 @@
+<div class="fight-container">
+    <div class="fight-info" *ngIf="clubFight">
+        <h2>CLUB FIGHT</h2>
+        <div [class]="clubFight.winnerId ? 'winner' : ''">Winner: {{ clubFight.winnerId ? clubFight.winnerId == clubFight.club1.id ? clubFight.club1.name : clubFight.club2.name : "???"}}</div>
+        <div class="timer">{{ clubFight.winnerId ? 'Fight ended' : 'Fight ends in: ' + tillFightEnd.days + 'days ' + tillFightEnd.hours + "hours "  + tillFightEnd.minutes + "minutes "}}</div>
+    </div>
+
+    <div class="clubs-info" *ngIf="clubFight && clubFightXPInfo">
+        <div class="club-info">
+            <div class="club-heading">
+                <div>
+                    <img [src]="clubFight.club1.image" height="80" width="80">
+                </div>
+                <div>
+                    <h5>{{ clubFight.club1.name }}</h5>
+                    <div class="total-xp">{{ clubFightXPInfo.club1TotalXp }}XP</div>
+                </div>
+            </div>
+            <div class="participants">
+                <div class="participant" *ngFor="let participant of clubFightXPInfo.club1ParticipantsInfo"> 
+                    <div class="image-container">
+                        <img width="60" height="60" class="participant__image" src="{{ participant.profileImage }}">
+                        <div class="participant__level">{{ participant.level }}</div>
+                    </div>
+                    <div class="participant__username">{{ participant.username }}</div> 
+                    <div class="participant__xp" [ngStyle]="{'width.px': 300 * participant.xpInFight / clubFightXPInfo.club1TotalXp }">{{ participant.xpInFight }}XP</div>
+                </div>
+            </div>
+        </div>
+        <div class="middle">{{ clubFightXPInfo.club1TotalXp > clubFightXPInfo.club2TotalXp ? ">" : "<" }}</div>
+        <div class="club-info">
+            <div class="club-heading">
+                <div>
+                    <img [src]="clubFight.club2.image" height="80" width="80">
+                </div>
+                <div>
+                    <h5>{{ clubFight.club2.name }}</h5>
+                    <div class="total-xp">{{ clubFightXPInfo.club2TotalXp }}XP</div>
+                </div>
+            </div>
+            <div class="participants">
+                <div class="participant" *ngFor="let participant of clubFightXPInfo.club2ParticipantsInfo"> 
+                    <div class="image-container">
+                        <img width="60" height="60" class="participant__image" src="{{ participant.profileImage }}">
+                        <div class="participant__level">{{ participant.level }}</div>
+                    </div>
+                    <div class="participant__username">{{ participant.username}}</div> 
+                    <div class="participant__xp" [ngStyle]="{'width.px': 300 * participant.xpInFight / clubFightXPInfo.club2TotalXp }">{{ participant.xpInFight }}XP</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button (click)="endFight()" class="button button-secondary">
+    End fight
+</button>

@@ -1,0 +1,35 @@
+<h1 class="heading">Manage coupon</h1>
+
+<div class="cont">
+    <form [formGroup]="couponForm">
+        <div class="somediv">
+            <mat-form-field>
+                <mat-label>Discount</mat-label>
+                <input matInput formControlName="discount" type="number" min="0" matInput required/>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Expiry Date</mat-label>
+                <input matInput formControlName="expiryDate" type="date" [min]="startDate.valueOf" matInput required/>
+            </mat-form-field>
+        
+            <mat-form-field>
+                <mat-label>Tourist</mat-label>
+                <mat-select formControlName="touristId" matInput required>
+                    <mat-option *ngFor="let tourist of tourists" [value]="tourist.id">{{tourist.email}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Tour</mat-label>
+                <mat-select formControlName="tourId" matInput>
+                    <mat-option *ngFor="let tour of tours" [value]="tour.id">{{tour.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <button *ngIf="!isForUpdate" class="createBtn" [disabled]="!couponForm.valid || !couponForm.get('touristId')?.valid || !couponForm.get('touristId')?.touched" (click)="createCoupon()" mat-raised-button>Create</button>
+            <button *ngIf="isForUpdate" class="updateBtn" [disabled]="!couponForm.valid" (click)="updateCoupon()" mat-raised-button>Update</button>
+
+        </div>
+    </form> 
+</div>

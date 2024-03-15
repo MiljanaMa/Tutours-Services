@@ -1,0 +1,30 @@
+<div class="scrollbar">
+    <table>
+        <thead>
+            <th></th>
+            <th>Challenger name</th>
+            <th>Fight Start</th>
+            <th>Fight End</th>
+            <th>Status</th>
+            <th>Winner</th>
+            <th></th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let fight of fights">
+                <td>
+                    <img [src]="fight.club1.id == club.id ? fight.club2.image : fight.club1.image" height="50px" width="50px">
+                </td>
+                <td>{{ fight.club1.id == club.id ? fight.club2.name : fight.club1.name }}</td>
+                <td>{{ fight.startOfFight | date: 'dd.MM.yyyy' }}</td>
+                <td>{{ fight.endOfFight | date: 'dd.MM.yyyy'}}</td>
+                <td>{{ fight.isInProgress ? "IN PROGRESS" : "COMPLETED" }}</td>
+                <td>{{ fight.winnerId ? fight.winnerId == fight.club1.id ? fight.club1.name : fight.club2.name : "/"}}</td>
+                <td>
+                    <button class="button button-secondary" (click)="openFightDetails(fight.id)">
+                        <span>See details</span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

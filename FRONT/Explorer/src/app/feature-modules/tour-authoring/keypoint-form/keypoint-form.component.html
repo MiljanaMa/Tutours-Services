@@ -1,0 +1,60 @@
+<div class="cont">
+    <form [formGroup]="keypointForm">
+        <div class="somediv">
+            <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" type="text"/>
+            </mat-form-field>
+    
+            <mat-form-field>
+                <mat-label>Latitude</mat-label>
+                <input matInput formControlName="latitude" type="number" min="-90" max="90"/>
+            </mat-form-field>
+    
+            <mat-form-field>
+                <mat-label>Longitude</mat-label>
+                <input matInput formControlName="longitude" type="number" min="-180" max="180"/>
+            </mat-form-field>
+    
+            <mat-form-field>
+              <mat-label>Description</mat-label>
+              <textarea matInput
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="1"
+              formControlName="description"
+              cdkAutosizeMaxRows="5"></textarea>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>ImageUrl</mat-label>
+                <input matInput formControlName="image" type="text"/>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Secret</mat-label>
+                <input matInput formControlName="secret" type="text"/>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Position</mat-label>
+                <input matInput formControlName="position" type="number" min="1"/>
+            </mat-form-field>
+    
+            <button color="primary" type="submit" (click)="saveKeypoint()" mat-raised-button [disabled]="tourId===0 || !keypointForm.valid">
+                <span *ngIf="mode === 'add'">Add new keypoint</span>
+                <span *ngIf="mode === 'edit'">Update keypoint</span>
+            </button>
+            <button color="primary" type="button" (click)="openPublicKeypointList = true" mat-raised-button>Get info from public keypoints</button>
+        </div>
+    </form>
+    <div class="map-container">
+        <app-map [enableClicks]="true" [toggleOff]="true" [routeQuery]="routeQuery" (clickEvent)="fillCoords($event)"
+        (routesFoundEvent)="routeFoundEmit($event)"></app-map>
+    </div>
+</div>
+
+<div class="popup" [class]="openPublicKeypointList ? 'show' : ''">
+    <h1>Public Keypoints</h1>
+    <xp-public-keypoint [publicKeypoints]="publicKeypoints" (keypointSelected)="selectPublicKeypoint($event)"></xp-public-keypoint>
+    <div class="exit" (click)="openPublicKeypointList = false"><span>X</span></div>
+</div>

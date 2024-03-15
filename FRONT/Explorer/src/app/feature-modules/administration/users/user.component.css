@@ -1,0 +1,262 @@
+body {
+    background-color: #f0f0f0; 
+    font-family: Arial, sans-serif; 
+    text-align: center; 
+}
+
+#users {
+    border: 2px solid #3498db; 
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    background-color: #ecf0f1; 
+}
+.block-button {
+    height: 25px;
+    width: 60px;
+    background-color: #e74c3c; 
+    color: #fff; 
+    border: none;
+    padding: 5px 15px; 
+    border-radius: 5px; 
+    cursor: pointer;
+    float: right; 
+    margin-top: -26px; 
+}
+#users-title {
+    font-size: 28px; 
+    font-weight: bold; 
+    color: #3498db; 
+    margin: 0; 
+}
+#users p {
+    font-size: 24px; 
+    margin: 0;
+    color: #3498db; 
+}
+
+#users hr {
+    margin: 10px 0;
+    border: none;
+    border-top: 2px solid #ccc; 
+}
+
+#users-details {
+    margin-top: 20px;
+}
+
+#users-details p {
+    font-size: 20px; 
+    margin: 0;
+    margin-bottom: 10px;
+    color: #555; 
+}
+
+
+
+
+
+
+#users-details p:nth-child(odd):first-child {
+    color: #3498db; 
+    font-weight: bold; 
+}
+
+
+
+
+#users-details div {
+    border: 2px solid #3498db; 
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 10px;
+    background-color: #ffffff; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+}
+
+
+#users-details div:nth-child(even) {
+    background-color: #e4e4e4; 
+}
+
+#users-details div:nth-child(odd) {
+    background-color: #e4e4e4; 
+}
+#user-div div:hover {
+    background-color: #f4f4f4; 
+}
+.block-button:hover {
+    
+    background-color: lightcoral; 
+}
+.edit-role-select {
+    margin-left: 100px; 
+  }
+.unblock-button {
+    height: 25px;
+    width: 60px;
+    background-color: #e74c3c; 
+    color: #fff; 
+    border: none;
+    padding: 5px 5px; 
+    border-radius: 5px; 
+    cursor: pointer;
+    float: right; 
+    margin-top: -26px; 
+}
+.delete-button {
+    height: 25px;
+    width: 60px;
+    background-color: #3498db; 
+    color: #fff; 
+    border: none;
+    padding: 5px 5px; 
+    border-radius: 5px; 
+    cursor: pointer;
+    float: right; 
+    margin-top: -90px; 
+}
+
+.add-user-form {
+    border: 2px solid #3498db; 
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 10px;
+    background-color: #ffffff; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+    text-align: left; 
+}
+
+.add-user-form h3 {
+    font-size: 24px; 
+    color: #3498db; 
+    margin: 0 0 15px; 
+}
+
+.add-user-form label {
+    display: block; 
+    font-weight: bold; 
+    color: #555; 
+    margin: 10px 0; 
+}
+
+.add-user-form input {
+    width: 99%; 
+    background-color: #fff; 
+    border: 2px solid #3498db; 
+    border-radius: 5px; 
+    padding: 10px; 
+    margin: 5px 0; 
+}
+.user-data input{
+    width: 4%;
+    background-color: #555; 
+    color: #555;
+    border: 2px solid #3498db; 
+    border-radius: 5px; 
+    padding: 10px; 
+    margin: 5px 0;
+}
+.add-coins-button{
+    height: 25px;
+    width: 37px;
+    background-color: #3498db;
+    color: #fff; 
+    border: none;
+    border-radius: 5px;
+    padding: 5px 5px ;
+    margin-left: 10px;
+}
+.edit-button {
+    height: 25px;
+    width: 60px;
+    background-color: #3498db; 
+    color: #fff; 
+    border: none;
+    padding: 5px 5px; 
+    border-radius: 5px; 
+    cursor: pointer;
+    float: right; 
+    margin-top: -58px; 
+}
+.close-button{
+    position: absolute;
+    margin-left: 2135px;
+    background-color: #3498db;
+    color: #fff; 
+    border: none;
+    border-radius: 5px;
+    padding: 10px 10px;
+}
+.add-user-form select {
+    width: 100%; 
+    background-color: #fff; 
+    border: 2px solid #3498db; 
+    border-radius: 5px; 
+    padding: 10px; 
+    margin: 5px 0; 
+}
+
+.add-user-form button.create-button {
+    background-color: #3498db; 
+    color: #fff; 
+    border: none;
+    padding: 10px; 
+    border-radius: 5px; 
+    cursor: pointer;
+    margin-top: 15px; 
+}
+
+.add-user-form button.create-button:hover {
+    background-color: #1d72b8; 
+}
+
+
+.add-user-form button.create-button:hover,
+.add-user-form button.block-button:hover {
+    background-color: #1d72b8; 
+}
+
+
+.create-button1 {
+    background-color: #3498db; 
+    color: #fff; 
+    border: none;
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    margin-left: 14px;
+}
+.update-button {
+    height: 25px;
+    width: 60px;
+    background-color: #3498db; 
+    color: #fff; 
+    border: none;
+    padding: 5px 5px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+}
+.unblock-button:hover {
+    background-color: lightgreen; 
+}
+
+#user-div input {
+    background-color: #fff; 
+    border: 2px solid #3498db; 
+    border-radius: 5px; 
+    padding: 5px; 
+    margin: 5px 0; 
+}
+
+#user-div select {
+    background-color: #fff; 
+    border: 2px solid #3498db; 
+    border-radius: 5px; 
+    padding: 5px; 
+    margin: 5px 0; 
+}
+
+
+
+
+

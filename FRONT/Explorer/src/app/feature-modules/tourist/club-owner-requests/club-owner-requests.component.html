@@ -1,0 +1,30 @@
+<div class="cont">
+    <div>
+        <h2>All Requests</h2>
+        <table>
+            <thead>
+                <th>UserId</th>
+                <th>Status</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let jr of joinRequests">
+                    <td>{{jr.userId}}</td>
+                    <td *ngIf="jr.status==0">Accepted</td>
+                    <td *ngIf="jr.status==1">Rejected</td>
+                    <td *ngIf="jr.status==2">Pending</td>
+                    <td *ngIf="jr.status==3">Canceled</td>
+                    <td>
+                        <button *ngIf="jr.status==2" aria-label="Accept Request" type="submit" 
+                        (click)="acceptRequest(jr)" color="primary" mat-raised-button>accept</button>
+                    </td>
+                    <td>
+                        <button *ngIf="jr.status==2" aria-label="Reject Request" type="submit" 
+                        (click)="rejectRequest(jr)" color="primary" mat-raised-button>reject</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+

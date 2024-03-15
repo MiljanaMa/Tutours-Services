@@ -1,0 +1,52 @@
+<div class="main">
+    <div class="blog-header">
+      <div class="blog-title-row">
+          <div class="blog-title">
+              <p class="p-blog-title">{{selectedBlog.title}}</p>
+              <p class="p-blog-date">Created: {{selectedBlog.creationDate}}</p>
+              <p style="margin-left: 35%; font-size: 20px; color: red;" *ngIf="selectedBlog.systemStatus === 'CLOSED'">{{selectedBlog.systemStatus}}</p>
+          </div>
+          <div class="rating-buttons">
+              <button (click)="rate(1)" mat-flat-button color="primary" [ngStyle]="{'background-color':'#74C69D'}" class="rating-button">
+                <mat-icon [ngStyle]="{'color':'white','margin-left': '10%'}">thumb_up_alt</mat-icon>
+              </button>
+              <button (click)="rate(2)" mat-flat-button color="primary" [ngStyle]="{'background-color':'#6260A6'}" class="rating-button">
+                <mat-icon [ngStyle]="{'color':'white','margin-left': '10%'}">thumb_down_alt</mat-icon>
+              </button>
+          </div>
+      </div>
+        <div class="blog-info">
+            <div class="blog-description">
+                <markdown ngPreserveWhitespaces style="color: #262F44 ;padding: 15px;line-height: 1.2;margin-top: 5px;">
+                  {{selectedBlog.description}}
+                </markdown>
+            </div>
+        </div>
+    </div>
+
+    <div class="images-container">
+      <div class="image-container">
+        <img style="height: 100%; object-fit: cover;" src="{{images[0]}}" alt="Can't load image at the moment">
+      </div>
+      <!-- <div class="image-container">
+        <img style="max-height: 50%; object-fit: cover;" [src]="images[1]" alt="Android user">
+        <img style="max-height: 50%; object-fit: cover;" [src]="images[2]" alt="lobotomite">
+      </div> -->
+      <div class="endmysuffering">
+        <div *ngFor="let r of selectedBlog.blogRatings" class="rating-container" style="margin-left: 5%;">
+          <div class="rating-header">
+              <p class="p-rating-header">{{r.username}}</p>
+          </div>
+          <div class="rating-body" [ngStyle]="{'background-color': r.rating === 'DOWNVOTE' ? '#6260A6' : '#74C69D'}">
+              <p class="p-rating-body">{{ r.rating === 'UPVOTE' ? 'LIKE' : 'DISSLIKE' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-container">
+        <div class="comments-container">
+            <xp-comments-display [blog]="selectedBlog" style="flex-direction: column; width: 100%; min-height: 60%;height: auto; margin-top: 1.7em; padding-bottom: 1em;"></xp-comments-display>
+        </div>
+    </div>
+</div>

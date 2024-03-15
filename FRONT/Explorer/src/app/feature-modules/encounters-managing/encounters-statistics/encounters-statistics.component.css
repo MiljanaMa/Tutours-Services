@@ -1,0 +1,53 @@
+.modal-content {
+    border: none;
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: 10px; 
+    border-top-right-radius: 10px;
+  }
+  
+  .modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  
+  .modal-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; 
+  }
+  
+  .chart-container {
+    border-radius: 10px; 
+    border: 1px solid #dee2e6;
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 10px; 
+  }
+
+  .arrow {
+    cursor: pointer;
+    font-size: 50px;
+  }
+  
+  .highchart{
+    min-width: 90%;
+    margin-left: 10px;
+  }

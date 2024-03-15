@@ -1,0 +1,18 @@
+<form [formGroup]="equipmentForm">
+    <div>
+        <mat-form-field>
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" type="text"/>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea matInput
+          cdkTextareaAutosize
+          cdkAutosizeMinRows="1"
+          formControlName="description"
+          cdkAutosizeMaxRows="5"></textarea>
+        </mat-form-field>
+    <button *ngIf="!shouldEdit" color="primary" type="submit" (click)="addEquipment()" mat-raised-button>Done</button>
+    <button *ngIf="shouldEdit" color="primary" type="submit" (click)="updateEquipment()" mat-raised-button>Done</button>
+    </div>
+</form>

@@ -1,0 +1,69 @@
+<div class="card">
+  <!-- Carousel for images -->
+  <div class="carousel">
+    <div style="position: absolute; top: 0;left: 0;display: flex;width: 6%;height: 100%;z-index: 500;">
+      <button style="border: none; background-color: rgba(255, 255, 255, 0.1);" (click)="prevImage()">
+        <img class="carousel-icons" src="assets/images/back.png">
+      </button>
+    </div>
+    <div style="position: absolute;top: 0;right: 0;display: flex;width: 6%; margin-right: 6%; height: 100%;z-index: 500;">
+      <button style="border: none; background-color: rgba(255, 255, 255, 0.1);" (click)="nextImage()">
+        <img class="carousel-icons" src="assets/images/next.png">
+      </button>
+    </div>
+    <div class="carousel-content" [style.transform]="'translateX(-' + currentIndex * 100 + '%)'">
+      <div class="carousel-item" *ngFor="let image of images">
+        <img [src]="image" alt="Tour image">
+      </div>
+    </div>
+  </div>
+  <!-- Card body for other information 262F44  -->
+  <div class="card-body">
+    <div class="card-description">
+      <h5 style="width:fit-content;padding: 0.1em 0.5em 0.5em 0.5em;height: 1.2em; color: #262F44; border-radius: 3%;" class="card-title">{{tour.name}}</h5>
+      <div style="width: 100%; height: 18%;">
+        <button *ngIf="tour.status == 'PUBLISHED' && (authService.isLoggedIn$ | async) && authService.user$.value.role == 'tourist'" mat-raised-button class="add-to-wishlist-button" (click)="addToWishList()">Add to Wishlist</button>
+        <p style="padding: 4%; font-size: 1.2em;font-style: italic;"  *ngIf="router.url.includes('/home') && tour.status != 'PUBLISHED' && (authService.isLoggedIn$ | async) && authService.user$.value.role == 'tourist'">This tour isn't published</p>
+      </div>
+      <p class="p-card-text" *ngIf="isCustom && tour.status === 'DRAFT'"><span style="color: red">This tour is unfinished. Add at least 2 keypoints to complete your custom tour.</span></p>
+      <p class="p-card-description">{{tour.description}}</p>
+      <p class="p-card-text">
+        <mat-icon style="padding-top: 1px;">date_range</mat-icon><strong style="font-size: medium; padding-left: 3px;">Date:</strong>
+        {{tour.statusUpdateTime| date:'dd.MM.yyyy'}}
+      </p>
+      <p class="p-card-text">
+        <mat-icon style="padding-top: 1px;">timer</mat-icon><strong style="font-size: medium;padding-left: 3px;">Duration:</strong>
+        {{tour.duration}} minutes
+      </p>
+      <p class="p-card-text">
+        <mat-icon style="padding-top: 1px;">location_on</mat-icon><strong style="font-size: medium;padding-left: 3px;">Start:</strong>
+        {{startingKeypoint.name}}
+      </p>
+      <p class="p-card-text">
+        <mat-icon style="padding-top: 1px;">attach_money</mat-icon><strong style="font-size: medium;padding-left: 3px;">Price:</strong>
+        {{tour.price}} AC
+      </p>
+    </div>
+    <!-- Buttons to open modals for reviews and add to cart-->
+    <div class="card-buttons">
+      <button *ngIf="!isCustom" mat-raised-button color="primary" class="add-to-cart-button" (click)="openReviews(tour.id??0)">
+        <mat-icon style="padding-right: 25%;">rate_review</mat-icon>
+        View Reviews
+      </button>
+      <button *ngIf="isCustom" mat-raised-button color="primary" (click)="editTour()">Edit</button>
+      <button *ngIf="isCustom" mat-raised-button color="primary" (click)="loadGmap(tour)">Load on gmaps</button>
+      <button [ngStyle]="{'height':'2.9em','background-color':'rgb(255, 0, 98)'}" mat-raised-button class="add-to-cart-button"
+        *ngIf="tour.status == 'PUBLISHED' && (authService.isLoggedIn$ | async) && authService.user$.value.role == 'tourist'"
+        (click)="addToCart()">
+          <mat-icon style="padding-right: 20%;">credit_card</mat-icon>
+          Add to Cart
+      </button>
+      <button mat-raised-button class="add-to-cart-button"
+        *ngIf="router.url.includes('/purchased-tours') && !isCustom && (authService.isLoggedIn$ | async) && authService.user$.value.role == 'tourist'"
+        (click)="showKeypoints()">
+        <mat-icon style="width: 20%;">pin_drop</mat-icon>
+        Show Keypoints
+      </button>
+    </div>
+  </div>
+</div>

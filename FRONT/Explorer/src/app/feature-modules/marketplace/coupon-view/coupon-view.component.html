@@ -1,0 +1,33 @@
+<div class="couponsDiv">
+    <h1>My coupons</h1>
+    <button class="createBtn" color="primary" mat-raised-button [routerLink]="['/coupon-create']">Create coupon</button>
+    <div>
+    <div class="couponsDiv">
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Expiration</th>
+                    <th>Discount</th>
+                    <th>Delete</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let coupon of coupons">
+                    <td>{{coupon.code}}</td>
+                    <td>{{coupon.expiryDate}}</td>
+                    <td>{{coupon.discount}}%</td>
+                    <td>
+                        <button (click)="deleteCoupon(coupon.id)" mat-raised-button>Delete</button>
+                    </td>
+                    <td>
+                        <button (click)="updateCoupon(coupon)" mat-raised-button [routerLink]="['/coupon-create']">Update</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+   
+    </div>
+</div>

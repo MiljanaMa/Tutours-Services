@@ -1,0 +1,25 @@
+<div class="cont">
+    <h1>Tours marketplace</h1>
+</div>
+<div class="cont">
+    <button class="button button-secondary" type="button" (click)="toggleForm()">Filter tours by location</button>
+    <form [formGroup]="tourFilterForm" *ngIf="showForm">
+        <label for="longitude">Longitude</label>
+        <input type="text" id="longitude" name="longitude" formControlName="longitude">
+
+        <label for="latitude">Latitude</label>
+        <input type="text" id="latitude" name="latitude" formControlName="latitude">
+
+        <label for="filterRadius">Filter Radius [km]</label>
+        <input type="number" id="filterRadius" name="filterRadius" formControlName="filterRadius" min="0">
+
+        <div class="map-container">
+            <app-map [enableClicks]="true" [toggleOff]="true" [drawRadiusOnClick]="true" (clickEvent)="handleMapClick($event)" [allowMultipleMarkers]="false" [radiusSize]="radius" [markerPositions]="pointsOfInterest" [rememberClick]="true"></app-map>
+        </div>
+    </form>
+</div>
+<div style="width: 100%;display: flex; flex-wrap: wrap; justify-content: center;">
+  <div style="flex: 0 0 22%;max-width: 30%; margin: 0.8em;" *ngFor="let tour of tours">
+    <xp-tour-card-compact [tour]="tour"></xp-tour-card-compact>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<div class="container" (click)="selectChat()">
+    <img *ngIf="userId === chatPreviewMessage.sender.id" [src]="chatPreviewMessage.receiver.profileImage" style="width: 5rem; height: 5rem;">
+    <img *ngIf="userId !== chatPreviewMessage.sender.id" [src]="chatPreviewMessage.sender.profileImage" style="width: 5rem; height: 5rem;">
+    <div class="contentContainer">
+        <h2 *ngIf="userId === chatPreviewMessage.sender.id">{{chatPreviewMessage.receiver.name}} {{chatPreviewMessage.receiver.surname}}</h2>
+        <h2 *ngIf="userId !== chatPreviewMessage.sender.id">{{chatPreviewMessage.sender.name}} {{chatPreviewMessage.sender.surname}}<span class="read-indicator" *ngIf="!chatPreviewMessage.isRead"></span></h2>
+        <p style="font-size: smaller; color: gray;">{{chatPreviewMessage.creationDateTime | date:'short'}}</p>
+        <p style="width: 50%;"><strong *ngIf="userId === chatPreviewMessage.sender.id">You: </strong>{{chatPreviewMessage.content}}</p>
+    </div>
+</div>

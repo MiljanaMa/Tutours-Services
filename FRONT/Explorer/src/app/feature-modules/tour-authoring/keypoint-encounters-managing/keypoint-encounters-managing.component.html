@@ -1,0 +1,13 @@
+<div>
+    <h2 class="content-container">Encounters for keypoint: {{selectedKeypoint.name}}</h2>
+
+    <div class="content-container">
+        <div>
+            <xp-keypoint-encounters [showActions]="true" [encounters]="encounters" (encounterSelected)="selectEncounter($event)" (encounterDeleted)="encounterDeleted()"></xp-keypoint-encounters>
+            <button color="primary" type="submit" (click)="addEncounter()" mat-raised-button>
+                Add new
+            </button>
+        </div>
+        <xp-keypoint-encounter-form class="form-container" *ngIf="showForm" [selectedEncounter]="selectedEncounter" [keypoint]="keypoint" (encounterUpdated)="encounterUpdated()" [mode]="formMode"></xp-keypoint-encounter-form>
+    </div>
+</div>

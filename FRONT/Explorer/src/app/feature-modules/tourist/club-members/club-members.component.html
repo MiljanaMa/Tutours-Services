@@ -1,0 +1,30 @@
+<div class="scrollbar">
+    <table>
+        <thead>
+            <th></th>
+            <th>Member name</th>
+            <th>Email</th>
+            <th>XP</th>
+            <th>Level</th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let member of members">
+                <td>
+                    <img [src]="member.profileImage" height="50px" width="50px">
+                </td>
+                <td>{{member.name}} {{member.surname}}</td>
+                <td>{{member.email}}</td>
+                <td>{{member.xp}}</td>
+                <td>{{member.level}}</td>
+                <!-- <td *ngIf="ownerPanel && member.id !== ownerId">
+                    
+                    Add in future
+
+                    <button class="quick-action-btn" color="primary" style="background-color: darkred;" mat-raised-button>
+                        <span>Kick</span>
+                    </button>
+                </td> -->
+            </tr>
+        </tbody>
+    </table>
+</div>

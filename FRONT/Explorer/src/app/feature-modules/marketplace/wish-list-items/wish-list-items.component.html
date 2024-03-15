@@ -1,0 +1,44 @@
+<!--div class="tour-card">
+    <h2 style="align-self: center;">{{item.tourName}}</h2>
+    <p><strong>Description:</strong> {{item.tourDescription}}</p>
+    <p><strong>Price:</strong> {{item.tourPrice}} AC</p>
+    <p><strong>Type:</strong> {{item.tourType}}</p>
+    <p><strong>Difficulty:</strong> {{item.tourDifficulty}}</p>    
+    <p><strong>Travel distance:</strong> {{item.travelDistance | number:'1.2-2'}} km</p>
+    <p><strong>Tour duration:</strong> {{item.tourDuration || 0 | time}}</p>
+    
+    <button class="button button-primary" (click)="addToCart()">Add to cart</button>
+</div-->
+<div class="tour-card">
+    <h2 style="align-self: center;">{{tour.name}}</h2>
+    <p><strong>Description:</strong> {{tour.description}}</p>
+    <p><strong>Price:</strong> {{tour.price}} AC</p>
+    <p><strong>Type:</strong> {{tour.transportType}}</p>
+    <p><strong>Difficulty:</strong> {{tour.difficulty}}</p>    
+    <p><strong>Travel distance:</strong> {{tour.distance | number:'1.2-2'}} km</p>
+    <p><strong>Tour duration:</strong> {{tour.duration || 0 | time}}</p>
+    <div class="tag-list">
+        <strong>Tags:</strong><div class="tag" *ngFor="let tag of tour.tags">{{ tag }}</div>
+    </div>
+    <p><strong>Keypoints:</strong></p>
+    <table>
+        <thead>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Image</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{firstKp.name}}</td>
+                <td>{{firstKp.description}}</td>
+                <td>
+                    <img [src]="firstKp.image" alt="kp image" width="30px" height="30px">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6"><strong style="color: green;">Buy tour to see all of its keypoints!</strong></td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="button button-primary" (click)="addToCart()">Add to cart</button>
+</div>

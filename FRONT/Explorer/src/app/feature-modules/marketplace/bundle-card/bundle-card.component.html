@@ -1,0 +1,17 @@
+<div *ngIf="bundle; else loading">
+    <h2>Bundle Details</h2>
+    <p><strong>Name:</strong> {{ bundle.name }}</p>
+    <p><strong>Bundle Price:</strong>{{bundlePrice.totalPrice}}</p>
+    <p><strong>Status:</strong>{{bundle.status}}</p>
+    <button (click)="navigateToBundleDetails(bundle)">View Details</button>
+    <button  *ngIf="bundle.status==='DRAFT'" (click)="deleteBundle(bundle.id??0)">Delete</button>
+    <button  *ngIf="bundle.status==='DRAFT'" (click)="publishBundle(bundle.id??0)">Publish</button>
+    <button  *ngIf="bundle.status==='PUBLISHED'" (click)="archiveBundle(bundle.id??0)">Archive</button>
+
+   <!-- <button  *ngIf="bundle.status==='PUBLISHED'" (click)="archiveBundle(bundle.id??0)">Archive</button>-->
+
+
+
+
+  </div>
+  <ng-template #loading>Loading...</ng-template>

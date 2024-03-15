@@ -1,0 +1,17 @@
+<div class="equipment-list">
+    <h2>Selected Equipment for {{tour.name}}</h2>
+    <mat-list>
+      <mat-list-item *ngFor="let equipment of selectedEquipment">
+        {{equipment.name}}
+        <button class="btn remove-button" (click)="removeFromSelected(equipment)">Remove</button>
+      </mat-list-item>
+    </mat-list>
+  </div>
+  
+  <div class="equipment-list">
+    <h2>All Equipment</h2>
+    <mat-list>
+      <mat-list-item *ngFor="let equipment of availableEquipment">{{equipment.name}} <button class="btn add-button" (click)="addToSelected(equipment)">Add</button></mat-list-item>
+    </mat-list>
+  </div>
+  

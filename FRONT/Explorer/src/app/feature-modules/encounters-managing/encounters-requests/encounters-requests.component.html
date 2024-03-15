@@ -1,0 +1,36 @@
+<div>
+<h2>Encounter Requests</h2>
+<div class="cont">
+    <div>
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Xp</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Approval status</th>
+                
+            </thead>
+            <tbody>
+                <tr *ngFor="let e of encounterRequests">
+                    <td>{{e.name}}</td>
+                    <td>{{e.description}}</td>
+                    <td>{{e.latitude}}</td>
+                    <td>{{e.longitude}}</td>
+                    <td>{{e.xp}}</td>
+                    <td>{{e.status}}</td>
+                    <td>{{e.type}}</td>
+                    <td>{{e.approvalStatus}}</td>
+                    <td *ngIf="e.approvalStatus == 'PENDING'">
+                        <button  class="button" color="primary" mat-raised-button (click)="approve(e)">Approve</button>
+                        <button  class="button" color="primary" mat-raised-button (click)="decline(e)">Decline</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>

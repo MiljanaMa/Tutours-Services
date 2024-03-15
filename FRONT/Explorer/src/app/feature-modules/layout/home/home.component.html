@@ -1,0 +1,105 @@
+<div id="mainContainer">
+    <!-- <header>
+        <nav>
+            <div class="navbar">
+                <div class="navbar-modules">
+                    <a href="#">Tours</a>
+                    <a href="#">Blogs</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="app-name">TourTravel</div>
+
+                <div class="navbar-modules">
+
+                    <a href="#">Sign In</a>
+                    <a href="#">Search</a>
+                </div>
+            </div>
+        </nav>
+    </header> -->
+    <div class="hero-image">
+        <img src="https://cdn.packhacker.com/2018/05/cotopaxi-allpa__usage-1-pack-hacker.jpg?auto=compress&auto=format&w=1110&h=740&fit=crop" height="600" width="auto">
+        <div class="welcome-text">Welcome! Ready to Travel?</div>
+    </div>
+    <div class="panel" style="margin-bottom: 2%;background-color: var(--color-accent-contrast); color: var(--color-foreground);" *ngIf="router.url.includes('/home')">
+        <p class="p-header">Embark on Adventures through Captivating Narratives</p>
+        <p class="p-regular">Explore our blog for a world of travel inspiration and exciting stories. From hidden
+            gems to travel tips, our blog has it all.</p>
+        <button class="button button-secondary">Read Our Blog</button>
+    </div>
+    <h2 style="font-size: 32px; font-weight: 700;">Tours that we recommend</h2>
+    <div style="width: 100%;display: flex; overflow: hidden;">
+        <div style="flex: 0 0 22%;max-width: 30%; margin: 0.8em;" *ngFor="let tour of tours">
+            <xp-tour-card-compact [tour]="tour"></xp-tour-card-compact>
+        </div>
+    </div>
+    <div *ngIf="!isLoading && tours.length === 0 && router.url.includes('/purchased-tours')">
+        <h1 class=cheapskate>Buy something, you cheapskate.</h1>
+    </div>
+
+    <h2 *ngIf="!router.url.includes('/home')" style="margin-left: 1rem; color:green;">Your custom tours:</h2>
+    <button *ngIf="!router.url.includes('/home')" style="margin-left: 1rem;" color="primary" class="btn" (click)="navigateToTourManagement(0)">
+        Create new custom tour
+    </button>
+
+    <button *ngIf="!router.url.includes('/home')" style=" height: 45px; width: 180px; margin-left: 4rem;" mat-flat-button color="accent"  (click)="navigateToCampaignCreation(0)">
+        Create a campaign
+    </button>
+
+    <div class="container" *ngIf="!router.url.includes('/home')">
+        <div style="display: flex; overflow: hidden;">
+            <div style="flex: 0 0 30%; max-width: 30%; margin: 1em;" *ngFor="let tour of customTours">
+                <xp-tour-card-compact [tour]="tour" [isCustom]="true"></xp-tour-card-compact>
+            </div>
+        </div>
+    </div>
+
+    <div class="image-with-text">
+        <div>
+            <img width="500" height="500" src="https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fHRyYXZlbCUyMHdhbGxwYXBlcnxlbnwwfHwwfHx8MA%3D%3D">
+        </div>
+        <div class="text">
+            <p style="text-align: right; border-bottom: 5px solid">Experienced in planning your trips?</p> <br>
+            <p>Become a Tour Author Today and Let Your Adventures Inspire Others to Explore!</p> 
+            <button class="button button-ternary">Join us!</button>
+        </div>
+    </div>
+
+    
+    <h2 style="font-size: 32px; font-weight: 700;">Our Blog</h2>
+    <div class="featured-blogs">
+        <a href="/blog/1" style="text-decoration: none;">
+            <div class="blog-card">
+                <div class="title">Danube</div>
+                <div class="date">2023-01-01</div>
+                <div class="img"><img width="100" src="https://cdn.britannica.com/54/6954-050-A7871925/Central-Budapest-Danube-River-bank-Parliament-Building.jpg"></div>
+                <div class="summary">The Danube is Europes second-longest river, flowing through ten countries...</div>
+            </div>
+        </a>
+        <a href="/blog/2" style="text-decoration: none;">
+            <div class="blog-card">
+                <div class="title">City Center</div>
+                <div class="date">2023-02-02</div>            
+                <div class="img"><img width="100" src="https://novisad.travel/wp-content/uploads/2022/02/Novi_Sad_Prolece_Naslovna_1_2022-scaled.jpg"></div>
+                <div class="summary">City Center, heart of New Now, filled with joy and endless entertainment...</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Color pallette test / samples -->
+        <div class="panel" style="background-color: var(--color-accent-dark); color: var(--color-foreground);" >
+            <p class="p-header">Discover New Experiences</p>
+            <p class="p-regular">Explore breathtaking destinations, uncover hidden gems, and make memories that last a
+                lifetime.</p>
+            <button class="button button-primary">Discover your adventure</button>
+        </div>
+
+        <!-- <div class="panel" style="background-color: var(--color-accent-light); color: var(--color-accent-contrast);" *ngIf="router.url.includes('/home')">
+            <p class="p-header">Embark on Adventures through Captivating Narratives</p>
+            <p class="p-regular">Explore our blog for a world of travel inspiration and exciting stories. From hidden
+                gems to travel tips, our blog has it all.</p>
+            <button class="button button-ternary">Read Our Blog</button>
+        </div> -->
+    <br>
+    <br>
+</div>

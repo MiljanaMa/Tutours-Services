@@ -1,0 +1,19 @@
+<div class="container">
+    <div class="chatPreview">
+        <mat-form-field style="width: 100%;">
+            <mat-select [formControl]="followerCtrl" placeholder="Search followers" i18n-placeholderLabel noEntriesFoundLabel="'No followers found'" #singleSelect>
+              <mat-option>
+                <ngx-mat-select-search [formControl]="followerFilterCtrl"></ngx-mat-select-search>
+              </mat-option>
+              <mat-option *ngFor="let follower of filteredFollowers | async" [value]="follower.id" (onSelectionChange)="createNewChat(follower.id || 0)">
+                {{follower.name}} {{follower.surname}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        <xp-chat-card *ngFor="let preview of chatPreviews" [chatPreviewMessage]="preview" class="card" (chatSelected)="chatSelected($event)"></xp-chat-card>
+    </div>
+    <div class="chatMessages">
+        <h2 *ngIf="selectedChatId === -1">Select chat</h2>
+        <xp-chat-messages-view *ngIf="selectedChatId !== -1" [followerId]="selectedChatId" (messageSent)="getChatPreviews()"></xp-chat-messages-view>
+    </div>
+</div>

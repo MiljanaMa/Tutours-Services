@@ -1,0 +1,21 @@
+.tourist-position-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 20px;
+    max-width: 1440px;
+    margin: 20px auto 0;
+}
+
+.tourist-position-container h2 {
+    margin: 0;
+}
+
+.tourist-position-container button {
+    margin-left: auto;
+}
+
+.map-container {
+    width: 80%;
+    margin: 0 auto;
+}

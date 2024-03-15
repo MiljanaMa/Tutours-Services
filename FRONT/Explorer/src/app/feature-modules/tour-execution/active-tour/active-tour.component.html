@@ -1,0 +1,145 @@
+<div class="active-tour-container">
+    <div *ngIf="showBlog" id="blog-form-container">
+        <xp-blog-form id="blog-form-display" [selectedBlog]="newBlog" [tourProgress]="activeTourCopy"></xp-blog-form>
+    </div>
+    <div>
+        <div class="tabs-header">
+            <h2 *ngIf="activeTour" (click)="activeTab = 'activeTour'" [ngClass]="{'active':(activeTab === 'activeTour')}">Active tour information</h2>
+            <h2 *ngIf="activeTour" (click)="activeTab = 'currentKeypoint'" [ngClass]="{'active':(activeTab === 'currentKeypoint')}">Current Keypoint information</h2>
+            <h2 (click)="activeTab = 'encounters'" [ngClass]="{'active':(activeTab === 'encounters')}">Encounters</h2>
+        </div>
+        <div class="active-tour__information">
+            <div class="tab" *ngIf="activeTour && activeTab === 'activeTour'">
+                <p><b>Tour name:</b> {{ activeTour.tour.name }}</p>
+                <p><b>Tour distance:</b> {{ activeTour.tour.distance | number:'1.2-2'}}km</p>
+                <p><b>Tour difficulty:</b> {{ activeTour.tour.difficulty }}</p>
+                <p><b>Tour duration:</b> {{ activeTour.tour.duration || 0 | time}}</p>
+                <div class="button-container">
+                    <button class="button button-secondary" (click)="abandonTour()">Abandon Tour</button>
+                </div>
+            </div>
+            <div class="tab" *ngIf="activeTour && currentKeyPoint && activeTab === 'currentKeypoint'">
+                <p><b>Start time:</b> {{ activeTour.startTime | date:"MMM dd, yyyy 'at' hh:mm a" }}</p>
+                <p><b>Your current location:</b> {{ activeTour.touristPosition?.longitude }}°, {{ activeTour.touristPosition?.latitude }}°</p>
+                <p><b>Keypoint Name:</b> {{ currentKeyPoint.name }}</p>
+                <p><b>Keypoint Position:</b> {{ currentKeyPoint.position }}</p>
+                <p><b>Keypoint Description:</b> {{ currentKeyPoint.description }}</p>
+            </div>
+            <div class="tab" *ngIf="activeTab === 'encounters'">
+                <div>
+                    <h2>Nearby encounters</h2>
+                    <table>
+                        <thead>
+                            <th>Name</th>
+                            <th>XP</th>
+                            <th>Type</th>
+                            <th>Info</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let e of nearbyEncounters">
+                                <td>{{e.name}}</td>
+                                <td>{{e.xp}}</td>
+                                <td>{{e.type}}</td>
+                                <td *ngIf="e.type == EncounterType.LOCATION"><img src="{{e.image}}" width="30" height="30" (click)="openImage()" style="cursor: pointer;"></td>
+                                <td *ngIf="e.type != EncounterType.LOCATION">{{e.description}}</td>
+                                <td>
+                                    <button color="primary" mat-icon-button (click)="startEncounter(e)">
+                                        <mat-icon>start</mat-icon>
+                                    </button>
+                                </td>
+                                <div class="popup" *ngIf="e.type == EncounterType.LOCATION" [class]="openImagePopup ? 'show' : ''">
+                                    <h1>{{ e.description }}</h1>
+                                    <img src="{{ e.image }}" width="500" height="500">
+                                    <div class="exit" (click)="openImagePopup = false"><span>X</span></div>
+                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- <xp-keypoint-encounters-preview [keypointEncounters]="keypointEncounters" [requiredEncounters]="requiredEncounters"></xp-keypoint-encounters-preview> -->
+            </div>
+        </div>
+        <div class="active-tour__content">
+            <div class="active-tour__map-container">
+                <app-map [enableClicks]="positionSetMode" [allowMultipleMarkers]="true" [toggleOff]="true" [routeQuery]="routeQuery" [markerPosition]="currentPosition" [markerPositions]="pointsOfInterest" [fitSelectedRoutes]="false" *ngIf="refreshMap" (clickEvent)="updateTouristPosition($event)"></app-map>
+            </div>
+            <div class="active-tour__settings">
+                <div class="setting-container">
+                    <p class="settings__title">Objects</p>
+                    <div class="toggle-container">
+                        <span>Off</span>
+                        <div class="toggle" (click)="toggleSetting(PointOfInterestType.publicObjects)">
+                            <div class="toggle__slider" [ngClass]="{'on':(nearbyObjectsToShow.indexOf(PointOfInterestType.publicObjects) > -1)}"></div>
+                        </div>
+                        <span>On</span>
+                    </div>
+                </div>
+                <div class="setting-container">
+                    <p class="settings__title">Active tour</p>
+                    <div class="toggle-container">
+                        <span>Off</span>
+                        <div class="toggle" (click)="toggleSetting(PointOfInterestType.activeTour)">
+                            <div class="toggle__slider" [ngClass]="{'on':(nearbyObjectsToShow.indexOf(PointOfInterestType.activeTour) > -1)}"></div>
+                        </div>
+                        <span>On</span>
+                    </div>
+                </div>
+                <div class="setting-container">
+                    <p class="settings__title">Active encounters</p>
+                    <div class="toggle-container">
+                        <span>Off</span>
+                        <div class="toggle" (click)="toggleSetting(PointOfInterestType.activeEncounters)">
+                            <div class="toggle__slider" [ngClass]="{'on':(nearbyObjectsToShow.indexOf(PointOfInterestType.activeEncounters) > -1)}"></div>
+                        </div>
+                        <span>On</span>
+                    </div>
+                </div>
+                <div class="setting-container">
+                    <p class="settings__title">Completed encounters</p>
+                    <div class="toggle-container">
+                        <span>Off</span>
+                        <div class="toggle" (click)="toggleSetting(PointOfInterestType.completedEncounters)">
+                            <div class="toggle__slider" [ngClass]="{'on':(nearbyObjectsToShow.indexOf(PointOfInterestType.completedEncounters) > -1)}"></div>
+                        </div>
+                        <span>On</span>
+                    </div>
+                </div>
+                <div class="setting-container">
+                    <p class="settings__title">New encounters</p>
+                    <div class="toggle-container">
+                        <span>Off</span>
+                        <div class="toggle" (click)="toggleSetting(PointOfInterestType.notStartedEncounters)">
+                            <div class="toggle__slider" [ngClass]="{'on':(nearbyObjectsToShow.indexOf(PointOfInterestType.notStartedEncounters) > -1)}"></div>
+                        </div>
+                        <span>On</span>
+                    </div>
+                </div>
+                <div class="setting-container">
+                    <p class="settings__title">Current position</p>
+                    <div class="toggle-container">
+                        <span>Off</span>
+                        <div class="toggle" (click)="toggleSetting(PointOfInterestType.position)">
+                            <div class="toggle__slider" [ngClass]="{'on':(nearbyObjectsToShow.indexOf(PointOfInterestType.position) > -1)}"></div>
+                        </div>
+                        <span>On</span>
+                    </div>
+                </div>
+                <div class="setting-container">
+                    <p class="settings__title">Public keypoints</p>
+                    <div class="toggle-container">
+                        <span>Off</span>
+                        <div class="toggle" (click)="toggleSetting(PointOfInterestType.publicKeypoints)">
+                            <div class="toggle__slider" [ngClass]="{'on':(nearbyObjectsToShow.indexOf(PointOfInterestType.publicKeypoints) > -1)}"></div>
+                        </div>
+                        <span>On</span>
+                    </div>
+                </div>
+                <!-- <div class="settings-container">
+                    <button class="button button-primary" (click)="changePosition()">Change position</button>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+<p-toast position="bottom-center"></p-toast>

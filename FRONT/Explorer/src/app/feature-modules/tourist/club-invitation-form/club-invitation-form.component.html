@@ -1,0 +1,17 @@
+<form [formGroup] = "clubInvitationForm">
+  <div>
+
+    <mat-form-field>
+      <mat-label>Club Id</mat-label>
+      <input matInput formControlName="clubId" type="number" readonly/>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>User Id</mat-label>
+      <input matInput formControlName="userId" type="number" />
+    </mat-form-field>
+
+    <button mat-raised-button type="submit" color="primary" (click)="addClubInvitation()">Submit</button>
+    <div>{{errorMessage}}</div>
+  </div>
+</form>

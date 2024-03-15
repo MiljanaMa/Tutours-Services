@@ -1,0 +1,59 @@
+<div class="bundle-details-container">
+    <h2>Bundle Details</h2>
+    <div class="bundle-info">
+        <p><strong>Name:</strong> {{ bundle.name }}</p>
+        <button  (click)="createBundlePrice()">Create</button>
+        <p *ngIf="bundlePrice"> 
+            <strong>Bundle Price:</strong> {{ bundlePrice.totalPrice || 0 }}
+          </p>    
+</div>
+    <table class="tour-table">
+        <thead>
+            <tr>
+                <th>Tour name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let tour of bundle.tours">
+                <td>{{ tour.name }}</td>
+                <td>{{ tour.description }}</td>
+                <td>{{tour.price}}</td>
+                <td><button (click)="deleteFromBundle(tour.id ?? 0, bundle?.id ?? 0)">Delete From Bundle</button></td>
+
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- Input field for updating name -->
+    <div class="update-name">
+        <input type="text" [(ngModel)]="newName" placeholder="Enter new name" />
+        <button (click)="saveName()">Update Name</button>
+    </div>
+    
+    <hr>
+    
+    <h4>All tours for current Author</h4>
+    <div>
+        <table class="tour-table">
+            <thead>
+                <tr>
+                    <th>Tour name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let tour of toursByAuthor">
+                    <td>{{ tour.name }}</td>
+                    <td>{{ tour.description }}</td>
+                    <td>{{ tour.price }}</td>
+                    <td><button (click)="addToBundle(tour.id ?? 0, bundle?.id ?? 0)">Add To Bundle</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

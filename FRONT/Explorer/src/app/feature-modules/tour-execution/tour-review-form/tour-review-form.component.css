@@ -1,0 +1,55 @@
+div {
+    width: 400px;
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+}
+
+#tourReviewForm {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    margin-left: 210px;
+}
+
+p {
+    font-size: 18px;
+    font-weight:bold;
+    font-family: sans-serif;
+    font-style: oblique;
+    color: #73655f;
+    margin-bottom: 0px;
+    margin-left: 50px;
+}
+
+table {
+    border-collapse: collapse;
+    font-family: sans-serif;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    font-size: 15px;
+    width: 650px;
+    margin-left: 50px;
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+
+thead tr {
+    background-color: #d0b8ac;
+    color: black;
+    text-align: center;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+#buttons {
+    background-color: #d0b8ac;
+    color: black;
+    font-weight:550;
+}

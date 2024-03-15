@@ -1,0 +1,21 @@
+<div [@slideInOut]>
+  <div *ngIf="averageRate !== undefined">
+    <h2>Average Rate: {{ averageRate }}</h2>
+  </div>
+  <h2>Reviews</h2>
+  <div *ngIf="tourReviews && tourReviews.length > 0; else noReviews">
+    <div *ngFor="let review of tourReviews">
+      <p><strong>Rating:</strong>
+        <mat-icon *ngFor="let i of [].constructor(parseToInt(review.rating))">star</mat-icon>
+        <mat-icon *ngFor="let i of [].constructor(5 - parseToInt(review.rating))">star_border</mat-icon>
+      </p>
+      <p><strong>Comment:</strong> {{review.comment}}</p>
+      <p><strong>Date:</strong> {{review.ratingDate | date:'dd.MM.yyyy'}}</p>
+      <p><strong>Author:</strong> Anon</p>
+      <hr>
+    </div>
+  </div>
+  <ng-template #noReviews>
+    <p>No reviews found for this tour.</p>
+  </ng-template>
+</div>

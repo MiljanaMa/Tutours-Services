@@ -1,0 +1,19 @@
+.preferences-container {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    max-width: 700px;
+}
+
+.tag-list {
+    display: flex;
+    gap: 10px;
+}
+
+.tag {
+    background-color: lightblue;
+    padding: 5px;
+    border-radius: 2px;
+    min-width: 50px;
+    text-align: center;
+}

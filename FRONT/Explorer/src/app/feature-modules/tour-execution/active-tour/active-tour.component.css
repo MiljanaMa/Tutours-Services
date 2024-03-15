@@ -1,0 +1,171 @@
+.active-tour-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+.active-tour__information {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 10px;
+    margin-bottom: 30px;
+    border: 3px solid var(--color-foreground);
+    border-radius: 15px;
+    background-color: var(--color-foreground);
+    min-height: 250px;
+}
+
+table {
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 300px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+thead tr {
+    background-color: #3f51b5;
+    color: #ffffff;
+    text-align: left;
+}
+
+th, td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.5rem;
+}
+
+tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+tbody tr:last-of-type {
+    border-bottom: 2px solid #3f51b5;
+}
+
+tbody tr.active-row {
+    font-weight: bold;
+    color: #3f51b5;
+}
+
+#blog-form-display {
+    width: 50%;
+    display: block;
+    margin: 200px auto;
+    z-index: 1000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.active-tour__content {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+}
+
+.active-tour__settings {
+    padding: 1rem 2rem;
+    box-sizing: border-box;
+}
+
+.toggle-container {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle {
+    background-color: var(--color-accent-light);
+    border: 1px solid var(--color-accent-dark);
+    border-radius: 26px;
+    width: 50px;
+    height: 50%;
+    position: relative;
+    padding: 0 10px;
+}
+
+.toggle__slider {
+    position: absolute;
+    height: 100%;
+    width: 20px;
+    bottom: 0;
+    background: #fff;
+    transition: all .4s ease;
+    border-radius: 50%;
+    left: 0;
+}
+
+.toggle__slider.on {
+    left: calc(100% - 20px);
+}
+
+.setting-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings__title {
+    font-weight: 700;
+    margin: 0;
+}
+
+.tabs-header {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.tabs-header h2 {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: var(--color-accent-dark);
+    color: var(--color-foreground);
+    margin: 0;
+    cursor: pointer;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.tabs-header .active {
+    background-color: var(--color-foreground);
+    color: var(--color-accent-contrast);
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    width: 50vw;
+    height: 70vh;
+    left: 30vw;
+    top: 15vh;
+    background-color: white;
+    padding: 20px;
+    z-index: 9999;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.popup.show {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup .exit {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+}
+
+.popup img {
+    margin: 0 auto;
+    height: 80%;
+    width: auto;
+}
+  

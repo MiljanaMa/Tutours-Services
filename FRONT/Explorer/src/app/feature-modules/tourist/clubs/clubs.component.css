@@ -1,0 +1,9 @@
+.clubs {
+    padding: 1%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card {
+    margin: 1%;
+}

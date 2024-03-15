@@ -1,0 +1,29 @@
+.container {
+    display: flex;
+    gap: 10px; /* Adjust the gap as needed for spacing between components */
+  }
+
+.border-big{
+    border: 3px solid black;
+    border-radius: 10px;
+}
+
+.tour-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.tour-table th, .tour-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.tour-table th {
+  background-color: #f2f2f2;
+}
+
+.tour-table tr:hover {
+  background-color: #f5f5f5;
+}

@@ -1,0 +1,7 @@
+<h2 mat-dialog-title>Keypoints for {{tour.name}}</h2>
+<div mat-dialog-content>
+    <div class="map-container">
+        <app-map [routeQuery]="this.routeQuery" [enableClicks]="false" [toggleOff]="true"
+            (routesFoundEvent)="routeFoundEmit($event)"></app-map>
+    </div>
+</div>

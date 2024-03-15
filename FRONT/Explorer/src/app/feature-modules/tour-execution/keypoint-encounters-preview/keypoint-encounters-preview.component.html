@@ -1,0 +1,49 @@
+<div class="cont">
+    <div>
+    <h2>All keypoint encounters</h2>
+    <table>
+        <thead>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Xp</th>
+            <th>Type</th>
+            <th  (click)="sortTable('isRequired')">Required for moving</th>
+            <th></th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let kpe of keypointEncounters">
+                <td>{{kpe.encounter.name}}</td>
+                <td>{{kpe.encounter.description}}</td>
+                <td>{{kpe.encounter.xp}}</td>
+                <td>{{kpe.encounter.type}}</td>
+                <td>{{kpe.isRequired === false ? 'NO' : 'YES'}}</td>
+                <td>
+                    <button *ngIf="kpe.encounter.type !== 'SOCIAL'" aria-label="Finish" type="submit" 
+                    (click)="startEncounter(kpe.encounter)" color="primary" mat-raised-button>Start</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div>
+    <h2>Solve this encounters to move to the next keypoint</h2>
+    <table>
+        <thead>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Xp</th>
+            <th>Type</th>
+            <th>Required for moving</th>
+        </thead>
+        <tbody>
+            <tr *ngFor="let rkpe of requiredEncounters">
+                <td>{{rkpe.encounter.name}}</td>
+                <td>{{rkpe.encounter.description}}</td>
+                <td>{{rkpe.encounter.xp}}</td>
+                <td>{{rkpe.encounter.type}}</td>
+                <td>{{rkpe.isRequired === false ? 'NO' : 'YES'}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</div>

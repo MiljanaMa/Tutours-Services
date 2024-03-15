@@ -1,0 +1,9 @@
+<form [formGroup]="clubJoinRequestForm">
+    <div>
+        <mat-form-field>
+            <mat-label>ClubId</mat-label>
+            <input matInput formControlName="clubId" type="number"/>
+        </mat-form-field>
+    <button color="primary" type="submit"  mat-raised-button (click)="sendRequest()">Send</button>
+    </div>
+</form>
