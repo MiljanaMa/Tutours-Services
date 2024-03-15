@@ -4,6 +4,7 @@ using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public.TourAuthoring;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Explorer.API.Controllers.Author;
 
@@ -12,6 +13,10 @@ namespace Explorer.API.Controllers.Author;
 public class TourManagementController : BaseApiController
 {
     private readonly ITourService _tourService;
+    private static HttpClient httpClient = new()
+    {
+        BaseAddress = new Uri(" http://localhost:8000/tours/"),
+    };
 
     public TourManagementController(ITourService tourService)
     {
@@ -29,10 +34,33 @@ public class TourManagementController : BaseApiController
     [AllowAnonymous]
     [HttpGet("{tourId:int}")]
     [Authorize(Roles = "author")]
-    public ActionResult<TourDto> GetById([FromRoute] int tourId)
+    public async Task<ActionResult<TourDto1>> GetById([FromRoute] int tourId)
     {
-        var result = _tourService.Get(tourId);
-        return CreateResponse(result);
+        /*var result = _tourService.Get(tourId);
+        return CreateResponse(result);*/
+        var httpResponse = await httpClient.GetAsync($"{tourId}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            if (httpResponse.StatusCode == HttpStatusCode.OK)
+            {
+                var response = await httpResponse.Content.ReadFromJsonAsync<TourDto1>();
+
+                return Ok(response);
+            }
+
+            return Ok();
+
+        }
+        else
+        {
+            return new ContentResult
+            {
+                StatusCode = (int)httpResponse.StatusCode,
+                Content = await httpResponse.Content.ReadAsStringAsync(),
+                ContentType = "text/plain"
+            };
+        }
     }
 
     [HttpPost]

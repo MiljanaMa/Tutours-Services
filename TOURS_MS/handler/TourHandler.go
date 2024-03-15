@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"tours/model"
 	"tours/service"
 
@@ -15,15 +16,33 @@ type TourHandler struct {
 }
 
 func (handler *TourHandler) GetById(writer http.ResponseWriter, req *http.Request) {
-	id := mux.Vars(req)["id"]
+	idStr := mux.Vars(req)["tourId"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(writer, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
 	tour, err := handler.TourService.GetById(id)
 	writer.Header().Set("Content-Type", "application/json")
 	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if tour.IsEmpty() {
 		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(tour)
+	jsonData, err := tour.MarshalJSON()
+	print(jsonData)
+	if err != nil {
+		http.Error(writer, "Failed to marshal JSON", http.StatusInternalServerError)
+		return
+	}
+
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Write(jsonData)
+	/*writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(tour)*/
 }
 
 func (handler *TourHandler) Create(writer http.ResponseWriter, req *http.Request) {
@@ -42,4 +61,30 @@ func (handler *TourHandler) Create(writer http.ResponseWriter, req *http.Request
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
+}
+func (handler *TourHandler) GetAll(writer http.ResponseWriter, req *http.Request) {
+	tours, err := handler.TourService.GetAll()
+	if err != nil {
+		http.Error(writer, "Failed to fetch tours", http.StatusInternalServerError)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(tours)
+}
+
+func (handler *TourHandler) GetAllByAuthor(writer http.ResponseWriter, req *http.Request) {
+	idStr := req.URL.Query().Get("authorId")
+	authorId, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(writer, "Invalid author ID", http.StatusBadRequest)
+		return
+	}
+
+	tours, err := handler.TourService.GetAllByAuthorId(authorId)
+	if err != nil {
+		http.Error(writer, "Failed to fetch tours", http.StatusInternalServerError)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(tours)
 }
