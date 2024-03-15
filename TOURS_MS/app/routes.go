@@ -13,11 +13,13 @@ func SetupTourRoutes(router *mux.Router, tourHandler *handler.TourHandler) {
 
 }
 
-/* TO DO
 func SetupKeypointRoutes(router *mux.Router, tourHandler *handler.KeypointHandler) {
 
+	router.HandleFunc("/keypoints/get/{id}", tourHandler.GetById).Methods("GET")
+	router.HandleFunc("/keypoints/getByTour/{id}", tourHandler.GetByTourId).Methods("GET")
+	router.HandleFunc("/keypoints/create", tourHandler.Create).Methods("POST")
+
 }
-*/
 
 /* TO DO
 func SetupObjectRoutes(router *mux.Router, tourHandler *handler.ObjectHandler) {

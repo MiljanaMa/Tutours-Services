@@ -2,7 +2,13 @@ using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public.TourAuthoring;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Net.Http;
+using System.Net.Mime;
+using System.Text;
+using System.Text.Json;
 
 namespace Explorer.API.Controllers.Author;
 
@@ -11,6 +17,11 @@ namespace Explorer.API.Controllers.Author;
 public class KeypointController : BaseApiController
 {
     private readonly IKeypointService _keypointService;
+
+    private static HttpClient sharedClient = new()
+    {
+        BaseAddress = new Uri(" http://localhost:8000/keypoints/"),
+    };
 
     public KeypointController(IKeypointService keypointService)
     {
@@ -24,6 +35,7 @@ public class KeypointController : BaseApiController
         return CreateResponse(result);
     }
 
+    /*
     [HttpGet("tour/{tourId:int}")]
     public ActionResult<PagedResult<KeypointDto>> GetByTour([FromQuery] int page, [FromQuery] int pageSize,
         [FromRoute] int tourId)
@@ -31,6 +43,49 @@ public class KeypointController : BaseApiController
         var result = _keypointService.GetByTourId(page, pageSize, tourId);
         return CreateResponse(result);
     }
+    */
+
+    [HttpGet("tour/{tourId:int}")]
+    public async Task<ActionResult<PagedResult<KeypointDto>>> GetByTour([FromQuery] int page, [FromQuery] int pageSize, [FromRoute] int tourId)
+    {
+        var httpResponse = await sharedClient.GetAsync($"getByTour/{tourId}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseContent = await httpResponse.Content.ReadAsStringAsync();
+
+            try
+            {
+                var keypoints = JsonSerializer.Deserialize<List<KeypointDto>>(responseContent);
+
+                if (keypoints == null || keypoints.Count == 0)
+                {
+                    return NotFound("No keypoints found for the provided tour ID.");
+                }
+
+                var totalCount = keypoints.Count;
+                var pagedKeypoints = keypoints.ToList();
+                var pagedResult = new PagedResult<KeypointDto>(pagedKeypoints, totalCount);
+
+                return pagedResult;
+            }
+            catch (JsonException ex)
+            {
+                return BadRequest("Error deserializing JSON response");
+            }
+        }
+        else
+        {
+            return new ContentResult
+            {
+                StatusCode = (int)httpResponse.StatusCode,
+                Content = await httpResponse.Content.ReadAsStringAsync(),
+                ContentType = "text/plain"
+            };
+        }
+    }
+
+    /*
 
     [HttpPost]
     public ActionResult<KeypointDto> Create([FromBody] KeypointDto keypoint)
@@ -38,6 +93,30 @@ public class KeypointController : BaseApiController
         var result = _keypointService.Create(keypoint);
         return CreateResponse(result);
     }
+    */
+
+    [HttpPost]
+    public async Task<ActionResult<KeypointDto>> Create([FromBody] KeypointDto keypoint)
+    {
+        var jsonContent = JsonSerializer.Serialize(keypoint);
+        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+        var httpResponse = await sharedClient.PostAsync("create", content);
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseContent = await httpResponse.Content.ReadAsStringAsync();
+            var createdKeypoint = JsonSerializer.Deserialize<KeypointDto>(responseContent);
+
+            return Ok(createdKeypoint);
+        }
+        else
+        {
+            return StatusCode((int)httpResponse.StatusCode, "Error creating keypoint");
+        }
+    }
+
+
 
     [HttpPost("/multiple")]
     public ActionResult<KeypointDto> CreateMultiple([FromBody] List<KeypointDto> keypoints)
