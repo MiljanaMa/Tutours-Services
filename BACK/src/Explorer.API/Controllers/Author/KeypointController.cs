@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
+using FluentResults;
 
 namespace Explorer.API.Controllers.Author;
 
@@ -56,17 +57,8 @@ public class KeypointController : BaseApiController
 
             try
             {
-                var keypoints = JsonSerializer.Deserialize<List<KeypointDto>>(responseContent);
-
-                if (keypoints == null || keypoints.Count == 0)
-                {
-                    return NotFound("No keypoints found for the provided tour ID.");
-                }
-
-                var totalCount = keypoints.Count;
-                var pagedKeypoints = keypoints.ToList();
-                var pagedResult = new PagedResult<KeypointDto>(pagedKeypoints, totalCount);
-
+                var keypoints = JsonSerializer.Deserialize<List<KeypointDto>>(responseContent);            
+                var pagedResult = new PagedResult<KeypointDto>(keypoints.ToList(), keypoints.Count);
                 return pagedResult;
             }
             catch (JsonException ex)
@@ -76,12 +68,7 @@ public class KeypointController : BaseApiController
         }
         else
         {
-            return new ContentResult
-            {
-                StatusCode = (int)httpResponse.StatusCode,
-                Content = await httpResponse.Content.ReadAsStringAsync(),
-                ContentType = "text/plain"
-            };
+            return StatusCode((int)httpResponse.StatusCode, "Error while creating keypoint");
         }
     }
 
@@ -107,12 +94,11 @@ public class KeypointController : BaseApiController
         {
             var responseContent = await httpResponse.Content.ReadAsStringAsync();
             var createdKeypoint = JsonSerializer.Deserialize<KeypointDto>(responseContent);
-
             return Ok(createdKeypoint);
         }
         else
         {
-            return StatusCode((int)httpResponse.StatusCode, "Error creating keypoint");
+            return StatusCode((int)httpResponse.StatusCode, "Error while creating keypoint");
         }
     }
 
@@ -125,17 +111,59 @@ public class KeypointController : BaseApiController
         return CreateResponse(result);
     }
 
+    /*
     [HttpPut("{id:int}")]
     public ActionResult<KeypointDto> Update([FromBody] KeypointDto keypoint)
     {
         var result = _keypointService.Update(keypoint);
         return CreateResponse(result);
     }
+    */
 
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<KeypointDto>> Update([FromBody] KeypointDto keypoint)
+    {
+        var jsonContent = JsonSerializer.Serialize(keypoint);
+        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+        var httpResponse = await sharedClient.PostAsync("update", content);
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var responseContent = await httpResponse.Content.ReadAsStringAsync();
+            var createdKeypoint = JsonSerializer.Deserialize<KeypointDto>(responseContent);
+
+            return Ok(createdKeypoint);
+        }
+        else
+        {
+            return StatusCode((int)httpResponse.StatusCode, "Error while updating keypoint");
+        }
+    }
+
+
+    /*
     [HttpDelete("{id:int}")]
     public ActionResult Delete(int id)
     {
         var result = _keypointService.Delete(id);
         return CreateResponse(result);
+    }
+    */
+
+
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        var httpResponse = await sharedClient.DeleteAsync($"delete/{id}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            return CreateResponse(Result.Ok());
+        }
+        else
+        {
+            return StatusCode((int)httpResponse.StatusCode, "Error while deleting keypoint");
+        }
     }
 }

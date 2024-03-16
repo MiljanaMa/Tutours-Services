@@ -32,24 +32,35 @@ func (handler *KeypointHandler) GetByTourId(writer http.ResponseWriter, req *htt
 	keypoints, err := handler.KeypointService.GetByTourId(id)
 	writer.Header().Set("Content-Type", "application/json")
 	if err != nil {
-		if len(keypoints) == 0 {
-			// No keypoints found error
-			writer.WriteHeader(http.StatusNotFound)
-			fmt.Fprintf(writer, `{"error": "No keypoints found for tour with ID %s"}`, id)
-		} else {
-			// Other errors
-			writer.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(writer, `{"error": "Failed to retrieve keypoints for tour with ID %s"}`, id)
-		}
+		writer.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(writer, `{"error": "Failed to retrieve keypoints for tour with ID %s"}`, id)
 		return
 	}
 
-	// Write the successful response with keypoints data
 	writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(writer).Encode(keypoints)
 }
 
 func (handler *KeypointHandler) Create(writer http.ResponseWriter, req *http.Request) {
+	var kp model.Keypoint
+	err_decode := json.NewDecoder(req.Body).Decode(&kp)
+	if err_decode != nil {
+		log.Println("Error while parsing json")
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	keypoint, err := handler.KeypointService.Create(&kp)
+	if err != nil {
+		log.Println("Error while creating keypoint")
+		writer.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	writer.WriteHeader(http.StatusCreated)
+	writer.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(writer).Encode(keypoint)
+}
+
+func (handler *KeypointHandler) Update(writer http.ResponseWriter, req *http.Request) {
 	var kp model.Keypoint
 	err := json.NewDecoder(req.Body).Decode(&kp)
 	if err != nil {
@@ -57,13 +68,24 @@ func (handler *KeypointHandler) Create(writer http.ResponseWriter, req *http.Req
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	keypoint, err := handler.KeypointService.Create(&kp)
+	keypoint, err := handler.KeypointService.Update(&kp)
 	if err != nil {
-		log.Println("Error while creating a new keypoint")
+		log.Println("Error while updating a new keypoint")
 		writer.WriteHeader(http.StatusExpectationFailed)
 		return
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(writer).Encode(keypoint)
+}
+
+func (handler *KeypointHandler) Delete(writer http.ResponseWriter, req *http.Request) {
+	id := mux.Vars(req)["id"]
+	err := handler.KeypointService.Delete(id)
+	writer.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(writer, `{"error": "Failed to delete keypoint}`)
+	}
+	writer.WriteHeader(http.StatusOK)
 }

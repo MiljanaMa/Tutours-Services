@@ -35,3 +35,19 @@ func (repo *KeypointRepository) Create(keypoint *model.Keypoint) (model.Keypoint
 	}
 	return *keypoint, nil
 }
+
+func (repo *KeypointRepository) Update(keypoint *model.Keypoint) (model.Keypoint, error) {
+	dbResult := repo.DatabaseConnection.Save(keypoint)
+	if dbResult.Error != nil {
+		return *keypoint, dbResult.Error
+	}
+	return *keypoint, nil
+}
+
+func (repo *KeypointRepository) Delete(id string) error {
+	dbResult := repo.DatabaseConnection.Delete(&model.Keypoint{}, id)
+	if dbResult.Error != nil {
+		return dbResult.Error
+	}
+	return nil
+}
