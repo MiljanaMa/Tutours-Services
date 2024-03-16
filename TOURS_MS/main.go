@@ -26,10 +26,16 @@ func main() {
 	keypointService := &service.KeypointService{KeypointRepository: keypointRepo}
 	keypointHandler := &handler.KeypointHandler{KeypointService: keypointService}
 
+	// Tourist positions setup
+	touristPositionRepo := &repo.TouristPositionRepository{DatabaseConnection: db}
+	touristPositionService := &service.TouristPositionService{TouristPositionRepository: touristPositionRepo}
+	touristPositionHandler := &handler.TouristPositionHandler{TouristPositionService: touristPositionService}
+
 	router := mux.NewRouter()
 
 	app.SetupTourRoutes(router, tourHandler)
 	app.SetupKeypointRoutes(router, keypointHandler)
+	app.SetupTouristPositionRoutes(router, touristPositionHandler)
 
 	log.Fatal(http.ListenAndServe(app.Port, router))
 }

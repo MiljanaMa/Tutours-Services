@@ -24,7 +24,7 @@ export class TouristPositionComponent implements OnInit {
     this.service.getTouristPosition().subscribe({
       next: (result: TouristPosition) => { 
         this.touristPosition = result;
-        this.touristMapPosition = {
+        this.touristMapPosition = {   
           latitude: this.touristPosition.latitude,
           longitude: this.touristPosition.longitude
         }
@@ -38,12 +38,14 @@ export class TouristPositionComponent implements OnInit {
 
   updateTouristPosition(event: number[]): void {
     this.touristPosition = {
+      id: this.touristPosition?.id,
       latitude: event[0],
       longitude: event[1]
     }
   }
 
   confirmPosition(): void {
+    
     if(this.touristPosition == null) {
       window.alert("Please select your position");
       return;
@@ -66,7 +68,7 @@ export class TouristPositionComponent implements OnInit {
         next: () => {
           window.alert("Position successfully added");  
           this.mode = 'edit';
-
+          this.getPosition();
           this.service.updateSocialEncounters().subscribe({
             next: () => {
           }
