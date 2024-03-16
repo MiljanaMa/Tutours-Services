@@ -93,8 +93,6 @@ public class TourManagementController : BaseApiController
     public async Task<ActionResult<TourDto>> Create([FromBody] TourDto tour)
     {
         tour.UserId = User.PersonId();
-        /*var result = _tourService.Create(tour);
-        return CreateResponse(result);*/
 
         string tourJson = JsonSerializer.Serialize(tour);
         using StringContent jsonContent = new StringContent(

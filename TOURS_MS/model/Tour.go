@@ -22,12 +22,14 @@ type Tour struct {
 	Status           enum.TourStatus
 	StatusUpdateTime time.Time
 	Tags             helper.ArrayString
-	//fali TourEquipments, Keypoints, TourReviews, Bundles
+	Keypoints        []Keypoint `gorm:"foreignKey:TourId"`
+	//fali TourEquipments, TourReviews, Bundles
 }
 
+// is it really needed
 func NewTour(name string, description string, price float64, difficulty enum.TourDifficulty,
 	tags helper.ArrayString, status enum.TourStatus, userId int, distance float64, duration int, transportType enum.TransportType,
-	statusUpdateTime time.Time) *Tour {
+	statusUpdateTime time.Time, keyPoints []Keypoint) *Tour {
 	tour := &Tour{
 		UserId:           userId,
 		Name:             name,
@@ -40,17 +42,20 @@ func NewTour(name string, description string, price float64, difficulty enum.Tou
 		Status:           status,
 		TransportType:    transportType,
 		StatusUpdateTime: statusUpdateTime,
-		//KeyPoints:     keyPoints,
+		Keypoints:        keyPoints,
 	}
 
 	return tour
 }
 
+// usage???
 func (tour *Tour) CreateID(scope *gorm.DB) error {
 	tour.Id = 0
 	return nil
 }
-func (tour *Tour) validate() error {
+
+// use when creating
+func (tour *Tour) Validate() error {
 	if tour.Name == "" {
 		return errors.New("invalid name")
 	}
@@ -66,17 +71,22 @@ func (tour *Tour) validate() error {
 	if tour.Distance < 0 {
 		return errors.New("invalid Distance")
 	}
-	if len(tour.Tags) == 0 {
-		return errors.New("not enough Tags")
-	}
-	if tour.Status == enum.PUBLISHED {
-		return errors.New("tour is already published")
-	}
-	/*if len(tour.KeyPoints) < 2 {
-		return errors.New("not enough Key Points")
-	}
-	*/
 
+	return nil
+}
+
+// use when updating
+func (tour *Tour) ValidateUpdate(oldTour *Tour) error {
+	/*if len(tour.Tags) == 0 {
+		return errors.New("not enough Tags")
+	}*/
+	if tour.Status == enum.ARCHIVED && oldTour.Status != enum.PUBLISHED {
+		return errors.New("Tour is not published yet")
+	}
+	//this stayed like this because collegues left tour update without keypoints
+	if len(oldTour.Keypoints) < 2 && tour.Status == enum.PUBLISHED {
+		return errors.New("Not enough Key Points")
+	}
 	return nil
 }
 func (t *Tour) IsEmpty() bool {
@@ -97,6 +107,7 @@ func (t *Tour) MarshalJSON() ([]byte, error) {
 		Status           string
 		StatusUpdateTime time.Time
 		Tags             helper.ArrayString
+		Keypoints        []Keypoint
 	}{
 		Id:               t.Id,
 		UserId:           t.UserId,
@@ -110,6 +121,7 @@ func (t *Tour) MarshalJSON() ([]byte, error) {
 		Status:           t.Status.ToString(),
 		StatusUpdateTime: t.StatusUpdateTime,
 		Tags:             t.Tags,
+		Keypoints:        t.Keypoints,
 	})
 }
 func (t *Tour) UnmarshalJSON(data []byte) error {
@@ -127,6 +139,7 @@ func (t *Tour) UnmarshalJSON(data []byte) error {
 		Status           string
 		StatusUpdateTime time.Time
 		Tags             helper.ArrayString
+		Keypoints        []Keypoint
 	}
 
 	if err := json.Unmarshal(data, &temp); err != nil {
@@ -145,6 +158,7 @@ func (t *Tour) UnmarshalJSON(data []byte) error {
 	t.Status = enum.FromStringToStatus(temp.Status)
 	t.StatusUpdateTime = temp.StatusUpdateTime
 	t.Tags = temp.Tags
+	t.Keypoints = temp.Keypoints
 
 	return nil
 }

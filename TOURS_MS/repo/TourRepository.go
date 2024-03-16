@@ -21,6 +21,11 @@ func (repo *TourRepository) GetById(id string) (model.Tour, error) {
 }*/
 
 func (repo *TourRepository) Create(tour *model.Tour) (model.Tour, error) {
+	err := tour.Validate()
+	if err != nil {
+		return *tour, err
+	}
+
 	dbResult := repo.DatabaseConnection.Create(tour)
 	if dbResult.Error != nil {
 		return *tour, dbResult.Error
@@ -28,6 +33,22 @@ func (repo *TourRepository) Create(tour *model.Tour) (model.Tour, error) {
 	return *tour, nil
 }
 func (repo *TourRepository) Update(tour *model.Tour) (model.Tour, error) {
+	tourForUpdate, err := repo.GetById(tour.Id)
+	if err != nil {
+		return *tour, err
+	}
+
+	//validation for archiving and publishing
+	err = tour.Validate()
+	if err != nil {
+		return *tour, err
+	}
+
+	err = tour.ValidateUpdate(&tourForUpdate)
+	if err != nil {
+		return *tour, err
+	}
+
 	dbResult := repo.DatabaseConnection.Save(tour)
 	if dbResult.Error != nil {
 		return *tour, dbResult.Error
@@ -40,7 +61,8 @@ func (repo *TourRepository) Delete(tourId int) error {
 	if err != nil {
 		return err
 	}
-	err = repo.DatabaseConnection.Delete(tour).Error
+	err = repo.DatabaseConnection.Select("Keypoints").Delete(tour).Error
+	//err = repo.DatabaseConnection.Unscoped().Model(&tour).Association("Keypoints").Unscoped().Clear()
 	if err != nil {
 		return err
 	}
@@ -49,7 +71,7 @@ func (repo *TourRepository) Delete(tourId int) error {
 
 func (repo *TourRepository) GetAllByAuthor(limit, page, userId int) ([]model.Tour, error) {
 	var tours []model.Tour
-	dbResult := repo.DatabaseConnection.Scopes(h.NewPaginate(limit, page).PaginatedResult).Where("user_id = ?", userId). /*.Preload("KeyPoints")*/ Find(&tours)
+	dbResult := repo.DatabaseConnection.Scopes(h.NewPaginate(limit, page).PaginatedResult).Where("user_id = ?", userId).Preload("Keypoints").Find(&tours)
 	if dbResult.Error != nil {
 		return nil, dbResult.Error
 	}
@@ -57,7 +79,7 @@ func (repo *TourRepository) GetAllByAuthor(limit, page, userId int) ([]model.Tou
 }
 func (repo *TourRepository) GetAll(limit, page int) ([]model.Tour, error) {
 	var tours []model.Tour
-	dbResult := repo.DatabaseConnection.Scopes(h.NewPaginate(limit, page).PaginatedResult). /*.Preload("KeyPoints")*/ Find(&tours)
+	dbResult := repo.DatabaseConnection.Scopes(h.NewPaginate(limit, page).PaginatedResult).Preload("Keypoints").Find(&tours)
 	if dbResult.Error != nil {
 		return nil, dbResult.Error
 	}
@@ -66,7 +88,7 @@ func (repo *TourRepository) GetAll(limit, page int) ([]model.Tour, error) {
 }
 func (repo *TourRepository) GetById(id int) (model.Tour, error) {
 	var tour model.Tour
-	dbResult := repo.DatabaseConnection.Where("id = ?", id). /*.Preload("KeyPoints")*/ Find(&tour)
+	dbResult := repo.DatabaseConnection.Where("id = ?", id).Preload("Keypoints").Find(&tour)
 	if dbResult.Error != nil {
 		return tour, dbResult.Error
 	}

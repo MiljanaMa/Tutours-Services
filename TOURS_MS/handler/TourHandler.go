@@ -44,8 +44,6 @@ func (handler *TourHandler) GetById(writer http.ResponseWriter, req *http.Reques
 
 	writer.Header().Set("Content-Type", "application/json")
 	writer.Write(jsonData)
-	/*writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(tour)*/
 }
 
 func (handler *TourHandler) Create(writer http.ResponseWriter, req *http.Request) {
@@ -123,14 +121,13 @@ func (handler *TourHandler) GetAll(writer http.ResponseWriter, req *http.Request
 	pageStr := req.URL.Query().Get("page")
 	limitStr := req.URL.Query().Get("pageSize")
 
-	// Convert limit and page to integers
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
-		// handle error
+		http.Error(writer, "Failed to read page size", http.StatusInternalServerError)
 	}
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
-		// handle error
+		http.Error(writer, "Failed to read page numbers", http.StatusInternalServerError)
 	}
 
 	tours, err := handler.TourService.GetAll(limit, page)
