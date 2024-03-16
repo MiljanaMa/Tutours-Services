@@ -1,7 +1,5 @@
 package enum
 
-import "encoding/json"
-
 type TourStatus int
 
 const (
@@ -36,6 +34,25 @@ func (ts TourStatus) ToString() string {
 		return "UNKNOWN"
 	}
 }
-func (t *TourStatus) MarshalJSON() ([]byte, error) {
-	return json.Marshal((*t).ToString())
+func FromStringToStatus(ts string) TourStatus {
+	switch ts {
+	case "DRAFT":
+		return DRAFT
+	case "PUBLISHED":
+
+		return PUBLISHED
+	case "ARCHIVED":
+
+		return ARCHIVED
+	case "DISABLED":
+		return DISABLED
+	case "CUSTOM":
+
+		return CUSTOM
+	case "CAMPAIGN":
+
+		return CAMPAIGN
+	default:
+		return DRAFT
+	}
 }

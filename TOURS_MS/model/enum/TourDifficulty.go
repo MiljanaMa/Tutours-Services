@@ -9,18 +9,36 @@ const (
 	EXTREME
 )
 
-/*
-func (d TourDifficulty) ToString() string {
-	switch d {
+func (td TourDifficulty) ToString() string {
+	switch td {
 	case EASY:
-		return "Easy"
+		return "EASY"
 	case MEDIUM:
-		return "Medium"
+
+		return "MEDIUM"
 	case HARD:
-		return "Hard"
+
+		return "HARD"
 	case EXTREME:
-		return "Extreme"
+
+		return "EXTREME"
 	default:
-		return "Unknown"
+		return "UNKNOWN"
 	}
-}*/
+}
+func FromStringToDifficulty(td string) TourDifficulty {
+	switch td {
+	case "EASY":
+		return EASY
+	case "MEDIUM":
+
+		return MEDIUM
+	case "HARD":
+
+		return HARD
+	case "EXTREME":
+		return EXTREME
+	default:
+		return EASY
+	}
+}

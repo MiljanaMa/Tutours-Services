@@ -2,9 +2,14 @@
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Tours.API.Dtos;
 using Explorer.Tours.API.Public.TourAuthoring;
+using Explorer.Tours.Core.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace Explorer.API.Controllers.Author;
 
@@ -25,26 +30,46 @@ public class TourManagementController : BaseApiController
 
     [HttpGet]
     [Authorize(Roles = "author, tourist")]
-    public ActionResult<PagedResult<TourDto>> GetAll([FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<ActionResult<PagedResult<TourDto>>> GetAll([FromQuery] int page, [FromQuery] int pageSize)
     {
-        var result = _tourService.GetPaged(page, pageSize);
-        return CreateResponse(result);
+        //do job, but find more beautiful way
+        var httpResponse = await httpClient.GetAsync($"?page={page}&pageSize={pageSize}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            if (httpResponse.StatusCode == HttpStatusCode.OK)
+            {
+                var response = await httpResponse.Content.ReadFromJsonAsync<List<TourDto>>();
+
+                return Ok(new PagedResult<TourDto>(response, response.Count));
+            }
+
+            return Ok();
+
+        }
+        else
+        {
+            return new ContentResult
+            {
+                StatusCode = (int)httpResponse.StatusCode,
+                Content = await httpResponse.Content.ReadAsStringAsync(),
+                ContentType = "text/plain"
+            };
+        }
     }
 
     [AllowAnonymous]
     [HttpGet("{tourId:int}")]
     [Authorize(Roles = "author")]
-    public async Task<ActionResult<TourDto1>> GetById([FromRoute] int tourId)
+    public async Task<ActionResult<TourDto>> GetById([FromRoute] int tourId)
     {
-        /*var result = _tourService.Get(tourId);
-        return CreateResponse(result);*/
         var httpResponse = await httpClient.GetAsync($"{tourId}");
 
         if (httpResponse.IsSuccessStatusCode)
         {
             if (httpResponse.StatusCode == HttpStatusCode.OK)
             {
-                var response = await httpResponse.Content.ReadFromJsonAsync<TourDto1>();
+                var response = await httpResponse.Content.ReadFromJsonAsync<TourDto>();
 
                 return Ok(response);
             }
@@ -65,37 +90,144 @@ public class TourManagementController : BaseApiController
 
     [HttpPost]
     [Authorize(Roles = "author")]
-    public ActionResult<TourDto> Create([FromBody] TourDto tour)
+    public async Task<ActionResult<TourDto>> Create([FromBody] TourDto tour)
     {
         tour.UserId = User.PersonId();
-        var result = _tourService.Create(tour);
-        return CreateResponse(result);
+        /*var result = _tourService.Create(tour);
+        return CreateResponse(result);*/
+
+        string tourJson = JsonSerializer.Serialize(tour);
+        using StringContent jsonContent = new StringContent(
+            tourJson,
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var httpResponse = await httpClient.PostAsync(
+        "create",
+        jsonContent);
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            if (httpResponse.StatusCode == HttpStatusCode.Created)
+            {
+                var response = await httpResponse.Content.ReadFromJsonAsync<TourDto>();
+
+                return Ok(response);
+            }
+
+            return Ok();
+
+        }
+        else
+        {
+            return new ContentResult
+            {
+                StatusCode = (int)httpResponse.StatusCode,
+                Content = await httpResponse.Content.ReadAsStringAsync(),
+                ContentType = "text/plain"
+            };
+        }
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = "author,tourist")]
-    public ActionResult<TourDto> Update([FromBody] TourDto tour)
+    public async Task<ActionResult<TourDto>> Update([FromBody] TourDto tour)
     {
         tour.UserId = User.PersonId();
-        var result = _tourService.Update(tour);
-        return CreateResponse(result);
+        string tourJson = JsonSerializer.Serialize(tour);
+        using StringContent jsonContent = new StringContent(
+            tourJson,
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var httpResponse = await httpClient.PutAsync(
+        "update",
+        jsonContent);
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            if (httpResponse.StatusCode == HttpStatusCode.OK)
+            {
+                var response = await httpResponse.Content.ReadFromJsonAsync<TourDto>();
+
+                return Ok(response);
+            }
+
+            return Ok();
+
+        }
+        else
+        {
+            return new ContentResult
+            {
+                StatusCode = (int)httpResponse.StatusCode,
+                Content = await httpResponse.Content.ReadAsStringAsync(),
+                ContentType = "text/plain"
+            };
+        }
     }
     
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "author")]
-    public ActionResult Delete(int id)
+    public async Task<ActionResult> Delete(int id)
     {
-        var result = _tourService.Delete(id);
-        return CreateResponse(result);
+        using HttpResponseMessage httpResponse = await httpClient.DeleteAsync($"delete/{id}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            if (httpResponse.StatusCode == HttpStatusCode.OK)
+            {
+                var response = await httpResponse.Content.ReadAsStringAsync();
+
+                return Ok(response);
+            }
+
+            return Ok();
+
+        }
+        else
+        {
+            return new ContentResult
+            {
+                StatusCode = (int)httpResponse.StatusCode,
+                Content = await httpResponse.Content.ReadAsStringAsync(),
+                ContentType = "text/plain"
+            };
+        }
     }
 
     [HttpGet("author")]
     [Authorize(Roles = "author")]
-    public ActionResult<PagedResult<TourDto>> GetByAuthor([FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<ActionResult<PagedResult<TourDto>>> GetByAuthor([FromQuery] int page, [FromQuery] int pageSize)
     {
         var authorId = User.PersonId();
-        var result = _tourService.GetByAuthor(page, pageSize, authorId);
-        return CreateResponse(result);
+        //fix this to add paggination
+        //var httpResponse = await httpClient.GetAsync($"author?page={page}&pageSize={pageSize}&authorId={authorId}");
+        var httpResponse = await httpClient.GetAsync($"author/{authorId}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            if (httpResponse.StatusCode == HttpStatusCode.OK)
+            {
+                var response = await httpResponse.Content.ReadFromJsonAsync<List<TourDto>>();
+
+                return Ok(new PagedResult<TourDto>(response, response.Count));
+            }
+
+            return Ok();
+
+        }
+        else
+        {
+            return new ContentResult
+            {
+                StatusCode = (int)httpResponse.StatusCode,
+                Content = await httpResponse.Content.ReadAsStringAsync(),
+                ContentType = "text/plain"
+            };
+        }
     }
 
     [AllowAnonymous]

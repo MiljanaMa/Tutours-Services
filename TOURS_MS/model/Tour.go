@@ -92,8 +92,8 @@ func (t *Tour) MarshalJSON() ([]byte, error) {
 		Price            float64
 		Duration         int
 		Distance         float64
-		Difficulty       enum.TourDifficulty
-		TransportType    enum.TransportType
+		Difficulty       string
+		TransportType    string
 		Status           string
 		StatusUpdateTime time.Time
 		Tags             helper.ArrayString
@@ -105,10 +105,46 @@ func (t *Tour) MarshalJSON() ([]byte, error) {
 		Price:            t.Price,
 		Duration:         t.Duration,
 		Distance:         t.Distance,
-		Difficulty:       t.Difficulty,    //t.Difficulty.ToString(),
-		TransportType:    t.TransportType, //t.TransportType.ToString(),
+		Difficulty:       t.Difficulty.ToString(),
+		TransportType:    t.TransportType.ToString(),
 		Status:           t.Status.ToString(),
 		StatusUpdateTime: t.StatusUpdateTime,
 		Tags:             t.Tags,
 	})
+}
+func (t *Tour) UnmarshalJSON(data []byte) error {
+
+	var temp struct {
+		Id               int
+		UserId           int
+		Name             string
+		Description      string
+		Price            float64
+		Duration         int
+		Distance         float64
+		Difficulty       string
+		TransportType    string
+		Status           string
+		StatusUpdateTime time.Time
+		Tags             helper.ArrayString
+	}
+
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+
+	t.Id = temp.Id
+	t.UserId = temp.UserId
+	t.Name = temp.Name
+	t.Description = temp.Description
+	t.Price = temp.Price
+	t.Duration = temp.Duration
+	t.Distance = temp.Distance
+	t.Difficulty = enum.FromStringToDifficulty(temp.Difficulty)
+	t.TransportType = enum.FromStringToType(temp.TransportType)
+	t.Status = enum.FromStringToStatus(temp.Status)
+	t.StatusUpdateTime = temp.StatusUpdateTime
+	t.Tags = temp.Tags
+
+	return nil
 }
