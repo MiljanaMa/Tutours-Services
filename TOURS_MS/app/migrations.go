@@ -13,6 +13,6 @@ func ExecuteMigrations(database *gorm.DB) {
 	//keypoints
 	database.AutoMigrate(&model.Keypoint{})
 
-	//objects
-
+	//tourist positions
+	database.AutoMigrate(&model.TouristPosition{})
 }

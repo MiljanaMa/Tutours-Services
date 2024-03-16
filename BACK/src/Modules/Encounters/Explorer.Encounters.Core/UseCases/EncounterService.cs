@@ -129,15 +129,27 @@ namespace Explorer.Encounters.Core.UseCases
 
         public Result<PagedResult<EncounterDto>> GetNearbyHidden(int page, int pageSize, int userId)
         {
-            TouristPositionDto touristPosition = _touristPositionService.GetByUser(userId).Value;
-            var encounters = _encounterRepository.GetNearbyByType(page, pageSize, touristPosition.Longitude, touristPosition.Latitude, EncounterType.LOCATION);
-            return MapToDto(encounters);
+            try {
+                TouristPositionDto touristPosition = _touristPositionService.GetByUser(userId).Value;
+                var encounters = _encounterRepository.GetNearbyByType(page, pageSize, touristPosition.Longitude, touristPosition.Latitude, EncounterType.LOCATION);
+                return MapToDto(encounters);
+
+            }catch(Exception e)
+            {
+                return Result.Fail(FailureCode.NotFound).WithError(e.Message);
+            }
         }
         public Result<PagedResult<EncounterDto>> GetNearby(int page, int pageSize, int userId)
         {
-            TouristPositionDto touristPosition = _touristPositionService.GetByUser(userId).Value;
-            var encounters = _encounterRepository.GetNearby(page, pageSize, touristPosition.Longitude, touristPosition.Latitude);
-            return MapToDto(encounters);
+            try {
+                TouristPositionDto touristPosition = _touristPositionService.GetByUser(userId).Value;
+                var encounters = _encounterRepository.GetNearby(page, pageSize, touristPosition.Longitude, touristPosition.Latitude);
+                return MapToDto(encounters);
+
+            }catch(Exception e)
+            {
+                return Result.Fail(FailureCode.NotFound).WithError(e.Message);
+            }
         }
     }
 }

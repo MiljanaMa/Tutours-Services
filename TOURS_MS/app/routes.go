@@ -23,8 +23,10 @@ func SetupKeypointRoutes(router *mux.Router, keypointHandler *handler.KeypointHa
 
 }
 
-/* TO DO
-func SetupObjectRoutes(router *mux.Router, tourHandler *handler.ObjectHandler) {
+func SetupTouristPositionRoutes(router *mux.Router, touristPositionHandler *handler.TouristPositionHandler) {
 
+	router.HandleFunc("/positions/get/{id}", touristPositionHandler.GetById).Methods("GET")
+	router.HandleFunc("/positions/getByUser/{id}", touristPositionHandler.GetByUserId).Methods("GET")
+	router.HandleFunc("/positions/create", touristPositionHandler.Create).Methods("POST")
+	router.HandleFunc("/positions/update", touristPositionHandler.Update).Methods("POST")
 }
-*/

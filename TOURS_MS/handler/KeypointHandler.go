@@ -45,7 +45,7 @@ func (handler *KeypointHandler) Create(writer http.ResponseWriter, req *http.Req
 	var kp model.Keypoint
 	err_decode := json.NewDecoder(req.Body).Decode(&kp)
 	if err_decode != nil {
-		log.Println("Error while parsing json")
+		log.Println("Error while parsing json - create keypoint")
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -64,13 +64,13 @@ func (handler *KeypointHandler) Update(writer http.ResponseWriter, req *http.Req
 	var kp model.Keypoint
 	err := json.NewDecoder(req.Body).Decode(&kp)
 	if err != nil {
-		log.Println("Error while parsing json")
+		log.Println("Error while parsing json - update keypoint")
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	keypoint, err := handler.KeypointService.Update(&kp)
 	if err != nil {
-		log.Println("Error while updating a new keypoint")
+		log.Println("Error while updating keypoint")
 		writer.WriteHeader(http.StatusExpectationFailed)
 		return
 	}

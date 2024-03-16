@@ -68,7 +68,7 @@ public class KeypointController : BaseApiController
         }
         else
         {
-            return StatusCode((int)httpResponse.StatusCode, "Error while creating keypoint");
+            return StatusCode((int)httpResponse.StatusCode, "Error while getting keypoint");
         }
     }
 
@@ -120,7 +120,7 @@ public class KeypointController : BaseApiController
     }
     */
 
-    [HttpPut("{id:int}")]
+    [HttpPut]
     public async Task<ActionResult<KeypointDto>> Update([FromBody] KeypointDto keypoint)
     {
         var jsonContent = JsonSerializer.Serialize(keypoint);
