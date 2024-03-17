@@ -57,19 +57,22 @@ func (tour *Tour) CreateID(scope *gorm.DB) error {
 // use when creating
 func (tour *Tour) Validate() error {
 	if tour.Name == "" {
-		return errors.New("invalid name")
+		return errors.New("Invalid name")
 	}
 	if tour.Description == "" {
-		return errors.New("invalid Description")
+		return errors.New("Invalid Description")
 	}
 	if tour.Price < 0 {
-		return errors.New("invalid Price")
+		return errors.New("Invalid Price")
 	}
 	if tour.Duration < 0 {
-		return errors.New("invalid Duration")
+		return errors.New("Invalid Duration")
 	}
 	if tour.Distance < 0 {
-		return errors.New("invalid Distance")
+		return errors.New("Invalid Distance")
+	}
+	if len(tour.Tags) == 0 {
+		return errors.New("Not enough Tags")
 	}
 
 	return nil
@@ -77,9 +80,6 @@ func (tour *Tour) Validate() error {
 
 // use when updating
 func (tour *Tour) ValidateUpdate(oldTour *Tour) error {
-	/*if len(tour.Tags) == 0 {
-		return errors.New("not enough Tags")
-	}*/
 	if tour.Status == enum.ARCHIVED && oldTour.Status != enum.PUBLISHED {
 		return errors.New("Tour is not published yet")
 	}

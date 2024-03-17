@@ -25,7 +25,6 @@ func (repo *TourRepository) Create(tour *model.Tour) (model.Tour, error) {
 	if err != nil {
 		return *tour, err
 	}
-
 	dbResult := repo.DatabaseConnection.Create(tour)
 	if dbResult.Error != nil {
 		return *tour, dbResult.Error

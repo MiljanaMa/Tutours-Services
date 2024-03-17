@@ -61,10 +61,15 @@ func (handler *TourHandler) Create(writer http.ResponseWriter, req *http.Request
 		return
 	}
 	savedTour, err := handler.TourService.Create(&tour)
-	jsonData, err := savedTour.MarshalJSON()
 	if err != nil {
 		log.Println("Error while creating a new tour")
-		writer.WriteHeader(http.StatusExpectationFailed)
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	jsonData, err := savedTour.MarshalJSON()
+	if err != nil {
+		log.Println("Error while parsing a new tour")
+		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
 	writer.WriteHeader(http.StatusCreated)
