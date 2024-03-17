@@ -1,4 +1,6 @@
-﻿using Explorer.BuildingBlocks.Core.UseCases;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Encounters.API.Dtos;
 using Explorer.Encounters.API.Public;
 using Explorer.Encounters.Core.Domain;
@@ -7,6 +9,7 @@ using Explorer.Tours.API.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Explorer.BuildingBlocks.Core.UseCases;
 
 namespace Explorer.API.Controllers
 {
@@ -25,8 +28,21 @@ namespace Explorer.API.Controllers
         [HttpGet]
         public ActionResult<PagedResult<EncounterDto>> GetApproved([FromQuery] int page, [FromQuery] int pageSize)
         {
-            var result = _encounterService.GetApproved(page, pageSize);
-            return CreateResponse(result);
+            string url = "http://localhost:8083/encounters";
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response =  client.GetAsync(url).Result;
+            Console.WriteLine("Usao");
+            Console.WriteLine(response);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = response.Content.ReadAsStringAsync().Result;
+                List<EncounterDto> encounters = JsonSerializer.Deserialize<List<EncounterDto>>(json);
+                PagedResult<EncounterDto> result = new PagedResult<EncounterDto>(encounters, encounters.Count);
+
+                return Ok(result); 
+            }
+            
+            return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
         }
 
         [HttpPost]
