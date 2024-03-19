@@ -31,11 +31,17 @@ func main() {
 	touristPositionService := &service.TouristPositionService{TouristPositionRepository: touristPositionRepo}
 	touristPositionHandler := &handler.TouristPositionHandler{TouristPositionService: touristPositionService}
 
+	// Tourist review setup
+	tourReviewRepo := &repo.TourReviewRepository{DatabaseConnection: db}
+	tourReviewService := &service.TourReviewService{TourReviewRepository: tourReviewRepo}
+	tourReviewHandler := &handler.TourReviewHandler{TourReviewService: tourReviewService}
+
 	router := mux.NewRouter()
 
 	app.SetupTourRoutes(router, tourHandler)
 	app.SetupKeypointRoutes(router, keypointHandler)
 	app.SetupTouristPositionRoutes(router, touristPositionHandler)
+	app.SetupTourReviewRoutes(router, tourReviewHandler)
 
 	log.Fatal(http.ListenAndServe(app.Port, router))
 }

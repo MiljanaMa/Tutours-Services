@@ -3,7 +3,6 @@ package repo
 import (
 	"gorm.io/gorm"
 	"tours/model"
-	h "tours/model/helper"
 )
 
 type TourRepository struct {
@@ -61,7 +60,6 @@ func (repo *TourRepository) Delete(tourId int) error {
 		return err
 	}
 	err = repo.DatabaseConnection.Select("Keypoints").Delete(tour).Error
-	//err = repo.DatabaseConnection.Unscoped().Model(&tour).Association("Keypoints").Unscoped().Clear()
 	if err != nil {
 		return err
 	}
@@ -70,7 +68,7 @@ func (repo *TourRepository) Delete(tourId int) error {
 
 func (repo *TourRepository) GetAllByAuthor(limit, page, userId int) ([]model.Tour, error) {
 	var tours []model.Tour
-	dbResult := repo.DatabaseConnection.Scopes(h.NewPaginate(limit, page).PaginatedResult).Where("user_id = ?", userId).Preload("Keypoints").Find(&tours)
+	dbResult := repo.DatabaseConnection.Where("user_id = ?", userId).Preload("Keypoints").Find(&tours)
 	if dbResult.Error != nil {
 		return nil, dbResult.Error
 	}
@@ -78,7 +76,7 @@ func (repo *TourRepository) GetAllByAuthor(limit, page, userId int) ([]model.Tou
 }
 func (repo *TourRepository) GetAll(limit, page int) ([]model.Tour, error) {
 	var tours []model.Tour
-	dbResult := repo.DatabaseConnection.Scopes(h.NewPaginate(limit, page).PaginatedResult).Preload("Keypoints").Find(&tours)
+	dbResult := repo.DatabaseConnection.Preload("Keypoints").Find(&tours)
 	if dbResult.Error != nil {
 		return nil, dbResult.Error
 	}
