@@ -22,14 +22,14 @@ type Tour struct {
 	Status           enum.TourStatus
 	StatusUpdateTime time.Time
 	Tags             helper.ArrayString
-	Keypoints        []Keypoint `gorm:"foreignKey:TourId"`
-	//fali TourEquipments, TourReviews, Bundles
+	Keypoints        []Keypoint   `gorm:"foreignKey:TourId"`
+	TourReviews      []TourReview `gorm:"foreignKey:TourId"`
 }
 
 // is it really needed
 func NewTour(name string, description string, price float64, difficulty enum.TourDifficulty,
 	tags helper.ArrayString, status enum.TourStatus, userId int, distance float64, duration int, transportType enum.TransportType,
-	statusUpdateTime time.Time, keyPoints []Keypoint) *Tour {
+	statusUpdateTime time.Time, keyPoints []Keypoint, tourReviews []TourReview) *Tour {
 	tour := &Tour{
 		UserId:           userId,
 		Name:             name,
@@ -43,6 +43,7 @@ func NewTour(name string, description string, price float64, difficulty enum.Tou
 		TransportType:    transportType,
 		StatusUpdateTime: statusUpdateTime,
 		Keypoints:        keyPoints,
+		TourReviews:      tourReviews,
 	}
 
 	return tour
@@ -108,6 +109,7 @@ func (t *Tour) MarshalJSON() ([]byte, error) {
 		StatusUpdateTime time.Time
 		Tags             helper.ArrayString
 		Keypoints        []Keypoint
+		TourReviews      []TourReview
 	}{
 		Id:               t.Id,
 		UserId:           t.UserId,
@@ -122,6 +124,7 @@ func (t *Tour) MarshalJSON() ([]byte, error) {
 		StatusUpdateTime: t.StatusUpdateTime,
 		Tags:             t.Tags,
 		Keypoints:        t.Keypoints,
+		TourReviews:      t.TourReviews,
 	})
 }
 func (t *Tour) UnmarshalJSON(data []byte) error {
@@ -140,6 +143,7 @@ func (t *Tour) UnmarshalJSON(data []byte) error {
 		StatusUpdateTime time.Time
 		Tags             helper.ArrayString
 		Keypoints        []Keypoint
+		TourReviews      []TourReview
 	}
 
 	if err := json.Unmarshal(data, &temp); err != nil {
@@ -159,6 +163,7 @@ func (t *Tour) UnmarshalJSON(data []byte) error {
 	t.StatusUpdateTime = temp.StatusUpdateTime
 	t.Tags = temp.Tags
 	t.Keypoints = temp.Keypoints
+	t.TourReviews = temp.TourReviews
 
 	return nil
 }

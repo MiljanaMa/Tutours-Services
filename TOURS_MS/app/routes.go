@@ -34,3 +34,8 @@ func SetupTouristPositionRoutes(router *mux.Router, touristPositionHandler *hand
 	router.HandleFunc("/positions/create", touristPositionHandler.Create).Methods("POST")
 	router.HandleFunc("/positions/update", touristPositionHandler.Update).Methods("POST")
 }
+
+func SetupTourReviewRoutes(router *mux.Router, tourReviewHandler *handler.TourReviewHandler) {
+	router.HandleFunc("/tourreview/", tourReviewHandler.GetAll).Methods("GET")
+	router.HandleFunc("/tourreview/create", tourReviewHandler.Create).Methods("POST")
+}
