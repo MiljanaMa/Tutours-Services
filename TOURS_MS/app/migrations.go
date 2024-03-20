@@ -15,4 +15,5 @@ func ExecuteMigrations(database *gorm.DB) {
 
 	//tourist positions
 	database.AutoMigrate(&model.TouristPosition{})
+	database.AutoMigrate(&model.TourReview{})
 }

@@ -4,6 +4,7 @@ import { PagedResults } from 'src/app/shared/model/paged-results.model';
 import { TourReview } from '../model/tour-review.model';
 import { Tour } from '../../tour-authoring/model/tour.model';
 import { TourAuthoringService } from '../../tour-authoring/tour-authoring.service';
+import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 
 @Component({
   selector: 'xp-tour-review',
@@ -20,7 +21,7 @@ export class TourReviewComponent implements OnInit {
   shouldEdit: boolean;
   shouldRenderTourReviewForm: boolean = false;
 
-  constructor(private service: TourExecutionService, private tourService: TourAuthoringService) {}
+  constructor(private service: TourExecutionService, private tourService: TourAuthoringService, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.getTourReviews();
@@ -28,8 +29,11 @@ export class TourReviewComponent implements OnInit {
   }
 
   getTourReviews(): void {
+    console.log(this.shouldRenderTourReviewForm)
+    this.shouldRenderTourReviewForm = false
     this.service.getTourReviews().subscribe({
       next: (result: PagedResults<TourReview>) => {
+        //zapucano je sad bilo bi dobro profiltrirati
         this.tourReview = result.results;
       },
       error: (err: any) => {
