@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Encounters.API.Dtos;
 using Explorer.Encounters.API.Public;
@@ -74,8 +75,30 @@ namespace Explorer.Encounters.Core.UseCases
                     {
                         var encounter = MapToDomain(encounterDto);
                         encounter.UpdateApprovalStatus(EncounterApprovalStatus.PENDING);
-                        var result = _encounterRepository.Create(encounter);
-                        return MapToDto(result);
+
+                        var jsonEncounter = JsonSerializer.Serialize(encounterDto);
+
+                        string url = "localhost:8083/encounters";
+                        HttpClient client = new HttpClient();
+
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(
+                            new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                        HttpResponseMessage response = client.PostAsync("http://localhost:8083/encounters",
+                            new StringContent(jsonEncounter, System.Text.Encoding.UTF8, "application/json")).Result;
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string json = response.Content.ReadAsStringAsync().Result;
+                            EncounterDto result = JsonSerializer.Deserialize<EncounterDto>(json);
+
+                            return Result.Ok(result);
+
+                        }
+
+                        return Result.Fail<EncounterDto>(response.ReasonPhrase); 
+
                     }
                     else
                     {
@@ -85,9 +108,30 @@ namespace Explorer.Encounters.Core.UseCases
                 else
                 {
                     var encounter = MapToDomain(encounterDto);
-                    encounter.UpdateApprovalStatus(EncounterApprovalStatus.SYSTEM_APPROVED);
-                    var result = _encounterRepository.Create(encounter);
-                    return MapToDto(result);
+                    encounter.UpdateApprovalStatus(EncounterApprovalStatus.PENDING);
+
+                    var jsonEncounter = JsonSerializer.Serialize(encounterDto);
+
+                    string url = "localhost:8083/encounters";
+                    HttpClient client = new HttpClient();
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                    HttpResponseMessage response = client.PostAsync("http://localhost:8083/encounters",
+                        new StringContent(jsonEncounter, System.Text.Encoding.UTF8, "application/json")).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string json = response.Content.ReadAsStringAsync().Result;
+                        EncounterDto result = JsonSerializer.Deserialize<EncounterDto>(json);
+
+                        return Result.Ok(result);
+
+                    }
+
+                    return Result.Fail<EncounterDto>(response.ReasonPhrase); 
                 }               
             }
             catch (Exception e)

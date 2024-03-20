@@ -24,25 +24,28 @@ namespace Explorer.API.Controllers
             _encounterService = encounterService;
         }
 
-
-        [HttpGet]
-        public ActionResult<PagedResult<EncounterDto>> GetApproved([FromQuery] int page, [FromQuery] int pageSize)
-        {
-            string url = "http://localhost:8083/encounters";
+        private ActionResult<PagedResult<EncounterDto>> SendGetRequest(string url){
             HttpClient client = new HttpClient();
-            HttpResponseMessage response =  client.GetAsync(url).Result;
-            Console.WriteLine("Usao");
-            Console.WriteLine(response);
-            if (response.IsSuccessStatusCode)
-            {
+            HttpResponseMessage response = client.GetAsync(url).Result;
+
+            if(response.IsSuccessStatusCode){
                 string json = response.Content.ReadAsStringAsync().Result;
                 List<EncounterDto> encounters = JsonSerializer.Deserialize<List<EncounterDto>>(json);
                 PagedResult<EncounterDto> result = new PagedResult<EncounterDto>(encounters, encounters.Count);
 
                 return Ok(result); 
+
             }
-            
+
             return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+        
+
+        }
+
+        [HttpGet]
+        public ActionResult<PagedResult<EncounterDto>> GetApproved([FromQuery] int page, [FromQuery] int pageSize)
+        {
+           return SendGetRequest("http://localhost:8083/encounters");
         }
 
         [HttpPost]
@@ -63,8 +66,15 @@ namespace Explorer.API.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var result = _encounterService.Delete(id);
-            return CreateResponse(result);
+            string url = "http://localhost:8083/encounters/" + id; 
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = client.DeleteAsync(url).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return Ok("Success"); 
+            }
+
+            return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}"); 
         }
 
         [HttpGet("status")]
@@ -78,16 +88,16 @@ namespace Explorer.API.Controllers
         public ActionResult<PagedResult<EncounterDto>> GetNearbyHidden([FromQuery] int page, [FromQuery] int pageSize)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            var result = _encounterService.GetNearbyHidden(page, pageSize, userId);
-            return CreateResponse(result);
+            return SendGetRequest("http://localhost:8083/encounters/nearby-by-type/"+userId);
+           
         }
 
         [HttpGet("nearby")]
         public ActionResult<PagedResult<EncounterDto>> GetNearby([FromQuery] int page, [FromQuery] int pageSize)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            var result = _encounterService.GetNearby(page, pageSize, userId);
-            return CreateResponse(result);
+            return SendGetRequest("http://localhost:8083/encounters/nearby/"+userId);
+
         }
 
         [HttpGet("byUser")]
