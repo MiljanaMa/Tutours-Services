@@ -25,7 +25,6 @@ func (handler *EncounterHandler) GetApproved(writer http.ResponseWriter, req *ht
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Failed to parse JSON"))
 	}
-
 	writer.Header().Set("Content-Type", "application/json")
 
 	writer.WriteHeader(http.StatusOK)

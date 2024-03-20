@@ -2,6 +2,7 @@ package repo
 
 import (
 	"ENCOUNTERS-MS/model"
+
 	"gorm.io/gorm"
 )
 

@@ -5,6 +5,8 @@ using Explorer.Encounters.API.Public;
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using FluentResults;
+using Explorer.Encounters.Core.Domain;
+using System.Text.Json;
 
 namespace Explorer.API.Controllers.Tourist.Encounters
 {
@@ -20,11 +22,30 @@ namespace Explorer.API.Controllers.Tourist.Encounters
         }
 
         [HttpGet]
-        public ActionResult<PagedResult<EncounterCompletionDto>> GetPagedByUser([FromQuery] int page, [FromQuery] int pageSize)
+        public ActionResult<PagedResult<EncounterCompletionDto_1>> GetPagedByUser([FromQuery] int page, [FromQuery] int pageSize)
         {
-            var userId = ClaimsPrincipalExtensions.PersonId(User);
+            string url = $"http://localhost:8083/tourist/encounter/{ClaimsPrincipalExtensions.PersonId(User)}";
+
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = client.GetAsync(url).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string json = response.Content.ReadAsStringAsync().Result;
+                List<EncounterCompletionDto_1> encounterCompletions = JsonSerializer.Deserialize<List<EncounterCompletionDto_1>>(json);
+                PagedResult<EncounterCompletionDto_1> result = new PagedResult<EncounterCompletionDto_1>(encounterCompletions, encounterCompletions.Count);
+
+                return Ok(result);
+            }
+
+            return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+
+
+            /*
             var result = _encounterCompletionService.GetPagedByUser(page, pageSize, userId);
-            return CreateResponse(result);
+            return CreateResponse(result); 
+            */
+
+
         }
 
         [HttpPost("completions")]
