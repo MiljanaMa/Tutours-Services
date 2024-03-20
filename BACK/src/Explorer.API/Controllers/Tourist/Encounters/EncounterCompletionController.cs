@@ -38,14 +38,6 @@ namespace Explorer.API.Controllers.Tourist.Encounters
             }
 
             return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
-
-
-            /*
-            var result = _encounterCompletionService.GetPagedByUser(page, pageSize, userId);
-            return CreateResponse(result); 
-            */
-
-
         }
 
         [HttpPost("completions")]
@@ -73,9 +65,42 @@ namespace Explorer.API.Controllers.Tourist.Encounters
         public ActionResult<EncounterCompletionDto> FinishEncounter([FromBody] EncounterDto encounter)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            var result = _encounterCompletionService.FinishEncounter(userId, encounter);
-            return CreateResponse(result);
+            var url = $"http://localhost:8083/tourist/encounter/finishEncounter/{userId}";
+            
+            //var encounterId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = client.GetAsync(url).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = response.Content.ReadAsStringAsync().Result;
+                var result = JsonSerializer.Deserialize<EncounterCompletionDto>(json);
+                return Ok(result);
+            }
+
+            return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
         }
+
+
+        /*
+         * public ActionResult<EncounterCompletionDto> FinishEncounter([FromBody] EncounterDto encounter)
+        {
+            var userId = ClaimsPrincipalExtensions.PersonId(User);
+
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = client.PutAsJsonAsync(url, encounter).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = response.Content.ReadAsStringAsync().Result;
+                var result = JsonSerializer.Deserialize<EncounterCompletionDto>(json);
+                return Ok(result);
+            }
+
+            return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+
+        }*/
 
         [HttpGet("checkNearbyCompletions")]
         public ActionResult<PagedResult<EncounterCompletionDto>> CheckNearbyEncounters() // currently handles only hidden encounters, it would be benefitial if all checks for nearby encounters would be here together with criteria for completition

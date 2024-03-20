@@ -16,3 +16,22 @@ func (service *EncounterCompletionService) GetPagedByUser(userId string) ([]*mod
 	}
 	return nil, fmt.Errorf("Error finding encounter completions")
 }
+
+func (service *EncounterCompletionService) FinishEncounter(userId string, encounterId string) (*model.EncounterCompletion, error) {
+	encounterCompletion, err := service.EncounterCompletionRepo.GetByUserAndEncounter(userId, encounterId)
+	if err != nil {
+		return encounterCompletion, err
+	}
+	if encounterCompletion == nil {
+		return nil, fmt.Errorf("Encounter completion not found for user and encounter")
+	}
+
+	encounterCompletion.Status = model.CompletionStatusCompleted
+	if err := service.EncounterCompletionRepo.Update(encounterCompletion); err != nil {
+		return encounterCompletion, err
+	}
+
+	//NOTE: XP for user, not needed now
+
+	return encounterCompletion, nil
+}

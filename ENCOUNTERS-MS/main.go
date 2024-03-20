@@ -43,6 +43,7 @@ func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.E
 
 	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET")
 	router.HandleFunc("/tourist/encounter/{id}", handlerCompletion.GetPagedByUser).Methods("GET")
+	router.HandleFunc("/tourist/encounter/finishEncounter/{id}", handlerCompletion.FinishEncounter).Methods("GET")
 
 	fmt.Println("Server is starting...")
 	log.Fatal(http.ListenAndServe(":8083", router))
@@ -72,6 +73,3 @@ func main() {
 
 	startServer(encounterHandler, completionHandler)
 }
-
-// started kod turiste su mozda vezani za completition,
-// mada pogledaj opet
