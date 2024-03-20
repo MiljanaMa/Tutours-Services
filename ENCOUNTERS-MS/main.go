@@ -38,16 +38,16 @@ func startServer(handler *handler.EncounterHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// GET
-	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET")
+	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET") // tested
 	router.HandleFunc("/tourist-created-encounters", handler.GetTouristCreatedEncounters).Methods("GET")
 	router.HandleFunc("/encounters/nearby/{userId}", handler.GetNearby).Methods("GET")
 	router.HandleFunc("/encounters/nearby-by-type/{userId}", handler.GetNearbyByType).Methods("GET")
 
 	// POST
-	router.HandleFunc("/encounters", handler.Create).Methods("POST")
+	router.HandleFunc("/encounters", handler.Create).Methods("POST") // tested
 
 	// DELETE
-	router.HandleFunc("/encounters/{id}", handler.Delete).Methods("DELETE")
+	router.HandleFunc("/encounters/{id}", handler.Delete).Methods("DELETE") // tested
 
 	fmt.Println("Server is starting...")
 	log.Fatal(http.ListenAndServe(":8083", router))

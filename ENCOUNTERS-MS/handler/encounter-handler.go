@@ -4,7 +4,7 @@ import (
 	"ENCOUNTERS-MS/model"
 	"ENCOUNTERS-MS/service"
 	json2 "encoding/json"
-	"github.com/google/uuid"
+	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -84,12 +84,15 @@ func (handler *EncounterHandler) GetNearbyByType(writer http.ResponseWriter, req
 }
 
 func (handler *EncounterHandler) Create(writer http.ResponseWriter, req *http.Request) {
+	fmt.Println("called")
 	var encounter model.Encounter
+	fmt.Println(req.Body)
 	if err := json2.NewDecoder(req.Body).Decode(&encounter); err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write([]byte("Cannot parse JSON"))
 		return
 	}
+	fmt.Println("called2")
 
 	res, err := handler.EncounterService.Create(&encounter)
 
@@ -113,13 +116,13 @@ func (handler *EncounterHandler) Create(writer http.ResponseWriter, req *http.Re
 
 func (handler *EncounterHandler) Delete(writer http.ResponseWriter, req *http.Request) {
 	id := mux.Vars(req)["id"]
-	uid, err := uuid.Parse(id)
+	numId, err := strconv.Atoi(id)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write([]byte("Can't parse the id"))
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("Can't convert id"))
 		return
 	}
-	if err := handler.EncounterService.Delete(uid); err != nil {
+	if err := handler.EncounterService.Delete(numId); err != nil {
 		writer.WriteHeader(http.StatusNotFound)
 		writer.Write([]byte("Can't find id to delete"))
 		return

@@ -5,7 +5,6 @@ import (
 	"ENCOUNTERS-MS/repo"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"strconv"
@@ -87,7 +86,7 @@ func (service *EncounterService) Create(encounter *model.Encounter) (*model.Enco
 
 }
 
-func (service *EncounterService) Delete(id uuid.UUID) error {
+func (service *EncounterService) Delete(id int) error {
 	if err := service.EncounterRepo.Delete(id); err != nil {
 		return fmt.Errorf("Can't find id to delete")
 	}

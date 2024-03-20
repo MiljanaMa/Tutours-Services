@@ -77,8 +77,7 @@ namespace Explorer.Encounters.Core.UseCases
                         encounter.UpdateApprovalStatus(EncounterApprovalStatus.PENDING);
 
                         var jsonEncounter = JsonSerializer.Serialize(encounterDto);
-
-                        string url = "localhost:8083/encounters";
+                        
                         HttpClient client = new HttpClient();
 
                         client.DefaultRequestHeaders.Accept.Clear();
@@ -112,7 +111,7 @@ namespace Explorer.Encounters.Core.UseCases
 
                     var jsonEncounter = JsonSerializer.Serialize(encounterDto);
 
-                    string url = "localhost:8083/encounters";
+                    Console.WriteLine("JSON:",jsonEncounter);
                     HttpClient client = new HttpClient();
 
                     client.DefaultRequestHeaders.Accept.Clear();

@@ -2,7 +2,6 @@ package repo
 
 import (
 	"ENCOUNTERS-MS/model"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -95,7 +94,7 @@ func (repo *EncounterRepository) GetByType(long float64, lat float64, encounterT
 	return encounters, nil
 }
 
-func (repo *EncounterRepository) Delete(id uuid.UUID) error {
+func (repo *EncounterRepository) Delete(id int) error {
 	var encounter model.Encounter
 	if dbResult := repo.DatabaseConnection.Where("id = ?", id).Delete(&encounter); dbResult.Error != nil {
 		return dbResult.Error
