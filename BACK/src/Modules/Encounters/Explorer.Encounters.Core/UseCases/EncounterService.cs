@@ -108,7 +108,7 @@ namespace Explorer.Encounters.Core.UseCases
                 else
                 {
                     var encounter = MapToDomain(encounterDto);
-                    encounter.UpdateApprovalStatus(EncounterApprovalStatus.PENDING);
+                    encounter.UpdateApprovalStatus(EncounterApprovalStatus.SYSTEM_APPROVED);
 
                     var jsonEncounter = JsonSerializer.Serialize(encounterDto);
 
