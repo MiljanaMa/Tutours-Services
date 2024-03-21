@@ -1,7 +1,5 @@
 package model
 
-import "github.com/google/uuid"
-
 type EncounterStatus string
 
 const (
@@ -28,8 +26,8 @@ const (
 )
 
 type Encounter struct {
-	ID             uuid.UUID
-	UserID         int
+	Id             int `gorm:"primaryKey;autoIncrement"`
+	UserId         int
 	Name           string
 	Description    string
 	Latitude       float64
