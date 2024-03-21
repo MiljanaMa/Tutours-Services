@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"gorm.io/gorm"
 	"time"
 	"tours/model"
@@ -23,6 +24,14 @@ func (repo *TourReviewRepository) Create(review *model.TourReview) (model.TourRe
 	err := review.Validate()
 	if err != nil {
 		return *review, err
+	}
+
+	var existingReview model.TourReview
+	dbResult1 := repo.DatabaseConnection.Where("tour_id = ? AND user_id = ?", review.TourId, review.UserId).Find(&existingReview)
+	if dbResult1.RowsAffected > 0 {
+		return existingReview, errors.New("Review already exists")
+	} else if dbResult1.Error != nil && !errors.Is(dbResult1.Error, gorm.ErrRecordNotFound) {
+		return *review, dbResult1.Error
 	}
 
 	review.RatingDate = time.Now()
