@@ -38,13 +38,20 @@ func startServer(handler *handler.EncounterHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// GET
-	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET") // tested
-	router.HandleFunc("/tourist-created-encounters", handler.GetTouristCreatedEncounters).Methods("GET")
-	router.HandleFunc("/encounters/nearby/{userId}", handler.GetNearby).Methods("GET")
-	router.HandleFunc("/encounters/nearby-by-type/{userId}", handler.GetNearbyByType).Methods("GET")
+	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET")                                         // tested
+	router.HandleFunc("/tourist-created-encounters", handler.GetTouristCreatedEncounters).Methods("GET")         // tested
+	router.HandleFunc("/encounters/nearby/{userId}", handler.GetNearby).Methods("GET")                           // tested
+	router.HandleFunc("/encounters/nearby-by-type/{userId}", handler.GetNearbyByType).Methods("GET")             // tested
+	router.HandleFunc("/encounters/get-by-user/{userId}", handler.GetByUser).Methods("GET")                      // tested
+	router.HandleFunc("/encounters/get-approved-by-status/{status}", handler.GetApprovedByStatus).Methods("GET") // tested
 
 	// POST
 	router.HandleFunc("/encounters", handler.Create).Methods("POST") // tested
+
+	// PUT
+	router.HandleFunc("/encounters", handler.Update).Methods("PUT") // tested
+	router.HandleFunc("/encounters/approve", handler.Approve).Methods("PUT")
+	router.HandleFunc("/encounters/decline", handler.Decline).Methods("PUT")
 
 	// DELETE
 	router.HandleFunc("/encounters/{id}", handler.Delete).Methods("DELETE") // tested

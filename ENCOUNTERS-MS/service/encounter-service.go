@@ -33,7 +33,7 @@ func (service *EncounterService) GetApprovedByStatus(status model.EncounterStatu
 }
 
 func (service *EncounterService) GetByUser(userId int) ([]*model.Encounter, error) {
-	if encounters, err := service.GetByUser(userId); err == nil {
+	if encounters, err := service.EncounterRepo.GetByUser(userId); err == nil {
 		return encounters, nil
 	}
 	return nil, fmt.Errorf("Couldn't find any.")
@@ -93,24 +93,32 @@ func (service *EncounterService) Delete(id int) error {
 	return nil
 }
 
-func (service *EncounterService) Approve(encounter *model.Encounter) error {
-
-	encounter.ApprovalStatus = model.EncounterApprovalStatus("ADMIN_APPROVED")
-	if err := service.EncounterRepo.Update(encounter); err != nil {
-		return fmt.Errorf("Couldn't approve.")
+func (service *EncounterService) Update(encounter *model.Encounter) (*model.Encounter, error) {
+	if err := service.EncounterRepo.Update(encounter); err == nil {
+		return encounter, nil
 	}
 
-	return nil
+	return nil, fmt.Errorf("Couldn't approve.")
+}
+func (service *EncounterService) Approve(encounter *model.Encounter) (*model.Encounter, error) {
+
+	encounter.ApprovalStatus = model.EncounterApprovalStatus("ADMIN_APPROVED")
+	if err := service.EncounterRepo.Update(encounter); err == nil {
+		return encounter, nil
+	}
+
+	return nil, fmt.Errorf("Couldn't approve.")
 
 }
 
-func (service *EncounterService) Decline(encounter *model.Encounter) error {
+func (service *EncounterService) Decline(encounter *model.Encounter) (*model.Encounter, error) {
 
 	encounter.ApprovalStatus = model.EncounterApprovalStatus("DECLINED")
-	if err := service.EncounterRepo.Update(encounter); err != nil {
-		return fmt.Errorf("Couldn't decline.")
+	if err := service.EncounterRepo.Update(encounter); err == nil {
+		return encounter, nil
 	}
-	return nil
+
+	return nil, fmt.Errorf("Couldn't approve.")
 }
 
 func findInVicinity(encountersPtr *[]*model.Encounter, lat, long float64) []*model.Encounter {

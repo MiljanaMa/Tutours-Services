@@ -27,7 +27,8 @@ func (repo *EncounterRepository) Create(encounter *model.Encounter) (*model.Enco
 }
 
 func (repo *EncounterRepository) Update(encounter *model.Encounter) error {
-	return repo.DatabaseConnection.Save(&encounter).Error
+	res := repo.DatabaseConnection.Save(&encounter)
+	return res.Error
 }
 
 func (repo *EncounterRepository) GetApprovedByStatus(status model.EncounterStatus) ([]*model.Encounter, error) {
