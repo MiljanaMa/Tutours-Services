@@ -67,8 +67,6 @@ namespace Explorer.API.Controllers.Tourist.Encounters
             var userId = ClaimsPrincipalExtensions.PersonId(User);
             var url = $"http://localhost:8083/tourist/encounter/finishEncounter/{userId}";
             
-            //var encounterId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
-
             HttpClient client = new HttpClient();
             HttpResponseMessage response = client.GetAsync(url).Result;
 

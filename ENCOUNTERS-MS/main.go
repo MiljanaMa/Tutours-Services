@@ -26,6 +26,7 @@ func initDB() *gorm.DB {
 	models := []interface{}{
 		model.Encounter{},
 		model.EncounterCompletion{},
+		model.KeypointEncounter{},
 	}
 
 	for _, m := range models {
@@ -38,12 +39,16 @@ func initDB() *gorm.DB {
 	return database
 
 }
-func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.EncounterCompletionHandler) {
+func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.EncounterCompletionHandler, keypointEncHandler *handler.KeypointEncounterHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET")
 	router.HandleFunc("/tourist/encounter/{id}", handlerCompletion.GetPagedByUser).Methods("GET")
 	router.HandleFunc("/tourist/encounter/finishEncounter/{id}", handlerCompletion.FinishEncounter).Methods("GET")
+	router.HandleFunc("/keypointencounter/{keypointid}", keypointEncHandler.GetPagedByKeypoint).Methods("GET")
+	router.HandleFunc("/keypointencounter/create", keypointEncHandler.Create).Methods("POST")
+	router.HandleFunc("/keypointencounter/update", keypointEncHandler.Update).Methods("PUT")
+	router.HandleFunc("/keypointencounter/delete/{id}", keypointEncHandler.Delete).Methods("DELETE")
 
 	fmt.Println("Server is starting...")
 	log.Fatal(http.ListenAndServe(":8083", router))
@@ -71,5 +76,9 @@ func main() {
 	completionService := &service.EncounterCompletionService{completionRepo}
 	completionHandler := &handler.EncounterCompletionHandler{completionService}
 
-	startServer(encounterHandler, completionHandler)
+	keypointEncRepo := &repo.KeypointEncounterRepository{db}
+	keypointEncService := &service.KeypointEncounterService{keypointEncRepo}
+	keypointEncHandler := &handler.KeypointEncounterHandler{keypointEncService}
+
+	startServer(encounterHandler, completionHandler, keypointEncHandler)
 }
