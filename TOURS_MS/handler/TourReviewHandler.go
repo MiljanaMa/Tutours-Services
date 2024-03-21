@@ -35,7 +35,7 @@ func (handler *TourReviewHandler) Create(writer http.ResponseWriter, req *http.R
 	review, err := handler.TourReviewService.Create(&r)
 	if err != nil {
 		log.Println("Error while creating tourist review")
-		writer.WriteHeader(http.StatusExpectationFailed)
+		http.Error(writer, err.Error(), http.StatusExpectationFailed)
 		return
 	}
 	writer.WriteHeader(http.StatusCreated)
