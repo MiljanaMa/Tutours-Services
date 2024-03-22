@@ -99,7 +99,7 @@ namespace Explorer.API.Controllers.Author
         //[HttpDelete("{id:int}")]
         [HttpDelete("/deletekeypointenc")]
         [Authorize(Roles = "author")]
-        public ActionResult Delete([FromBody] UuidDto id) //UuidDto
+        public ActionResult Delete( string id) //UuidDto
         {
             string url = $"http://localhost:8083/keypointencounter/delete";
 

@@ -48,7 +48,7 @@ func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.E
 	router.HandleFunc("/keypointencounter/{keypointid}", keypointEncHandler.GetPagedByKeypoint).Methods("GET")
 	router.HandleFunc("/keypointencounter/create", keypointEncHandler.Create).Methods("POST")
 	router.HandleFunc("/keypointencounter/update", keypointEncHandler.Update).Methods("PUT")
-	router.HandleFunc("/keypointencounter/delete/{id}", keypointEncHandler.Delete).Methods("DELETE")
+	router.HandleFunc("/keypointencounter/delete", keypointEncHandler.Delete).Methods("DELETE")
 
 	fmt.Println("Server is starting...")
 	log.Fatal(http.ListenAndServe(":8083", router))

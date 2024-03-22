@@ -38,7 +38,9 @@ func (repo *KeypointEncounterRepository) Create(keypointEncounter *model.Keypoin
 }
 
 func (repo *KeypointEncounterRepository) Delete(keypointEncounterId string) error {
-	result := repo.DatabaseConnection.Delete(&model.KeypointEncounter{}, keypointEncounterId)
+	query := fmt.Sprintf("DELETE FROM keypoint_encounters WHERE id = '%s'", keypointEncounterId)
+
+	result := repo.DatabaseConnection.Exec(query)
 	if result.Error != nil {
 		return fmt.Errorf("error deleting keypoint encounter: %s", result.Error)
 	}

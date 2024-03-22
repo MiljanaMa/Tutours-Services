@@ -110,8 +110,13 @@ func (handler *KeypointEncounterHandler) Update(writer http.ResponseWriter, req 
 
 // dodaj id u putanji, enc_id
 func (handler *KeypointEncounterHandler) Delete(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id := vars["id"]
+	//vars := mux.Vars(req)
+	//id := vars["id"]
+	id := "d8f246bf-9e7e-4b3b-8de8-f9db02a81e64"
+	/*if err := json.NewDecoder(req.Body).Decode(&id); err != nil {
+	writer.WriteHeader(http.StatusBadRequest)
+	writer.Write([]byte("Invalid request body"))
+	return*/
 
 	err := handler.KeypointEncounterService.Delete(id)
 	if err != nil {
