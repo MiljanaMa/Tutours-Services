@@ -20,7 +20,6 @@ func (handler *EncounterHandler) createGetResponse(encounters *[]*model.Encounte
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Failed to parse JSON"))
 	}
-
 	writer.Header().Set("Content-Type", "application/json")
 
 	writer.WriteHeader(http.StatusOK)

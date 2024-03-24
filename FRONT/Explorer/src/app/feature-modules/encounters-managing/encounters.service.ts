@@ -7,6 +7,7 @@ import { PagedResults } from 'src/app/shared/model/paged-results.model';
 import { EncounterCompletion } from './model/encounterCompletion.model';
 import { EncounterStats } from './model/encounter-stats.model';
 import { EncounterYearStats } from './model/encounter-year-stats.model';
+import { EncounterMS } from './model/encounter_MS.model';
 
 @Injectable({
   providedIn: 'root'

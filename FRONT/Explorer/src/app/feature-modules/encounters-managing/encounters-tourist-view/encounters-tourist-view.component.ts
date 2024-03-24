@@ -7,6 +7,7 @@ import { EncounterCompletion, EncounterCompletionStatus } from '../model/encount
 import { MapComponent } from 'src/app/shared/map/map.component';
 import { MatDialog } from '@angular/material/dialog';
 import { EncountersStatisticsComponent } from '../encounters-statistics/encounters-statistics.component';
+import { EncounterMS } from '../model/encounter_MS.model';
 
 @Component({
   selector: 'xp-encounter-map',
@@ -26,6 +27,8 @@ export class EncountersTouristViewComponent implements OnInit {
   public showForm: boolean;
   public formMode: string;
   public canCreateEncounters: boolean = false;
+  public encounterId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
+  public encounterMS: EncounterMS;
   @ViewChild(MapComponent) mapComponent: MapComponent;
 
   constructor(private service: EncountersService, private dialog: MatDialog) { }
@@ -70,6 +73,9 @@ export class EncountersTouristViewComponent implements OnInit {
   }
 
   finishEncounter(encounter: Encounter): void {
+    //this.encounterId = encounter.id.toString
+    //// aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    //prebaci id modela i sve metode iz int u string zbog uuid
     this.service.finishEncounter(encounter).subscribe({
       next: () =>{
         window.confirm("You successfully completed encounter");
