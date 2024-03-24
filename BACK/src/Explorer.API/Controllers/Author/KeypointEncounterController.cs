@@ -1,6 +1,7 @@
 ﻿using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Encounters.API.Dtos;
 using Explorer.Encounters.API.Public;
+using Explorer.Encounters.Core.Domain;
 using Explorer.Encounters.Core.UseCases;
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using Explorer.Tours.Core.Domain;
@@ -92,20 +93,17 @@ namespace Explorer.API.Controllers.Author
                     return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
                 }
             }
-            /*var result = _keypointEncounterService.Update(keypointEncounter);
-            return CreateResponse(result);*/
         }
 
         //[HttpDelete("{id:int}")]
         [HttpDelete("/deletekeypointenc")]
         [Authorize(Roles = "author")]
-        public ActionResult Delete( string id) //UuidDto
+        public ActionResult Delete([FromQuery] string id)
         {
-            string url = $"http://localhost:8083/keypointencounter/delete";
+            string url = $"http://localhost:8083/keypointencounter/delete?id={id}";
 
             using (HttpClient client = new HttpClient())
             {
-
                 HttpResponseMessage response = client.DeleteAsync(url).Result;
 
                 if (response.IsSuccessStatusCode)
@@ -117,9 +115,6 @@ namespace Explorer.API.Controllers.Author
                     return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
                 }
             }
-
-            /*var result = _keypointEncounterService.Delete(id);
-            return CreateResponse(result);*/
         }
 
         [HttpPut("{keypointId:int}")]
