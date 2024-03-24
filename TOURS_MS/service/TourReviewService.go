@@ -21,7 +21,9 @@ func (service *TourReviewService) GetAll() ([]model.TourReview, error) {
 func (service *TourReviewService) Create(tp *model.TourReview) (*model.TourReview, error) {
 	review, err := service.TourReviewRepository.Create(tp)
 	if err != nil {
-		return nil, fmt.Errorf("error while creating review")
+
+		fmt.Println(err.Error())
+		return nil, err
 	}
 	return &review, nil
 }

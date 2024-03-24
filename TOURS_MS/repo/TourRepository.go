@@ -59,7 +59,7 @@ func (repo *TourRepository) Delete(tourId int) error {
 	if err != nil {
 		return err
 	}
-	err = repo.DatabaseConnection.Select("Keypoints").Delete(tour).Error
+	err = repo.DatabaseConnection.Select("Keypoints", "TourReviews").Delete(tour).Error
 	if err != nil {
 		return err
 	}

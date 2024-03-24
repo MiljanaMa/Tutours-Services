@@ -42,9 +42,24 @@ func initDB() *gorm.DB {
 func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.EncounterCompletionHandler, keypointEncHandler *handler.KeypointEncounterHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET")
+	//ENCOUNTER
+	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET")                                         // tested
+	router.HandleFunc("/tourist-created-encounters", handler.GetTouristCreatedEncounters).Methods("GET")         // tested
+	router.HandleFunc("/encounters/nearby/{userId}", handler.GetNearby).Methods("GET")                           // tested
+	router.HandleFunc("/encounters/nearby-by-type/{userId}", handler.GetNearbyByType).Methods("GET")             // tested
+	router.HandleFunc("/encounters/get-by-user/{userId}", handler.GetByUser).Methods("GET")                      // tested
+	router.HandleFunc("/encounters/get-approved-by-status/{status}", handler.GetApprovedByStatus).Methods("GET") // tested
+	router.HandleFunc("/encounters", handler.Create).Methods("POST")                                             // tested
+	router.HandleFunc("/encounters", handler.Update).Methods("PUT")                                              // tested
+	router.HandleFunc("/encounters/approve", handler.Approve).Methods("PUT")
+	router.HandleFunc("/encounters/decline", handler.Decline).Methods("PUT")
+	router.HandleFunc("/encounters/{id}", handler.Delete).Methods("DELETE") // tested
+
+	//ENCOUNTER COMPLETION
 	router.HandleFunc("/tourist/encounter/{id}", handlerCompletion.GetPagedByUser).Methods("GET")
 	router.HandleFunc("/tourist/encounter/finishEncounter/{id}", handlerCompletion.FinishEncounter).Methods("GET")
+
+	//KEYPOINT ENCOUNTER
 	router.HandleFunc("/keypointencounter/{keypointid}", keypointEncHandler.GetPagedByKeypoint).Methods("GET")
 	router.HandleFunc("/keypointencounter/create", keypointEncHandler.Create).Methods("POST")
 	router.HandleFunc("/keypointencounter/update", keypointEncHandler.Update).Methods("PUT")
@@ -54,13 +69,6 @@ func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.E
 	log.Fatal(http.ListenAndServe(":8083", router))
 }
 func main() {
-
-	/*uuid1 := uuid.New()
-	uuid2 := uuid.New()
-	uuid3 := uuid.New()
-	fmt.Println("k1:", uuid1)
-	fmt.Println("k2:", uuid2)
-	fmt.Println("k3", uuid3)*/
 
 	db := initDB()
 

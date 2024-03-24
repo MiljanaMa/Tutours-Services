@@ -70,7 +70,7 @@ let visitDate = new Date()
     },
     error: (error) => {
       // Handle any errors that occur during the HTTP request
-      console.error('Error adding tour review:', error);
+      alert(error.error);
     }
   });
   }
@@ -107,7 +107,7 @@ let visitDate = new Date()
   getTours(): void {
     this.tourService.getTours().subscribe({
       next: (result: PagedResults<Tour>) => {
-        this.tours = result.results;
+        this.tours = result.results.filter(r => r.status !== "DRAFT");
       },
       error: (err: any) => {
         console.log(err)

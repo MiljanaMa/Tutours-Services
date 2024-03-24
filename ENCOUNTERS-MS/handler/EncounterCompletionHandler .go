@@ -38,12 +38,7 @@ func (handler *EncounterCompletionHandler) GetPagedByUser(writer http.ResponseWr
 
 func (handler *EncounterCompletionHandler) FinishEncounter(writer http.ResponseWriter, req *http.Request) {
 	fmt.Println("aaaaaaaaaaaaaaa")
-	/*var encounter string
-	if err := json.NewDecoder(req.Body).Decode(&encounter); err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write([]byte("Invalid request body"))
-		return
-	}*/
+
 	encounterId := "f47ac10b-58cc-4372-a567-0e02b2c3d479" //mora se menjati na frontu sve ili ovde da je id tipa int a ne uuid
 	vars := mux.Vars(req)
 	userId := vars["id"]

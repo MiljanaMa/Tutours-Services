@@ -74,7 +74,12 @@ public class TourReviewController : BaseApiController
         }
         else
         {
-            return StatusCode((int)httpResponse.StatusCode, "Error while creating keypoint");
+            return new ContentResult
+            {
+                StatusCode = (int)httpResponse.StatusCode,
+                Content = await httpResponse.Content.ReadAsStringAsync(),
+                ContentType = "text/plain"
+            };
         }
     }
 
