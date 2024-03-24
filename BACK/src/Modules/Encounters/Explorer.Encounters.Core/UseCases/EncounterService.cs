@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Encounters.API.Dtos;
 using Explorer.Encounters.API.Public;
@@ -74,8 +75,29 @@ namespace Explorer.Encounters.Core.UseCases
                     {
                         var encounter = MapToDomain(encounterDto);
                         encounter.UpdateApprovalStatus(EncounterApprovalStatus.PENDING);
-                        var result = _encounterRepository.Create(encounter);
-                        return MapToDto(result);
+
+                        var jsonEncounter = JsonSerializer.Serialize(encounterDto);
+                        
+                        HttpClient client = new HttpClient();
+
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(
+                            new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                        HttpResponseMessage response = client.PostAsync("http://localhost:8083/encounters",
+                            new StringContent(jsonEncounter, System.Text.Encoding.UTF8, "application/json")).Result;
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string json = response.Content.ReadAsStringAsync().Result;
+                            EncounterDto result = JsonSerializer.Deserialize<EncounterDto>(json);
+
+                            return Result.Ok(result);
+
+                        }
+
+                        return Result.Fail<EncounterDto>(response.ReasonPhrase); 
+
                     }
                     else
                     {
@@ -86,8 +108,29 @@ namespace Explorer.Encounters.Core.UseCases
                 {
                     var encounter = MapToDomain(encounterDto);
                     encounter.UpdateApprovalStatus(EncounterApprovalStatus.SYSTEM_APPROVED);
-                    var result = _encounterRepository.Create(encounter);
-                    return MapToDto(result);
+
+                    var jsonEncounter = JsonSerializer.Serialize(encounterDto);
+
+                    Console.WriteLine("JSON:",jsonEncounter);
+                    HttpClient client = new HttpClient();
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                    HttpResponseMessage response = client.PostAsync("http://localhost:8083/encounters",
+                        new StringContent(jsonEncounter, System.Text.Encoding.UTF8, "application/json")).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string json = response.Content.ReadAsStringAsync().Result;
+                        EncounterDto result = JsonSerializer.Deserialize<EncounterDto>(json);
+
+                        return Result.Ok(result);
+
+                    }
+
+                    return Result.Fail<EncounterDto>(response.ReasonPhrase); 
                 }               
             }
             catch (Exception e)
@@ -129,15 +172,27 @@ namespace Explorer.Encounters.Core.UseCases
 
         public Result<PagedResult<EncounterDto>> GetNearbyHidden(int page, int pageSize, int userId)
         {
-            TouristPositionDto touristPosition = _touristPositionService.GetByUser(userId).Value;
-            var encounters = _encounterRepository.GetNearbyByType(page, pageSize, touristPosition.Longitude, touristPosition.Latitude, EncounterType.LOCATION);
-            return MapToDto(encounters);
+            try {
+                TouristPositionDto touristPosition = _touristPositionService.GetByUser(userId).Value;
+                var encounters = _encounterRepository.GetNearbyByType(page, pageSize, touristPosition.Longitude, touristPosition.Latitude, EncounterType.LOCATION);
+                return MapToDto(encounters);
+
+            }catch(Exception e)
+            {
+                return Result.Fail(FailureCode.NotFound).WithError(e.Message);
+            }
         }
         public Result<PagedResult<EncounterDto>> GetNearby(int page, int pageSize, int userId)
         {
-            TouristPositionDto touristPosition = _touristPositionService.GetByUser(userId).Value;
-            var encounters = _encounterRepository.GetNearby(page, pageSize, touristPosition.Longitude, touristPosition.Latitude);
-            return MapToDto(encounters);
+            try {
+                TouristPositionDto touristPosition = _touristPositionService.GetByUser(userId).Value;
+                var encounters = _encounterRepository.GetNearby(page, pageSize, touristPosition.Longitude, touristPosition.Latitude);
+                return MapToDto(encounters);
+
+            }catch(Exception e)
+            {
+                return Result.Fail(FailureCode.NotFound).WithError(e.Message);
+            }
         }
     }
 }

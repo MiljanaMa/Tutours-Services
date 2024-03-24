@@ -11,7 +11,9 @@ func ExecuteMigrations(database *gorm.DB) {
 	database.AutoMigrate(&model.Tour{})
 
 	//keypoints
+	database.AutoMigrate(&model.Keypoint{})
 
-	//objects
-
+	//tourist positions
+	database.AutoMigrate(&model.TouristPosition{})
+	database.AutoMigrate(&model.TourReview{})
 }

@@ -6,6 +6,7 @@ import { TourReviewString } from '../model/tour-review-string.model';
 import { Tour } from '../../tour-authoring/model/tour.model';
 import { TourAuthoringService } from '../../tour-authoring/tour-authoring.service';
 import { PagedResults } from 'src/app/shared/model/paged-results.model';
+import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 
 @Component({
   selector: 'xp-tour-review-form',
@@ -41,33 +42,45 @@ export class TourReviewFormComponent implements OnChanges {
   })
 
   addTourReview(): void {
+  console.log(this.tourReviewForm.value.visitDate)
   
-    const tourReview: TourReviewString = {
-      rating: Number(this.tourReviewForm.value.rating),
-      comment: this.tourReviewForm.value.comment || "",
-      visitDate: new Date(this.tourReviewForm.value.visitDate as string).toISOString().toString(),
-      ratingDate: new Date().toISOString(),
-      imageLinks: this.tourReviewForm.value.imageLinks?.split('\n') as string[],
-      tourId: this.radioClicked(this.selectedTour) as string | undefined,
-      userId: localStorage.getItem('loggedId')??'1'
+const dateString = this.tourReviewForm.value.visitDate;
+let visitDate = new Date()
+  if (dateString) {
+    const parts = dateString.split('-');
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JavaScript Date
+    const day = parseInt(parts[2], 10);
+    visitDate = new Date(Date.UTC(year, month, day));
+  }
+  const tourReview: TourReviewString = {
+    rating: Number(this.tourReviewForm.value.rating),
+    comment: this.tourReviewForm.value.comment || "",
+    visitDate: visitDate,
+    ratingDate: new Date(),//.toISOString(),
+    imageLinks: this.tourReviewForm.value.imageLinks?.split('\n') as string[],
+    tourId: this.radioClicked(this.selectedTour) as string | undefined,
+    userId: localStorage.getItem('loggedId')??'1'
+  }
+  this.clearFormFields();
+  this.service.addTourReview(tourReview).subscribe({
+    next: (tourReview) => {
+      this.tourReviewUpdated.emit();
+      alert('Successfully added tour review!');
+    },
+    error: (error) => {
+      // Handle any errors that occur during the HTTP request
+      alert(error.error);
     }
-    
-    this.clearFormFields();
-
-    this.service.addTourReview(tourReview).subscribe({
-      next: (_) => {
-        this.tourReviewUpdated.emit();
-        alert('Successfully added tour review!');
-      }
-    });
+  });
   }
 
   updateTourReview(): void {
     const tourReview: TourReviewString = {
       rating: Number(this.tourReviewForm.value.rating),
       comment: this.tourReviewForm.value.comment || "",
-      visitDate: this.tourReviewForm.value.visitDate + "T00:00:00.000Z",
-      ratingDate: new Date().toISOString(),
+      visitDate: new Date(/*this.tourReviewForm.value.visitDate*/), //+ "T00:00:00.000Z",
+      ratingDate: new Date(),//.toISOString(),
       imageLinks: this.tourReviewForm.value.imageLinks as unknown as string[],
       tourId: this.tourReview.tourId.toString(),
       userId: localStorage.getItem('loggedId')??'1'
@@ -94,7 +107,7 @@ export class TourReviewFormComponent implements OnChanges {
   getTours(): void {
     this.tourService.getTours().subscribe({
       next: (result: PagedResults<Tour>) => {
-        this.tours = result.results;
+        this.tours = result.results.filter(r => r.status !== "DRAFT");
       },
       error: (err: any) => {
         console.log(err)

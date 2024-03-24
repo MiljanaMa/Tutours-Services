@@ -38,7 +38,7 @@ export class TourAuthoringService {
   }
 
   updateKeypoint(updatedKeypoint: Keypoint): Observable<Keypoint>{
-    return this.http.put<Keypoint>(`${this.apiUrl}/keypoints/${updatedKeypoint.id}`, updatedKeypoint);
+    return this.http.put<Keypoint>(`${this.apiUrl}/keypoints`, updatedKeypoint);
   }
 
   getPublicKeypoints(): Observable<PagedResults<Keypoint>>{

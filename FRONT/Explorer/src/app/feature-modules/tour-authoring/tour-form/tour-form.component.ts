@@ -46,6 +46,8 @@ export class TourFormComponent implements OnChanges, OnInit{
             
             this.getTourKeypoints();
           });
+        }else{
+          this.tour.tags = [];
         }
       });
   }
@@ -76,6 +78,10 @@ export class TourFormComponent implements OnChanges, OnInit{
           this.router.navigate(
             ['/tour-management', newTour.id]
           );
+        },
+        error: (err) => {
+          console.error("Error while saving tour:", err);
+          window.alert(err.error);
         }
       });
     }else{
