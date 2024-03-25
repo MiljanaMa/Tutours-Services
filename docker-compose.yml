@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16.2-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - explorer_data:/var/lib/postgresql/data
+      - ./BACK/scripts/tutours-db-backup.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_PASSWORD=super
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=explorer
+
+  explorer:
+    volumes:
+      - ./BACK/src:/explorer/src
+    build: ./BACK
+    restart: on-failure
+    ports:
+      - "44333:80"
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_PASSWORD: super
+      DATABASE_USER: postgres
+      DATABASE_SCHEMA: explorer
+      TOUR_HOST: tour
+      TOUR_PORT: 8000
+    depends_on:
+      - postgres
+
+  tour:
+    build: ./TOURS_MS
+    restart: on-failure
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: super
+      DB_PORT: 5432
+      DB_DATABASE: explorer
+      DB_HOST: postgres
+    depends_on:
+      - postgres
+
+volumes:
+  explorer_data:
+    driver: local

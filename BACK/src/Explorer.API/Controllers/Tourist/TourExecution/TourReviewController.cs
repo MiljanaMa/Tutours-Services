@@ -64,7 +64,7 @@ public class TourReviewController : BaseApiController
         var jsonContent = JsonSerializer.Serialize(tourReview);
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-        var httpResponse = await httpClient.PostAsync("create", content);
+        var httpResponse = await httpClient.PostAsync("create" + tourApi, content);
 
         if (httpResponse.IsSuccessStatusCode)
         {

@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-
+	app.Init()
 	db := app.InitDB()
 	app.ExecuteMigrations(db)
 

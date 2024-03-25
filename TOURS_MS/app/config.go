@@ -1,6 +1,25 @@
 package app
 
-const (
-	ConnectionString = "host=localhost user=postgres password=super dbname=tours port=5432 sslmode=disable"
-	Port             = ":8000"
+import "os"
+
+var (
+	ConnectionString string
+	Port             string
 )
+
+func Init() {
+	ConnectionString = "host=" + os.Getenv("DB_HOST") +
+		" user=" + os.Getenv("DB_USER") +
+		" password=" + os.Getenv("DB_PASSWORD") +
+		" dbname=" + os.Getenv("DB_DATABASE") +
+		" port=" + "postgres" + os.Getenv("DB_PORT") +
+		" sslmode=disable"
+
+	Port = ":8000"
+}
+
+/*
+const (
+	ConnectionString = "host=" + os.LookupEnv("DB_HOST") + "user=" + os.Getenv("DB_USER") + " password=" + os.Getenv("DB_PASSWORD") + "dbname=" + os.Getenv("DB_DATABASE") + "port=" + os.Getenv("DB_PORT") + "sslmode=disable"
+	Port             = ":8000"
+)*/
