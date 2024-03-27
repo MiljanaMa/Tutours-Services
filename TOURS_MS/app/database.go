@@ -1,10 +1,9 @@
 package app
 
 import (
-	"log"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
 )
 
 func InitDB() *gorm.DB {
@@ -13,7 +12,6 @@ func InitDB() *gorm.DB {
 
 	if err != nil {
 		log.Fatal(err)
-		return nil
 	}
 
 	return database

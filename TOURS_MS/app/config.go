@@ -1,6 +1,8 @@
 package app
 
-import "os"
+import (
+	"os"
+)
 
 var (
 	ConnectionString string
@@ -8,13 +10,14 @@ var (
 )
 
 func Init() {
-	ConnectionString = "host=" + os.Getenv("DB_HOST") +
-		" user=" + os.Getenv("DB_USER") +
-		" password=" + os.Getenv("DB_PASSWORD") +
-		" dbname=" + os.Getenv("DB_DATABASE") +
-		" port=" + "postgres" + os.Getenv("DB_PORT") +
-		" sslmode=disable"
-
+	ConnectionString =
+		"user=" + os.Getenv("DB_USER") +
+			" password=" + os.Getenv("DB_PASSWORD") +
+			" host=" + os.Getenv("DB_HOST") +
+			" search_path=public" +
+			" dbname=" + os.Getenv("DB_DATABASE") +
+			" port=" + os.Getenv("DB_PORT") +
+			" sslmode=disable"
 	Port = ":8000"
 }
 

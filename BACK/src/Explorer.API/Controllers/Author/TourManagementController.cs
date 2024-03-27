@@ -10,6 +10,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using System;
 
 namespace Explorer.API.Controllers.Author;
 
@@ -18,10 +19,33 @@ namespace Explorer.API.Controllers.Author;
 public class TourManagementController : BaseApiController
 {
     private readonly ITourService _tourService;
-    private static HttpClient httpClient = new()
+    string tourHost = Environment.GetEnvironmentVariable("TOUR_HOST");
+    int tourPort = 8000; // Assuming the port is 8000
+
+    Uri baseUri = new UriBuilder("http", Environment.GetEnvironmentVariable("TOUR_HOST"), 8000, "tours").Uri;
+
+    HttpClient httpClient = new HttpClient()
     {
-        BaseAddress = new Uri(" http://localhost:8000/tours/"),
-    };
+        BaseAddress = new UriBuilder("http", Environment.GetEnvironmentVariable("TOUR_HOST"), 8000, "tours").Uri
+};
+    /*Uri baseUri = new UriBuilder()
+    {
+        Scheme = "http",
+        Host = "tour",
+        Port = 8000,
+        Path = "/tours/"
+    }.Uri;
+    private static HttpClient httpClient = new()
+    {*/
+        /*BaseAddress = new UriBuilder()
+        {
+            Scheme = "http",
+            Host = Environment.GetEnvironmentVariable("TOUR_HOST"),
+            Port = 8000, // Assuming the port is 8000
+            Path = "/tours/"
+        }.Uri
+        BaseAddress = new Uri("http://tour:8000/tours/"),*/
+    //};
 
     public TourManagementController(ITourService tourService)
     {
@@ -34,6 +58,7 @@ public class TourManagementController : BaseApiController
     {
         //do job, but find more beautiful way
         var httpResponse = await httpClient.GetAsync($"?page={page}&pageSize={pageSize}");
+        Console.WriteLine("aaa");
 
         if (httpResponse.IsSuccessStatusCode)
         {
