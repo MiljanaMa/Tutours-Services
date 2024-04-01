@@ -81,6 +81,7 @@ func (handler *TourHandler) Update(writer http.ResponseWriter, req *http.Request
 	body, err := io.ReadAll(req.Body)
 
 	if err != nil {
+		log.Println("Error while parsing body")
 		http.Error(writer, "Failed to read request body", http.StatusBadRequest)
 		return
 	}
@@ -133,6 +134,8 @@ func (handler *TourHandler) GetAll(writer http.ResponseWriter, req *http.Request
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		http.Error(writer, "Failed to read page numbers", http.StatusInternalServerError)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	tours, err := handler.TourService.GetAll(limit, page)
@@ -146,19 +149,12 @@ func (handler *TourHandler) GetAll(writer http.ResponseWriter, req *http.Request
 
 func (handler *TourHandler) GetAllByAuthor(writer http.ResponseWriter, req *http.Request) {
 	fmt.Println("Handler: GetAllByAuthor called")
-	//pageStr := req.URL.Query().Get("page")
-	//limitStr := req.URL.Query().Get("pageSize")
-	/*idStr := req.URL.Query().Get("authorId")
-	authorId, err := strconv.Atoi(idStr)
-	println("Author ID String:", idStr)
-	if err != nil {
-		http.Error(writer, "Invalid author ID", http.StatusBadRequest)
-		return
-	}*/
+
 	idStr := mux.Vars(req)["authorId"]
 	authorId, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(writer, "Invalid user ID", http.StatusBadRequest)
+		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	//zapucano dok ne skontam zasto ne radi kao query param

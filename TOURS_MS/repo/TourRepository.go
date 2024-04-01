@@ -2,6 +2,7 @@ package repo
 
 import (
 	"gorm.io/gorm"
+	"log"
 	"tours/model"
 )
 
@@ -32,6 +33,7 @@ func (repo *TourRepository) Create(tour *model.Tour) (model.Tour, error) {
 }
 func (repo *TourRepository) Update(tour *model.Tour) (model.Tour, error) {
 	tourForUpdate, err := repo.GetById(tour.Id)
+	log.Println("Error while parsing body")
 	if err != nil {
 		return *tour, err
 	}
@@ -41,13 +43,14 @@ func (repo *TourRepository) Update(tour *model.Tour) (model.Tour, error) {
 	if err != nil {
 		return *tour, err
 	}
-
+	log.Println("Error while parsing body11")
 	err = tour.ValidateUpdate(&tourForUpdate)
 	if err != nil {
 		return *tour, err
 	}
-
+	log.Println("Error while parsing body111")
 	dbResult := repo.DatabaseConnection.Save(tour)
+	log.Println("Error while parsing body111")
 	if dbResult.Error != nil {
 		return *tour, dbResult.Error
 	}
