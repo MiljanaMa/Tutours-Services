@@ -15,19 +15,23 @@ namespace Explorer.API.Controllers.Tourist.Encounters
     public class EncounterCompletionController : BaseApiController
     {
         private readonly IEncounterCompletionService _encounterCompletionService;
+        protected static HttpClient httpClient = new()
+        {
+            BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("ENCOUNTER_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("ENCOUNTER_PORT") ?? "8083"}/tourist/encounter/")
+        };
 
         public EncounterCompletionController(IEncounterCompletionService encounterCompletionService)
         {
             _encounterCompletionService = encounterCompletionService;
         }
-
+        
         [HttpGet]
         public ActionResult<PagedResult<EncounterCompletionDto_1>> GetPagedByUser([FromQuery] int page, [FromQuery] int pageSize)
         {
-            string url = $"http://localhost:8083/tourist/encounter/{ClaimsPrincipalExtensions.PersonId(User)}";
+            //string url = $"http://localhost:8083/tourist/encounter/{ClaimsPrincipalExtensions.PersonId(User)}";
 
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = client.GetAsync(url).Result;
+            //HttpClient client = new HttpClient();
+            HttpResponseMessage response = httpClient.GetAsync($"{ClaimsPrincipalExtensions.PersonId(User)}").Result;
             if (response.IsSuccessStatusCode)
             {
                 string json = response.Content.ReadAsStringAsync().Result;
@@ -65,10 +69,10 @@ namespace Explorer.API.Controllers.Tourist.Encounters
         public ActionResult<EncounterCompletionDto> FinishEncounter([FromBody] EncounterDto encounter)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            var url = $"http://localhost:8083/tourist/encounter/finishEncounter/{userId}";
+            //var url = $"http://localhost:8083/tourist/encounter/finishEncounter/{userId}";
             
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = client.GetAsync(url).Result;
+            //HttpClient client = new HttpClient();
+            HttpResponseMessage response = httpClient.GetAsync($"finishEncounter/{userId}").Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -80,9 +84,8 @@ namespace Explorer.API.Controllers.Tourist.Encounters
             return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
         }
 
-
         /*
-         * public ActionResult<EncounterCompletionDto> FinishEncounter([FromBody] EncounterDto encounter)
+         public ActionResult<EncounterCompletionDto> FinishEncounter([FromBody] EncounterDto encounter)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
 
@@ -98,7 +101,7 @@ namespace Explorer.API.Controllers.Tourist.Encounters
 
             return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
 
-        }*/
+        }
 
         [HttpGet("checkNearbyCompletions")]
         public ActionResult<PagedResult<EncounterCompletionDto>> CheckNearbyEncounters() // currently handles only hidden encounters, it would be benefitial if all checks for nearby encounters would be here together with criteria for completition
@@ -106,6 +109,6 @@ namespace Explorer.API.Controllers.Tourist.Encounters
             var userId = ClaimsPrincipalExtensions.PersonId(User);
             var result = _encounterCompletionService.CheckNearbyEncounters(userId);
             return CreateResponse(result);
-        }
+        }*/
     }
 }

@@ -19,9 +19,9 @@ public class KeypointController : BaseApiController
 {
     private readonly IKeypointService _keypointService;
 
-    private static HttpClient sharedClient = new()
+    protected static HttpClient sharedClient = new()
     {
-        BaseAddress = new Uri(" http://localhost:8000/keypoints/"),
+        BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("TOUR_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("TOUR_PORT") ?? "8000"}/keypoints/")
     };
 
     public KeypointController(IKeypointService keypointService)
@@ -45,7 +45,7 @@ public class KeypointController : BaseApiController
         return CreateResponse(result);
     }
     */
-
+    
     [HttpGet("tour/{tourId:int}")]
     public async Task<ActionResult<PagedResult<KeypointDto>>> GetByTour([FromQuery] int page, [FromQuery] int pageSize, [FromRoute] int tourId)
     {
@@ -71,17 +71,17 @@ public class KeypointController : BaseApiController
             return StatusCode((int)httpResponse.StatusCode, "Error while getting keypoint");
         }
     }
-
+    
+    
     /*
-
     [HttpPost]
     public ActionResult<KeypointDto> Create([FromBody] KeypointDto keypoint)
     {
         var result = _keypointService.Create(keypoint);
         return CreateResponse(result);
     }
+    
     */
-
     [HttpPost]
     public async Task<ActionResult<KeypointDto>> Create([FromBody] KeypointDto keypoint)
     {
@@ -102,7 +102,7 @@ public class KeypointController : BaseApiController
         }
     }
 
-
+    
 
     [HttpPost("/multiple")]
     public ActionResult<KeypointDto> CreateMultiple([FromBody] List<KeypointDto> keypoints)
@@ -110,8 +110,8 @@ public class KeypointController : BaseApiController
         var result = _keypointService.CreateMultiple(keypoints);
         return CreateResponse(result);
     }
-
     /*
+    
     [HttpPut("{id:int}")]
     public ActionResult<KeypointDto> Update([FromBody] KeypointDto keypoint)
     {
@@ -140,7 +140,7 @@ public class KeypointController : BaseApiController
             return StatusCode((int)httpResponse.StatusCode, "Error while updating keypoint");
         }
     }
-
+    
 
     /*
     [HttpDelete("{id:int}")]
@@ -151,7 +151,7 @@ public class KeypointController : BaseApiController
     }
     */
 
-
+    
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {

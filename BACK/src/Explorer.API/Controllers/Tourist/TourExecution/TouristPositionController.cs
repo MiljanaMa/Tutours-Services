@@ -15,9 +15,9 @@ public class TouristPositionController : BaseApiController
 {
     private readonly ITouristPositionService _touristPositionService;
 
-    private static HttpClient sharedClient = new()
+    protected static HttpClient sharedClient = new()
     {
-        BaseAddress = new Uri(" http://localhost:8000/positions/"),
+        BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("TOUR_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("TOUR_PORT") ?? "8000"}/positions/")
     };
 
     public TouristPositionController(ITouristPositionService touristPositionService)
@@ -25,14 +25,6 @@ public class TouristPositionController : BaseApiController
         _touristPositionService = touristPositionService;
     }
 
-    /*
-    [HttpGet]
-    public ActionResult<TouristPositionDto> GetByUser()
-    {
-        var result = _touristPositionService.GetByUser(User.PersonId());
-        return CreateResponse(result);
-    }
-    */
 
     
     [HttpGet]
@@ -61,15 +53,6 @@ public class TouristPositionController : BaseApiController
         }
     }
     
-    /*
-    [HttpPost] 
-    public ActionResult<TourPreferenceDto> Create([FromBody] TouristPositionDto touristPosition)
-    {
-        touristPosition.UserId = User.PersonId();
-        var result = _touristPositionService.Create(touristPosition);
-        return CreateResponse(result);
-    }
-    */
     
     
     [HttpPost]
@@ -93,16 +76,6 @@ public class TouristPositionController : BaseApiController
             return StatusCode((int)httpResponse.StatusCode, "Error while creating tourist position");
         }
     }
-
-    /*
-    [HttpPut]
-    public ActionResult<TouristPositionDto> Update([FromBody] TouristPositionDto touristPosition)
-    {
-        touristPosition.UserId = User.PersonId();
-        var result = _touristPositionService.Update(touristPosition);
-        return CreateResponse(result);
-    }
-    */
 
     [HttpPut]
     public async Task<ActionResult<TouristPositionDto>> Update([FromBody] TouristPositionDto touristPosition)

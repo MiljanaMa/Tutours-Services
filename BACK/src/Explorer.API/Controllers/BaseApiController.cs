@@ -7,6 +7,7 @@ namespace Explorer.API.Controllers;
 [ApiController]
 public class BaseApiController : ControllerBase
 {
+    protected string tourApi = $"http://{Environment.GetEnvironmentVariable("TOUR_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("TOUR_PORT") ?? "8080"}/";
     protected ActionResult CreateErrorResponse(List<IError> errors)
     {
         var code = 500;

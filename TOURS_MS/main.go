@@ -12,9 +12,10 @@ import (
 )
 
 func main() {
-
+	app.Init()
 	db := app.InitDB()
-	app.ExecuteMigrations(db)
+	//app.ExecuteMigrations(db)
+	app.MigrateDatabase(db)
 
 	// Tours setup
 	tourRepo := &repo.TourRepository{DatabaseConnection: db}

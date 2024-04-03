@@ -17,9 +17,9 @@ namespace Explorer.API.Controllers.Tourist.TourExecution;
 public class TourReviewController : BaseApiController
 {
     private readonly ITourReviewService _tourReviewService;
-    private static HttpClient httpClient = new()
+    protected static HttpClient httpClient = new()
     {
-        BaseAddress = new Uri(" http://localhost:8000/tourreview/"),
+        BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("TOUR_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("TOUR_PORT") ?? "8000"}/tourreview/")
     };
 
     public TourReviewController(ITourReviewService tourReviewService)
