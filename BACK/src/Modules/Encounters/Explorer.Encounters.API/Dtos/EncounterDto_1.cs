@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Explorer.Encounters.API.Dtos
 {
-    public class EncounterDto_1
+    /*public class EncounterDto_1
     {
         public string Id { get; set; }
         public int UserId { get; set; }
@@ -24,5 +24,5 @@ namespace Explorer.Encounters.API.Dtos
         public int? PeopleCount { get; set; }
         public string ApprovalStatus { get; set; }
 
-    }
+    }*/
 }

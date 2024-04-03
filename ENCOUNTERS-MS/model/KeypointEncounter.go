@@ -1,10 +1,8 @@
 package model
 
-import "github.com/google/uuid"
-
 type KeypointEncounter struct {
-	Id          uuid.UUID `gorm:"type:uuid;primaryKey"`
-	EncounterId uuid.UUID `gorm:"type:uuid"`
+	Id          int `gorm:"primaryKey;autoIncrement"`
+	EncounterId int `gorm:"foreignKey:EncounterId"`
 	Encounter   *Encounter
 	KeyPointId  int
 	IsRequired  bool

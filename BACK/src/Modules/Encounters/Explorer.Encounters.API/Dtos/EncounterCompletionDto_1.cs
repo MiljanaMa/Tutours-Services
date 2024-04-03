@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Explorer.Encounters.API.Dtos
 {
-    public class EncounterCompletionDto_1
+    /*public class EncounterCompletionDto_1
     {
             public long UserId { get; set; }
             public DateTime LastUpdatedAt { get; set; }
@@ -16,5 +16,5 @@ namespace Explorer.Encounters.API.Dtos
             public EncounterDto Encounter { get; set; }
 
 
-    }
+    }*/
 }

@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type EncounterCompletionStatus string
@@ -16,9 +14,9 @@ const (
 )
 
 type EncounterCompletion struct {
-	Id            uuid.UUID `gorm:"type:uuid;primaryKey"`
+	Id            int `gorm:"primaryKey;autoIncrement"`
 	UserId        int
-	EncounterId   uuid.UUID `gorm:"type:uuid"`
+	EncounterId   int `gorm:"foreignKey:EncounterId"`
 	LastUpdatedAt time.Time
 	Xp            int
 	Status        EncounterCompletionStatus

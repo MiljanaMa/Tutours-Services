@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -19,8 +18,6 @@ func (handler *KeypointEncounterHandler) GetPagedByKeypoint(writer http.Response
 	fmt.Println("test 1")
 	keypointId := mux.Vars(req)["keypointid"]
 
-	//vars := mux.Vars(req)
-	//keypointId := vars["keypointId"]
 	fmt.Println("test 2")
 
 	result, err := handler.KeypointEncounterService.GetPagedByKeypoint(keypointId)
@@ -42,13 +39,10 @@ func (handler *KeypointEncounterHandler) GetPagedByKeypoint(writer http.Response
 	writer.Write(jsonData)
 }
 
-// dodaj id u putanju, userid, mada i ne mora
 func (handler *KeypointEncounterHandler) Create(writer http.ResponseWriter, req *http.Request) {
 	fmt.Println("test create 1")
 
-	uuid1 := uuid.New()
 	var keypointEncounter model.KeypointEncounter
-	keypointEncounter.Id = uuid1
 	err := json.NewDecoder(req.Body).Decode(&keypointEncounter)
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)

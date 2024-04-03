@@ -26,7 +26,7 @@ namespace Explorer.API.Controllers.Tourist.Encounters
         }
         
         [HttpGet]
-        public ActionResult<PagedResult<EncounterCompletionDto_1>> GetPagedByUser([FromQuery] int page, [FromQuery] int pageSize)
+        public ActionResult<PagedResult<EncounterCompletionDto>> GetPagedByUser([FromQuery] int page, [FromQuery] int pageSize)
         {
             //string url = $"http://localhost:8083/tourist/encounter/{ClaimsPrincipalExtensions.PersonId(User)}";
 
@@ -35,8 +35,8 @@ namespace Explorer.API.Controllers.Tourist.Encounters
             if (response.IsSuccessStatusCode)
             {
                 string json = response.Content.ReadAsStringAsync().Result;
-                List<EncounterCompletionDto_1> encounterCompletions = JsonSerializer.Deserialize<List<EncounterCompletionDto_1>>(json);
-                PagedResult<EncounterCompletionDto_1> result = new PagedResult<EncounterCompletionDto_1>(encounterCompletions, encounterCompletions.Count);
+                List<EncounterCompletionDto> encounterCompletions = JsonSerializer.Deserialize<List<EncounterCompletionDto>>(json);
+                PagedResult<EncounterCompletionDto> result = new PagedResult<EncounterCompletionDto>(encounterCompletions, encounterCompletions.Count);
 
                 return Ok(result);
             }
