@@ -16,7 +16,7 @@ const (
 type EncounterCompletion struct {
 	Id            int `gorm:"primaryKey;autoIncrement"`
 	UserId        int
-	EncounterId   int `gorm:"foreignKey:EncounterId"`
+	EncounterId   int //`gorm:"foreignKey:EncounterId"`
 	LastUpdatedAt time.Time
 	Xp            int
 	Status        EncounterCompletionStatus
