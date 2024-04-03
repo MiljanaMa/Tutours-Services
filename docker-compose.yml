@@ -15,11 +15,14 @@ services:
         target: /tmp/explorer-init.sql
       - type: bind
         source: ./TOURS_MS/tours.sql
-        target: /tmp/tours-init.sql 
+        target: /tmp/tours-init.sql
+      - type: bind
+        source: ./ENCOUNTERS-MS/encounters.sql
+        target: /tmp/encounters-init.sql 
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: super
-      POSTGRES_MULTIPLE_DATABASES: tours,explorer
+      POSTGRES_MULTIPLE_DATABASES: tours,explorer,encounters
       PGPORT: 5432
       PGUSER: postgres
     healthcheck:
@@ -46,10 +49,14 @@ services:
       DATABASE_USER: postgres
       DATABASE_SCHEMA: explorer
       TOUR_HOST: tour
+      ENCOUNTER_HOST: encounter
+      ENCOUNTER_PORT: 8083
     depends_on:
       db:
           condition: service_healthy
       tour:
+          condition: service_started
+      encounter:
           condition: service_started
       
   tour:
@@ -66,6 +73,24 @@ services:
       DB_PORT: 5432
       DB_DATABASE: tours
       DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+
+  encounter:
+    build: 
+      context: ./ENCOUNTERS-MS
+    restart: on-failure
+    ports:
+      - "8083:8083"
+    networks:
+      - database
+    environment:
+      DB_USER_E: postgres
+      DB_PASSWORD_E: super
+      DB_PORT_E: 5432
+      DB_DATABASE_E: encounters
+      DB_HOST_E: db
     depends_on:
       db:
         condition: service_healthy

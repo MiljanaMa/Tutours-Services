@@ -18,6 +18,10 @@ namespace Explorer.API.Controllers
     public class EncounterController : BaseApiController
     {
         private readonly IEncounterService _encounterService;
+        protected static HttpClient httpClient = new()
+        {
+            BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("ENCOUNTER_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("ENCOUNTER_PORT") ?? "8083"}/encounters/")
+        };
 
         public EncounterController(IEncounterService encounterService)
         {
@@ -25,8 +29,7 @@ namespace Explorer.API.Controllers
         }
 
         private ActionResult<PagedResult<EncounterDto>> SendGetRequest(string url){
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = client.GetAsync(url).Result;
+            HttpResponseMessage response = httpClient.GetAsync(url).Result;
             
             if(response.IsSuccessStatusCode){
                 string json = response.Content.ReadAsStringAsync().Result;
@@ -54,7 +57,7 @@ namespace Explorer.API.Controllers
         [HttpGet]
         public ActionResult<PagedResult<EncounterDto>> GetApproved([FromQuery] int page, [FromQuery] int pageSize)
         {
-           return SendGetRequest("http://localhost:8083/encounters");
+           return SendGetRequest("");
         }
 
         [HttpPost]
@@ -69,9 +72,9 @@ namespace Explorer.API.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            string url = "http://localhost:8083/encounters/" + id; 
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = client.DeleteAsync(url).Result;
+            //string url = "http://localhost:8083/encounters/" + id; 
+            //HttpClient client = new HttpClient();
+            HttpResponseMessage response = httpClient.DeleteAsync($"{id}").Result;
             if (response.IsSuccessStatusCode)
             {
                 return Ok("Success"); 
@@ -83,14 +86,14 @@ namespace Explorer.API.Controllers
         [HttpGet("status")]
         public ActionResult<PagedResult<EncounterDto>> GetApprovedByStatus([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] string status)
         {
-            return SendGetRequest("http://localhost:8083/encounters/get-approved-by-status/"+status);;
+            return SendGetRequest("get-approved-by-status/" + status);;
         }        
         
         [HttpGet("nearbyHidden")]
         public ActionResult<PagedResult<EncounterDto>> GetNearbyHidden([FromQuery] int page, [FromQuery] int pageSize)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            return SendGetRequest("http://localhost:8083/encounters/nearby-by-type/"+userId);
+            return SendGetRequest("nearby-by-type/" + userId);
            
         }
 
@@ -98,7 +101,7 @@ namespace Explorer.API.Controllers
         public ActionResult<PagedResult<EncounterDto>> GetNearby([FromQuery] int page, [FromQuery] int pageSize)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            return SendGetRequest("http://localhost:8083/encounters/nearby/"+userId);
+            return SendGetRequest("nearby");
 
         }
 
@@ -106,33 +109,33 @@ namespace Explorer.API.Controllers
         public ActionResult<PagedResult<EncounterDto>> GetByUser([FromQuery] int page, [FromQuery] int pageSize)
         {
             var userId = ClaimsPrincipalExtensions.PersonId(User);
-            return SendGetRequest("http://localhost:8083/encounters/get-by-user/"+userId);
+            return SendGetRequest("get-by-user/" + userId);
         }
 
         [HttpGet("touristCreatedEncouters")]
         public ActionResult<PagedResult<EncounterDto>> GetTouristCreatedEncounters([FromQuery] int page, [FromQuery] int pageSize)
         {
-            return SendGetRequest("http://localhost:8083/tourist-created-encounters");
+            return SendGetRequest("tourist-created-encounters");
         }
         
         [HttpPut("approve")]
         [Authorize(Roles = "administrator")]
         public ActionResult<EncounterDto> Approve(EncounterDto encounter)
         {
-            return sendPut("http://localhost:8083/encounters/approve", encounter); 
+            return sendPut("approve", encounter); 
         }
 
         [HttpPut("decline")]
         [Authorize(Roles = "administrator")]
         public ActionResult<EncounterDto> Decline(EncounterDto encounter)
         {
-            return sendPut("http://localhost:8083/encounters/decline", encounter); 
+            return sendPut("decline", encounter); 
         }
-        
-        [HttpPut]
-        public ActionResult<EncounterDto> Update([FromBody] EncounterDto encounter)
+
+        [HttpPut("{encounterId:int}")]
+        public ActionResult<EncounterDto> Update([FromRoute] int encounterId, [FromBody] EncounterDto encounter)
         {
-            return sendPut("http://localhost:8083/encounters", encounter); 
+            return sendPut("", encounter); 
         }
 
         private ActionResult<EncounterDto> sendPut(string url, EncounterDto encounter)
@@ -140,13 +143,13 @@ namespace Explorer.API.Controllers
             var jsonEncounter = JsonSerializer.Serialize(encounter);
 
             Console.WriteLine("JSON:",jsonEncounter);
-            HttpClient client = new HttpClient();
+            //HttpClient client = new HttpClient();
 
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(
-                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            //client.DefaultRequestHeaders.Accept.Clear();
+            //client.DefaultRequestHeaders.Accept.Add(
+            //    new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            HttpResponseMessage response = client.PutAsync(url,
+            HttpResponseMessage response = httpClient.PutAsync(url,
                 new StringContent(jsonEncounter, System.Text.Encoding.UTF8, "application/json")).Result;
 
             if (response.IsSuccessStatusCode)

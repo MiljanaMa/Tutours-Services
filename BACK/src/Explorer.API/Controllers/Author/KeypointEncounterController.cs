@@ -16,20 +16,24 @@ namespace Explorer.API.Controllers.Author
     public class KeypointEncounterController : BaseApiController
     {
         private readonly IKeypointEncounterService _keypointEncounterService;
+        protected static HttpClient httpClient = new()
+        {
+            BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("ENCOUNTER_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("ENCOUNTER_PORT") ?? "8083"}/keypointencounter/")
+        };
 
         public KeypointEncounterController(IKeypointEncounterService encounterService)
         {
             _keypointEncounterService = encounterService;
         }
-
+        
         [HttpGet("{keypointId:long}")]
         [Authorize(Roles = "author, tourist")]
         public ActionResult<PagedResult<KeypointEncounterDto_1>> GetPagedByKeypoint([FromQuery] int page, [FromQuery] int pageSize, long keypointId)
         {
-            string url = $"http://localhost:8083/keypointencounter/{keypointId}";
+            //string url = $"http://localhost:8083/keypointencounter/{keypointId}";
 
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = client.GetAsync(url).Result;
+            //HttpClient client = new HttpClient();
+            HttpResponseMessage response = httpClient.GetAsync($"{keypointId}").Result;
             if (response.IsSuccessStatusCode)
             {
                 string json = response.Content.ReadAsStringAsync().Result;
@@ -47,14 +51,14 @@ namespace Explorer.API.Controllers.Author
         [Authorize(Roles = "author")]
         public ActionResult<KeypointEncounterDto_1> Create([FromBody] KeypointEncounterDto_1 keypointEncounter)
         {
-            string url = "http://localhost:8083/keypointencounter/create";
+            //string url = "http://localhost:8083/keypointencounter/create";
 
-            using (HttpClient client = new HttpClient())
-            {
+            //using (HttpClient client = new HttpClient())
+            //{
                 string jsonContent = JsonSerializer.Serialize(keypointEncounter);
                 HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = client.PostAsync(url, content).Result;
+                HttpResponseMessage response = httpClient.PostAsync("create", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -66,21 +70,21 @@ namespace Explorer.API.Controllers.Author
                 {
                     return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
                 }
-            }
+            //}
         }
 
         [HttpPut]
         [Authorize(Roles = "author")]
         public ActionResult<KeypointEncounterDto_1> Update([FromBody] KeypointEncounterDto_1 keypointEncounter)
         {
-            string url = "http://localhost:8083/keypointencounter/update";
+            //string url = "http://localhost:8083/keypointencounter/update";
 
-            using (HttpClient client = new HttpClient())
-            {
+            //using (HttpClient client = new HttpClient())
+            //{
                 string jsonContent = JsonSerializer.Serialize(keypointEncounter);
                 HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = client.PutAsync(url, content).Result;
+                HttpResponseMessage response = httpClient.PutAsync("update", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -92,7 +96,7 @@ namespace Explorer.API.Controllers.Author
                 {
                     return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
                 }
-            }
+            //}
         }
 
         //[HttpDelete("{id:int}")]
@@ -100,11 +104,11 @@ namespace Explorer.API.Controllers.Author
         [Authorize(Roles = "author")]
         public ActionResult Delete([FromQuery] string id)
         {
-            string url = $"http://localhost:8083/keypointencounter/delete?id={id}";
+            //string url = $"http://localhost:8083/keypointencounter/delete?id={id}";
 
-            using (HttpClient client = new HttpClient())
-            {
-                HttpResponseMessage response = client.DeleteAsync(url).Result;
+            //using (HttpClient client = new HttpClient())
+            //{
+                HttpResponseMessage response = httpClient.DeleteAsync($"delete?id={id}").Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -114,7 +118,7 @@ namespace Explorer.API.Controllers.Author
                 {
                     return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
                 }
-            }
+            //}
         }
 
         [HttpPut("{keypointId:int}")]
