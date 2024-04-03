@@ -30,8 +30,7 @@ services:
       interval: 10s
       timeout: 20s
       retries: 5
-      start_period: 30s  
-
+      start_period: 30s
 
   monolit:
     build:
@@ -59,23 +58,6 @@ services:
       encounter:
           condition: service_started
       
-  tour:
-    build: 
-      context: ./TOURS_MS
-    restart: on-failure
-    ports:
-      - "8000:8000"
-    networks:
-      - database
-    environment:
-      DB_USER: postgres
-      DB_PASSWORD: super
-      DB_PORT: 5432
-      DB_DATABASE: tours
-      DB_HOST: db
-    depends_on:
-      db:
-        condition: service_healthy
 
   encounter:
     build: 
@@ -94,12 +76,26 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      
+  tour:
+    build: 
+      context: ./TOURS_MS
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    networks:
+      - database
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: super
+      DB_PORT: 5432
+      DB_DATABASE: tours
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
 
 networks:
   database:
     name: database
     driver: bridge
-
-volumes:
-  explorer_data:
-    driver: local

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
@@ -15,35 +16,35 @@ import (
 )
 
 func initDB() *gorm.DB {
-	/*connectionUrl :=
-	"user=" + os.Getenv("DB_USER_E") +
-		" password=" + os.Getenv("DB_PASSWORD_E") +
-		" host=" + os.Getenv("DB_HOST_E") +
-		" search_path=public" +
-		" dbname=" + os.Getenv("DB_DATABASE_E") +
-		" port=" + os.Getenv("DB_PORT_E") +
-		" sslmode=disable"*/
-	connectionUrl := "postgres://postgres:super@localhost:5432"
+	connectionUrl :=
+		"user=" + os.Getenv("DB_USER_E") +
+			" password=" + os.Getenv("DB_PASSWORD_E") +
+			" host=" + os.Getenv("DB_HOST_E") +
+			" search_path=public" +
+			" dbname=" + os.Getenv("DB_DATABASE_E") +
+			" port=" + os.Getenv("DB_PORT_E") +
+			" sslmode=disable"
+	//connectionUrl := "postgres://postgres:super@localhost:5432"
 	database, err := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{SkipDefaultTransaction: true})
 
 	if err != nil {
 		log.Fatal(err)
 		return nil
 	}
-
-	models := []interface{}{
-		model.Encounter{},
-		model.EncounterCompletion{},
-		model.KeypointEncounter{},
-	}
-
-	for _, m := range models {
-		if err := database.AutoMigrate(m); err != nil {
-			log.Fatal(err)
-			return nil
+	/*
+		models := []interface{}{
+			model.Encounter{},
+			model.EncounterCompletion{},
+			model.KeypointEncounter{},
 		}
-	}
 
+		for _, m := range models {
+			if err := database.AutoMigrate(m); err != nil {
+				log.Fatal(err)
+				return nil
+			}
+		}
+	*/
 	MigrateDatabase(database)
 	return database
 
