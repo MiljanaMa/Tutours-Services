@@ -28,7 +28,7 @@ namespace Explorer.API.Controllers.Author
         
         [HttpGet("{keypointId:long}")]
         [Authorize(Roles = "author, tourist")]
-        public ActionResult<PagedResult<KeypointEncounterDto_1>> GetPagedByKeypoint([FromQuery] int page, [FromQuery] int pageSize, long keypointId)
+        public ActionResult<PagedResult<KeypointEncounterDto>> GetPagedByKeypoint([FromQuery] int page, [FromQuery] int pageSize, long keypointId)
         {
             //string url = $"http://localhost:8083/keypointencounter/{keypointId}";
 
@@ -37,8 +37,8 @@ namespace Explorer.API.Controllers.Author
             if (response.IsSuccessStatusCode)
             {
                 string json = response.Content.ReadAsStringAsync().Result;
-                List<KeypointEncounterDto_1> keyPointEncounters = JsonSerializer.Deserialize<List<KeypointEncounterDto_1>>(json);
-                PagedResult<KeypointEncounterDto_1> result = new PagedResult<KeypointEncounterDto_1>(keyPointEncounters, keyPointEncounters.Count);
+                List<KeypointEncounterDto> keyPointEncounters = JsonSerializer.Deserialize<List<KeypointEncounterDto>>(json);
+                PagedResult<KeypointEncounterDto> result = new PagedResult<KeypointEncounterDto>(keyPointEncounters, keyPointEncounters.Count);
 
                 return Ok(result);
             }
@@ -49,7 +49,7 @@ namespace Explorer.API.Controllers.Author
 
         [HttpPost]
         [Authorize(Roles = "author")]
-        public ActionResult<KeypointEncounterDto_1> Create([FromBody] KeypointEncounterDto_1 keypointEncounter)
+        public ActionResult<KeypointEncounterDto> Create([FromBody] KeypointEncounterDto keypointEncounter)
         {
             //string url = "http://localhost:8083/keypointencounter/create";
 
@@ -63,7 +63,7 @@ namespace Explorer.API.Controllers.Author
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonResponse = response.Content.ReadAsStringAsync().Result;
-                    KeypointEncounterDto_1 createdKeypointEncounter = JsonSerializer.Deserialize<KeypointEncounterDto_1>(jsonResponse);
+                    KeypointEncounterDto createdKeypointEncounter = JsonSerializer.Deserialize<KeypointEncounterDto>(jsonResponse);
                     return Ok(createdKeypointEncounter);
                 }
                 else
@@ -75,7 +75,7 @@ namespace Explorer.API.Controllers.Author
 
         [HttpPut]
         [Authorize(Roles = "author")]
-        public ActionResult<KeypointEncounterDto_1> Update([FromBody] KeypointEncounterDto_1 keypointEncounter)
+        public ActionResult<KeypointEncounterDto> Update([FromBody] KeypointEncounterDto keypointEncounter)
         {
             //string url = "http://localhost:8083/keypointencounter/update";
 
@@ -89,7 +89,7 @@ namespace Explorer.API.Controllers.Author
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonResponse = response.Content.ReadAsStringAsync().Result;
-                    KeypointEncounterDto_1 updatedKeypointEncounter = JsonSerializer.Deserialize<KeypointEncounterDto_1>(jsonResponse);
+                    KeypointEncounterDto updatedKeypointEncounter = JsonSerializer.Deserialize<KeypointEncounterDto>(jsonResponse);
                     return Ok(updatedKeypointEncounter);
                 }
                 else

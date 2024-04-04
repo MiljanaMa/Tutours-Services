@@ -24,26 +24,26 @@ func initDB() *gorm.DB {
 			" dbname=" + os.Getenv("DB_DATABASE_E") +
 			" port=" + os.Getenv("DB_PORT_E") +
 			" sslmode=disable"
-	//connection_url := "postgres://postgres:super@localhost:5432"
+	//connectionUrl := "postgres://postgres:super@localhost:5432"
 	database, err := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{SkipDefaultTransaction: true})
 
 	if err != nil {
 		log.Fatal(err)
 		return nil
 	}
-
-	/*models := []interface{}{
-		model.Encounter{},
-		model.EncounterCompletion{},
-		model.KeypointEncounter{},
-	}
-
-	for _, m := range models {
-		if err := database.AutoMigrate(m); err != nil {
-			log.Fatal(err)
-			return nil
+	/*
+		models := []interface{}{
+			model.Encounter{},
+			model.EncounterCompletion{},
+			model.KeypointEncounter{},
 		}
-	}
+
+		for _, m := range models {
+			if err := database.AutoMigrate(m); err != nil {
+				log.Fatal(err)
+				return nil
+			}
+		}
 	*/
 	MigrateDatabase(database)
 	return database
