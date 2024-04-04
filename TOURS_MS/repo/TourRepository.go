@@ -43,14 +43,11 @@ func (repo *TourRepository) Update(tour *model.Tour) (model.Tour, error) {
 	if err != nil {
 		return *tour, err
 	}
-	log.Println("Error while parsing body11")
 	err = tour.ValidateUpdate(&tourForUpdate)
 	if err != nil {
 		return *tour, err
 	}
-	log.Println("Error while parsing body111")
 	dbResult := repo.DatabaseConnection.Save(tour)
-	log.Println("Error while parsing body111")
 	if dbResult.Error != nil {
 		return *tour, dbResult.Error
 	}
