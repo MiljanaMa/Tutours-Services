@@ -18,6 +18,10 @@ public class BlogController : BaseApiController
     {
         _blogService = blogService;
     }
+    protected static HttpClient httpClient = new()
+    {
+        BaseAddress = new Uri($"http://localhost:8095/followers/")
+    };
 
     [HttpGet]
     public ActionResult<PagedResult<BlogDto>> GetAll([FromQuery] int page, [FromQuery] int pageSize)
@@ -34,10 +38,31 @@ public class BlogController : BaseApiController
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult<BlogDto> Get(int id)
+    public async Task<ActionResult<BlogDto>> Get(int id)
     {
         var result = _blogService.Get(id);
-        return CreateResponse(result);
+        int id1 = result.Value.CreatorId;
+        int id2 = User.PersonId();
+        HttpResponseMessage response = await httpClient.GetAsync("check-if-following/"+id2+"/"+id1);
+        if (response.IsSuccessStatusCode)
+        {
+            
+            string responseContent = await response.Content.ReadAsStringAsync();
+            bool isFollowing = bool.Parse(responseContent);
+        
+            if (isFollowing)
+            {
+                return CreateResponse(result);
+            }
+            else
+            {
+                return BadRequest("You are not following this creator.");
+            }
+            
+        }
+       
+        
+        return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
     }
 
     [HttpPost]

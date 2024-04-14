@@ -4,9 +4,10 @@ import (
 	"FOLLOWERS-MS/service"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type FollowersHandler struct {
@@ -59,6 +60,7 @@ func (handler *FollowersHandler) GetRecommendation(writer http.ResponseWriter, r
 	vars := mux.Vars(req)
 	id, err := strconv.Atoi(vars["id"])
 
+	fmt.Println("DA")
 	if err != nil {
 		fmt.Println("Id must be integer")
 		writer.WriteHeader(http.StatusBadRequest)
@@ -66,6 +68,7 @@ func (handler *FollowersHandler) GetRecommendation(writer http.ResponseWriter, r
 	}
 
 	result, error := handler.FollowerService.GetRecommendations(id)
+
 	if error != nil {
 		fmt.Println(error)
 		writer.WriteHeader(http.StatusInternalServerError)
