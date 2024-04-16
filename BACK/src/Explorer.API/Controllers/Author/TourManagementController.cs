@@ -92,7 +92,7 @@ public class TourManagementController : BaseApiController
 
     [HttpPost]
     [Authorize(Roles = "author")]
-    public async Task<ActionResult<TourDto>> Create([FromBody] TourDto tour)
+    public async Task<ActionResult<TourDto1>> Create([FromBody] TourDto tour)
     {
         tour.UserId = User.PersonId();
 
@@ -111,7 +111,7 @@ public class TourManagementController : BaseApiController
         {
             if (httpResponse.StatusCode == HttpStatusCode.Created)
             {
-                var response = await httpResponse.Content.ReadFromJsonAsync<TourDto>();
+                var response = await httpResponse.Content.ReadFromJsonAsync<TourDto1>();
 
                 return Ok(response);
             }
@@ -200,7 +200,7 @@ public class TourManagementController : BaseApiController
 
     [HttpGet("author")]
     [Authorize(Roles = "author")]
-    public async Task<ActionResult<PagedResult<TourDto>>> GetByAuthor([FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<ActionResult<PagedResult<TourDto1>>> GetByAuthor([FromQuery] int page, [FromQuery] int pageSize)
     {
         var authorId = User.PersonId();
         var httpResponse = await httpClient.GetAsync($"author/{authorId}");
@@ -209,9 +209,9 @@ public class TourManagementController : BaseApiController
         {
             if (httpResponse.StatusCode == HttpStatusCode.OK)
             {
-                var response = await httpResponse.Content.ReadFromJsonAsync<List<TourDto>>();
+                var response = await httpResponse.Content.ReadFromJsonAsync<List<TourDto1>>();
 
-                return Ok(new PagedResult<TourDto>(response, response.Count));
+                return Ok(new PagedResult<TourDto1>(response, response.Count));
             }
 
             return Ok();

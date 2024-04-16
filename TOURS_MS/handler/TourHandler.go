@@ -104,16 +104,9 @@ func (handler *TourHandler) Update(writer http.ResponseWriter, req *http.Request
 }
 func (handler *TourHandler) Delete(writer http.ResponseWriter, req *http.Request) {
 
-	idStr := mux.Vars(req)["tourId"]
-	tourId, err := strconv.Atoi(idStr)
+	tourId := mux.Vars(req)["tourId"]
 
-	if err != nil {
-		log.Println("Error while parsing query params")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	err = handler.TourService.Delete(tourId)
+	err := handler.TourService.Delete(tourId)
 
 	if err != nil {
 		log.Println("Error while updating tour key point")

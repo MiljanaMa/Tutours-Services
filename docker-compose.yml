@@ -86,6 +86,7 @@ services:
     networks:
       - database
     environment:
+      MONGODB_ADDR: "mongodb://mongo:27017"
       DB_USER: postgres
       DB_PASSWORD: super
       DB_PORT: 5432
@@ -94,6 +95,46 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mongo:
+        condition: service_healthy
+
+  # NoSQL: MongoDB
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - database
+    # Docker healtcheck - checks if database is "alive"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - mongo_store:/data/db
+
+  # NoSQL: MognoExpress
+  mongo-express:
+    image: mongo-express
+    restart: always
+    networks:
+      - database
+    environment:
+      # hostname of mongo databse
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
+    volumes:
+      - mongo_express_data:/data/db
+
+volumes:
+  mongo_store:
+  mongo_express_data:
 
 networks:
   database:

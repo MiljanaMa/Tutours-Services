@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"tours/app"
 	"tours/handler"
 	"tours/repo"
@@ -13,36 +14,36 @@ import (
 
 func main() {
 	app.Init()
-	db := app.InitDB()
-	//app.ExecuteMigrations(db)
-	app.MigrateDatabase(db)
+	client := app.InitDB()
+	storeLogger := log.New(os.Stdout, "[patient-store] ", log.LstdFlags)
+	app.InsertInfo(client)
 
 	// Tours setup
-	tourRepo := &repo.TourRepository{DatabaseConnection: db}
+	tourRepo := &repo.TourRepository{ /*DatabaseConnection: db*/ Cli: client, Logger: storeLogger}
 	tourService := &service.TourService{TourRepository: tourRepo}
 	tourHandler := &handler.TourHandler{TourService: tourService}
+	/*
+		// Keypoints setup
+		keypointRepo := &repo.KeypointRepository{DatabaseConnection: db}
+		keypointService := &service.KeypointService{KeypointRepository: keypointRepo}
+		keypointHandler := &handler.KeypointHandler{KeypointService: keypointService}
 
-	// Keypoints setup
-	keypointRepo := &repo.KeypointRepository{DatabaseConnection: db}
-	keypointService := &service.KeypointService{KeypointRepository: keypointRepo}
-	keypointHandler := &handler.KeypointHandler{KeypointService: keypointService}
+		// Tourist positions setup
+		touristPositionRepo := &repo.TouristPositionRepository{DatabaseConnection: db}
+		touristPositionService := &service.TouristPositionService{TouristPositionRepository: touristPositionRepo}
+		touristPositionHandler := &handler.TouristPositionHandler{TouristPositionService: touristPositionService}
 
-	// Tourist positions setup
-	touristPositionRepo := &repo.TouristPositionRepository{DatabaseConnection: db}
-	touristPositionService := &service.TouristPositionService{TouristPositionRepository: touristPositionRepo}
-	touristPositionHandler := &handler.TouristPositionHandler{TouristPositionService: touristPositionService}
-
-	// Tourist review setup
-	tourReviewRepo := &repo.TourReviewRepository{DatabaseConnection: db}
-	tourReviewService := &service.TourReviewService{TourReviewRepository: tourReviewRepo}
-	tourReviewHandler := &handler.TourReviewHandler{TourReviewService: tourReviewService}
-
+		// Tourist review setup
+		tourReviewRepo := &repo.TourReviewRepository{DatabaseConnection: db}
+		tourReviewService := &service.TourReviewService{TourReviewRepository: tourReviewRepo}
+		tourReviewHandler := &handler.TourReviewHandler{TourReviewService: tourReviewService}
+	*/
 	router := mux.NewRouter()
 
 	app.SetupTourRoutes(router, tourHandler)
-	app.SetupKeypointRoutes(router, keypointHandler)
-	app.SetupTouristPositionRoutes(router, touristPositionHandler)
-	app.SetupTourReviewRoutes(router, tourReviewHandler)
+	//app.SetupKeypointRoutes(router, keypointHandler)
+	//app.SetupTouristPositionRoutes(router, touristPositionHandler)
+	//app.SetupTourReviewRoutes(router, tourReviewHandler)
 
 	log.Fatal(http.ListenAndServe(app.Port, router))
 }

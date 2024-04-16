@@ -3,56 +3,27 @@ package model
 import (
 	"encoding/json"
 	"errors"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 	"tours/model/enum"
 	"tours/model/helper"
 )
 
 type Tour struct {
-	Id               int `gorm:"primaryKey"`
-	UserId           int
-	Name             string
-	Description      string
-	Price            float64
-	Duration         int
-	Distance         float64
-	Difficulty       enum.TourDifficulty
-	TransportType    enum.TransportType
-	Status           enum.TourStatus
-	StatusUpdateTime time.Time
-	Tags             helper.ArrayString
-	Keypoints        []Keypoint   `gorm:"foreignKey:TourId"`
-	TourReviews      []TourReview `gorm:"foreignKey:TourId"`
-}
-
-// is it really needed
-func NewTour(name string, description string, price float64, difficulty enum.TourDifficulty,
-	tags helper.ArrayString, status enum.TourStatus, userId int, distance float64, duration int, transportType enum.TransportType,
-	statusUpdateTime time.Time, keyPoints []Keypoint, tourReviews []TourReview) *Tour {
-	tour := &Tour{
-		UserId:           userId,
-		Name:             name,
-		Description:      description,
-		Price:            price,
-		Duration:         duration,
-		Distance:         distance,
-		Difficulty:       difficulty,
-		Tags:             tags,
-		Status:           status,
-		TransportType:    transportType,
-		StatusUpdateTime: statusUpdateTime,
-		Keypoints:        keyPoints,
-		TourReviews:      tourReviews,
-	}
-
-	return tour
-}
-
-// usage???
-func (tour *Tour) CreateID(scope *gorm.DB) error {
-	tour.Id = 0
-	return nil
+	Id               primitive.ObjectID  `bson:"_id,omitempty" json:"id"`
+	UserId           int                 `bson:"user_id,omitempty" json:"user_id"`
+	Name             string              `bson:"name,omitempty" json:"name"`
+	Description      string              `bson:"description,omitempty" json:"description"`
+	Price            float64             `bson:"price,omitempty" json:"price"`
+	Duration         int                 `bson:"duration,omitempty" json:"duration"`
+	Distance         float64             `bson:"distance,omitempty" json:"distance"`
+	Difficulty       enum.TourDifficulty `bson:"difficulty,omitempty" json:"difficulty"`
+	TransportType    enum.TransportType  `bson:"transport_type,omitempty" json:"transport_type"`
+	Status           enum.TourStatus     `bson:"status,omitempty" json:"status"`
+	StatusUpdateTime time.Time           `bson:"status_update_time" json:"status_update_time"`
+	Tags             helper.ArrayString  `bson:"tags,omitempty" json:"tags"`
+	Keypoints        []Keypoint          //`gorm:"foreignKey:TourId"`
+	TourReviews      []TourReview        //`gorm:"foreignKey:TourId"`
 }
 
 // use when creating
@@ -96,7 +67,7 @@ func (t *Tour) IsEmpty() bool {
 
 func (t *Tour) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		Id               int
+		Id               primitive.ObjectID
 		UserId           int
 		Name             string
 		Description      string
@@ -150,7 +121,7 @@ func (t *Tour) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	t.Id = temp.Id
+	t.Id = primitive.ObjectID{}
 	t.UserId = temp.UserId
 	t.Name = temp.Name
 	t.Description = temp.Description

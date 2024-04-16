@@ -1,39 +1,60 @@
 package app
 
 import (
-	"tours/model"
-
-	"gorm.io/gorm"
+	"context"
+	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"log"
+	"time"
 )
 
-func ExecuteMigrations(database *gorm.DB) {
-	// tours
-	database.AutoMigrate(&model.Tour{})
+func InsertInfo(client *mongo.Client) {
+	// Create a context with a timeout of 5 seconds.
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	//keypoints
-	database.AutoMigrate(&model.Keypoint{})
+	// Access the "tourService" database and "tours" collection.
+	toursDatabase := client.Database("tourService")
+	toursCollection := toursDatabase.Collection("tours")
 
-	//tourist positions
-	database.AutoMigrate(&model.TouristPosition{})
-	database.AutoMigrate(&model.TourReview{})
-
-}
-func MigrateDatabase(database *gorm.DB) {
-	migrator := database.Migrator()
-
-	// Example: Create a new table
-	if !migrator.HasTable(&model.Tour{}) {
-		migrator.CreateTable(&model.Tour{})
+	// Define the documents to insert.
+	tours := []interface{}{
+		map[string]interface{}{
+			"_id":                primitive.NewObjectID(),
+			"user_id":            16,
+			"name":               "Zlatibor Nature Escape",
+			"description":        "Discover the natural beauty of Zlatibor.",
+			"price":              1500,
+			"duration":           37,
+			"distance":           7,
+			"difficulty":         2,
+			"transport_type":     3,
+			"status":             0,
+			"status_update_time": time.Date(2024, time.February, 16, 0, 0, 0, 0, time.UTC),
+			"tags":               []string{"nature", "escape", "Zlatibor"},
+		},
+		map[string]interface{}{
+			"_id":                primitive.NewObjectID(),
+			"user_id":            18,
+			"name":               "Zlatibor Nature Escape2",
+			"description":        "Natural beauty of Zlatibor.",
+			"price":              1400,
+			"duration":           33,
+			"distance":           7,
+			"difficulty":         2,
+			"transport_type":     3,
+			"status":             0,
+			"status_update_time": time.Date(2024, time.February, 16, 0, 0, 0, 0, time.UTC),
+			"tags":               []string{"nature", "escape", "Zlatibor"},
+		},
 	}
-	if !migrator.HasTable(&model.Keypoint{}) {
-		migrator.CreateTable(&model.Keypoint{})
-	}
-	if !migrator.HasTable(&model.TouristPosition{}) {
-		migrator.CreateTable(&model.TouristPosition{})
-	}
-	if !migrator.HasTable(&model.TourReview{}) {
-		migrator.CreateTable(&model.TourReview{})
+
+	// Insert documents into MongoDB collection.
+	_, err := toursCollection.InsertMany(ctx, tours)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	// Other migration steps...
+	fmt.Println("Documents inserted successfully.")
 }
