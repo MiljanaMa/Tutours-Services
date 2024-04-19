@@ -21,7 +21,7 @@ func InsertInfo(client *mongo.Client) {
 	// Define the documents to insert.
 	tours := []interface{}{
 		map[string]interface{}{
-			"_id":                1,
+			"_id":                5,
 			"user_id":            16,
 			"name":               "Zlatibor Nature Escape",
 			"description":        "Discover the natural beauty of Zlatibor.",
@@ -30,12 +30,12 @@ func InsertInfo(client *mongo.Client) {
 			"distance":           7,
 			"difficulty":         2,
 			"transport_type":     3,
-			"status":             0,
+			"status":             1,
 			"status_update_time": time.Date(2024, time.February, 16, 0, 0, 0, 0, time.UTC),
 			"tags":               []string{"nature", "escape", "Zlatibor"},
 		},
 		map[string]interface{}{
-			"_id":                2,
+			"_id":                6,
 			"user_id":            18,
 			"name":               "Zlatibor Nature Escape2",
 			"description":        "Natural beauty of Zlatibor.",
@@ -57,13 +57,21 @@ func InsertInfo(client *mongo.Client) {
 	}
 
 	fmt.Println("Documents inserted successfully.")
-	counterDoc := map[string]interface{}{
-		"_id":   1, // Assuming "_id" is "tourCounter" for the counter document.
-		"value": 3, // Initial value for the counter.
+	counterDocs := []interface{}{
+		map[string]interface{}{
+			"_id":   1,
+			"value": 3,
+			"name":  "tour",
+		},
+		map[string]interface{}{
+			"_id":   2,
+			"value": 1,
+			"name":  "review",
+		},
+		// Add more counter documents as needed
 	}
 
-	// Insert document into the "counter" collection.
-	_, err = counter.InsertOne(ctx, counterDoc)
+	_, err = counter.InsertMany(ctx, counterDocs)
 	if err != nil {
 		log.Fatal(err)
 	}

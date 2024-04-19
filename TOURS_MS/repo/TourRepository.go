@@ -6,16 +6,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"gorm.io/gorm"
 	"log"
 	"time"
 	"tours/model"
 )
 
 type TourRepository struct {
-	DatabaseConnection *gorm.DB
-	Cli                *mongo.Client
-	Logger             *log.Logger
+	Cli    *mongo.Client
+	Logger *log.Logger
 }
 
 // Check database connection
@@ -48,11 +46,11 @@ func (repo *TourRepository) Create(tour *model.Tour) (model.Tour, error) {
 	toursCollection := repo.getCollection()
 	counterCollection := repo.getCounter()
 
-	// Retrieve the current counter value from the "counter" collection.
-	filter := bson.M{"_id": 1}
+	filter := bson.M{"name": "tour"}
 	var counter struct {
-		Id    int `bson:"_id"`
-		Value int `bson:"value"`
+		Id    int    `bson:"_id"`
+		Value int    `bson:"value"`
+		Name  string `bson:"name"`
 	}
 	errCounter := counterCollection.FindOne(ctx, filter).Decode(&counter)
 	if errCounter != nil {
@@ -61,18 +59,14 @@ func (repo *TourRepository) Create(tour *model.Tour) (model.Tour, error) {
 
 	currentCounterValue := counter.Value
 
-	// Set the ID of the tour to the current counter value.
 	tour.Id = currentCounterValue
-	// Insert the tour into the "tours" collection.
 	_, err = toursCollection.InsertOne(ctx, &tour)
 	if err != nil {
 		return *tour, err
 	}
 
-	// Increment the counter value.
 	newCounterValue := currentCounterValue + 1
 
-	// Update the counter document in the "counter" collection with the new counter value.
 	update := bson.M{"$set": bson.M{"value": newCounterValue}}
 	_, err = counterCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
