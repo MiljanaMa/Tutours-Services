@@ -113,6 +113,7 @@ services:
       timeout: 10s
       retries: 10
     volumes:
+      - ./init/mongo_init.js:/docker-entrypoint-initdb.d/mongo_init.js:ro
       - mongo_store:/data/db
 
   # NoSQL: MognoExpress

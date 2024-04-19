@@ -3,14 +3,13 @@ package model
 import (
 	"encoding/json"
 	"errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 	"tours/model/enum"
 	"tours/model/helper"
 )
 
 type Tour struct {
-	Id               primitive.ObjectID  `bson:"_id,omitempty" json:"id"`
+	Id               int                 `bson:"_id,omitempty" json:"id"`
 	UserId           int                 `bson:"user_id,omitempty" json:"user_id"`
 	Name             string              `bson:"name,omitempty" json:"name"`
 	Description      string              `bson:"description,omitempty" json:"description"`
@@ -67,7 +66,7 @@ func (t *Tour) IsEmpty() bool {
 
 func (t *Tour) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		Id               primitive.ObjectID
+		Id               int
 		UserId           int
 		Name             string
 		Description      string
@@ -121,7 +120,7 @@ func (t *Tour) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	t.Id = primitive.ObjectID{}
+	t.Id = temp.Id
 	t.UserId = temp.UserId
 	t.Name = temp.Name
 	t.Description = temp.Description

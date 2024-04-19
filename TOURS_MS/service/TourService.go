@@ -1,7 +1,6 @@
 package service
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"tours/model"
 	"tours/repo"
 )
@@ -33,7 +32,7 @@ func (service *TourService) Update(tour *model.Tour) (model.Tour, error) {
 	}
 	return updatedTour, nil
 }
-func (service *TourService) Delete(tourId string) error {
+func (service *TourService) Delete(tourId int) error {
 	err := service.TourRepository.Delete(tourId)
 	if err != nil {
 		return err
@@ -61,7 +60,7 @@ func (service *TourService) GetAllByAuthorId(limit, page, userId int) ([]model.T
 
 func (service *TourService) GetById(id int) (model.Tour, error) {
 	var tour model.Tour
-	tour, err := service.TourRepository.GetById(primitive.ObjectID{})
+	tour, err := service.TourRepository.GetById(id)
 	if err != nil {
 		return tour, err
 	}

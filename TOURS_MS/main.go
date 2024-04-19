@@ -16,7 +16,7 @@ func main() {
 	app.Init()
 	client := app.InitDB()
 	storeLogger := log.New(os.Stdout, "[patient-store] ", log.LstdFlags)
-	app.InsertInfo(client)
+	//app.InsertInfo(client)
 
 	// Tours setup
 	tourRepo := &repo.TourRepository{ /*DatabaseConnection: db*/ Cli: client, Logger: storeLogger}

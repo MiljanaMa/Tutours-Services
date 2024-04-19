@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"time"
@@ -17,11 +16,12 @@ func InsertInfo(client *mongo.Client) {
 	// Access the "tourService" database and "tours" collection.
 	toursDatabase := client.Database("tourService")
 	toursCollection := toursDatabase.Collection("tours")
+	counter := toursDatabase.Collection("counter")
 
 	// Define the documents to insert.
 	tours := []interface{}{
 		map[string]interface{}{
-			"_id":                primitive.NewObjectID(),
+			"_id":                1,
 			"user_id":            16,
 			"name":               "Zlatibor Nature Escape",
 			"description":        "Discover the natural beauty of Zlatibor.",
@@ -35,7 +35,7 @@ func InsertInfo(client *mongo.Client) {
 			"tags":               []string{"nature", "escape", "Zlatibor"},
 		},
 		map[string]interface{}{
-			"_id":                primitive.NewObjectID(),
+			"_id":                2,
 			"user_id":            18,
 			"name":               "Zlatibor Nature Escape2",
 			"description":        "Natural beauty of Zlatibor.",
@@ -57,4 +57,16 @@ func InsertInfo(client *mongo.Client) {
 	}
 
 	fmt.Println("Documents inserted successfully.")
+	counterDoc := map[string]interface{}{
+		"_id":   1, // Assuming "_id" is "tourCounter" for the counter document.
+		"value": 3, // Initial value for the counter.
+	}
+
+	// Insert document into the "counter" collection.
+	_, err = counter.InsertOne(ctx, counterDoc)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Document inserted into 'counter' collection successfully.")
 }

@@ -4,12 +4,10 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"gorm.io/gorm"
 	"log"
-	"reflect"
 	"time"
 	"tours/model"
 )
@@ -48,8 +46,35 @@ func (repo *TourRepository) Create(tour *model.Tour) (model.Tour, error) {
 	defer cancel()
 
 	toursCollection := repo.getCollection()
+	counterCollection := repo.getCounter()
 
+	// Retrieve the current counter value from the "counter" collection.
+	filter := bson.M{"_id": 1}
+	var counter struct {
+		Id    int `bson:"_id"`
+		Value int `bson:"value"`
+	}
+	errCounter := counterCollection.FindOne(ctx, filter).Decode(&counter)
+	if errCounter != nil {
+		return *tour, errCounter
+	}
+
+	currentCounterValue := counter.Value
+
+	// Set the ID of the tour to the current counter value.
+	tour.Id = currentCounterValue
+	// Insert the tour into the "tours" collection.
 	_, err = toursCollection.InsertOne(ctx, &tour)
+	if err != nil {
+		return *tour, err
+	}
+
+	// Increment the counter value.
+	newCounterValue := currentCounterValue + 1
+
+	// Update the counter document in the "counter" collection with the new counter value.
+	update := bson.M{"$set": bson.M{"value": newCounterValue}}
+	_, err = counterCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return *tour, err
 	}
@@ -77,16 +102,17 @@ func (repo *TourRepository) Update(tour *model.Tour) (model.Tour, error) {
 
 	filter := bson.M{"_id": tour.Id}
 	// Create the update map
-	update := bson.M{}
-
-	// Iterate over the fields of the tour object and add them to the update map
-	val := reflect.ValueOf(tour).Elem()
-	typ := val.Type()
-	for i := 0; i < val.NumField(); i++ {
-		fieldName := typ.Field(i).Name
-		fieldValue := val.Field(i).Interface()
-		update[fieldName] = fieldValue
-	}
+	update := bson.M{"$set": bson.M{
+		"tags":               tour.Tags,
+		"description":        tour.Description,
+		"price":              tour.Price,
+		"duration":           tour.Duration,
+		"difficulty":         tour.Difficulty,
+		"distance":           tour.Distance,
+		"status_update_time": tour.StatusUpdateTime,
+		"name":               tour.Name,
+		"status":             tour.Status,
+	}}
 
 	result, err := toursCollection.UpdateOne(ctx, filter, update)
 	repo.Logger.Printf("Documents matched: %v\n", result.MatchedCount)
@@ -103,14 +129,13 @@ func (repo *TourRepository) Update(tour *model.Tour) (model.Tour, error) {
 
 	return updatedTour, nil
 }
-func (repo *TourRepository) Delete(tourId string) error {
+func (repo *TourRepository) Delete(tourId int) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	toursCollection := repo.getCollection()
 
-	objID, _ := primitive.ObjectIDFromHex(tourId)
-	filter := bson.D{{Key: "_id", Value: objID}}
+	filter := bson.D{{Key: "_id", Value: tourId}}
 	result, err := toursCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
@@ -156,7 +181,7 @@ func (repo *TourRepository) GetAll(limit, page int) ([]model.Tour, error) {
 
 	return tours, nil
 }
-func (repo *TourRepository) GetById(id primitive.ObjectID) (model.Tour, error) {
+func (repo *TourRepository) GetById(id int) (model.Tour, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -175,4 +200,9 @@ func (tr *TourRepository) getCollection() *mongo.Collection {
 	tourDatabase := tr.Cli.Database("tourService")
 	toursCollection := tourDatabase.Collection("tours")
 	return toursCollection
+}
+func (tr *TourRepository) getCounter() *mongo.Collection {
+	tourDatabase := tr.Cli.Database("tourService")
+	counter := tourDatabase.Collection("counter")
+	return counter
 }
