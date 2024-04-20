@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
@@ -96,6 +97,99 @@ func (repo *FollowerRepository) GetRecommendation(id int) ([]int, error) {
 
 			}
 			return recommendations, nil
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return result.([]int), nil
+
+}
+
+func (repo *FollowerRepository) DeleteFollowingCon(id1, id2 int) error {
+	ctx := context.Background()
+	session := repo.Driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	parameters := map[string]interface{}{
+		"id1": id1,
+		"id2": id2,
+	}
+	_, err := session.ExecuteWrite(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(
+				ctx,
+				`MATCH (u1:User {id: $id1}) -[r:Following]-> (u2:User{id: $id2}) 
+				 DELETE r`,
+				parameters)
+			return result, err
+		})
+	return err
+}
+
+func (repo *FollowerRepository) GetFollowings(id int) ([]int, error) {
+
+	ctx := context.Background()
+	session := repo.Driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	parameters := map[string]interface{}{
+		"id": id,
+	}
+
+	var followings []int
+	result, err := session.ExecuteRead(ctx,
+		func(transcation neo4j.ManagedTransaction) (any, error) {
+			result, err := transcation.Run(ctx,
+				`MATCH (u1:User {id: $id})-[:Following]->(following:User)
+				 		RETURN following.id as followingID`,
+				parameters)
+			if err != nil {
+				return nil, err
+			}
+			for result.Next(ctx) {
+				value, _ := result.Record().Get("followingID")
+				followingID, _ := value.(int64)
+				followings = append(followings, int(followingID))
+
+			}
+			return followings, nil
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return result.([]int), nil
+
+}
+
+func (repo *FollowerRepository) GetFollowers(id int) ([]int, error) {
+
+	ctx := context.Background()
+	session := repo.Driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	parameters := map[string]interface{}{
+		"id": id,
+	}
+
+	var followers []int
+	result, err := session.ExecuteRead(ctx,
+		func(transcation neo4j.ManagedTransaction) (any, error) {
+			result, err := transcation.Run(ctx,
+				`MATCH (u1:User {id: $id})<-[:Following]-(follower:User)
+				 		RETURN follower.id as followerID`,
+				parameters)
+			if err != nil {
+				return nil, err
+			}
+			for result.Next(ctx) {
+				value, _ := result.Record().Get("followerID")
+				followerID, _ := value.(int64)
+				followers = append(followers, int(followerID))
+
+			}
+			return followers, nil
 		},
 	)
 	if err != nil {

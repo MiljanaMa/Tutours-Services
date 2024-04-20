@@ -6,11 +6,12 @@ import (
 	"FOLLOWERS-MS/service"
 	"context"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
 func startServer(handler *handler.FollowersHandler) {
@@ -20,6 +21,9 @@ func startServer(handler *handler.FollowersHandler) {
 	router.HandleFunc(url+"follow/{id1}/{id2}", handler.Follow).Methods("POST")
 	router.HandleFunc(url+"check-if-following/{id1}/{id2}", handler.CheckIfFollowing).Methods("GET")
 	router.HandleFunc(url+"get-recommendations/{id}", handler.GetRecommendation).Methods("GET")
+	router.HandleFunc(url+"unfollow/{id1}/{id2}", handler.Unfollow).Methods("DELETE")
+	router.HandleFunc(url+"get-followings/{id}", handler.GetFollowings).Methods("GET")
+	router.HandleFunc(url+"get-followers/{id}", handler.GetFollowers).Methods("GET")
 
 	fmt.Println("Starting server")
 	log.Fatal(http.ListenAndServe(":8095", router))
