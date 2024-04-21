@@ -3,56 +3,27 @@ package model
 import (
 	"encoding/json"
 	"errors"
-	"gorm.io/gorm"
+	"fmt"
 	"time"
 	"tours/model/enum"
 	"tours/model/helper"
 )
 
 type Tour struct {
-	Id               int `gorm:"primaryKey"`
-	UserId           int
-	Name             string
-	Description      string
-	Price            float64
-	Duration         int
-	Distance         float64
-	Difficulty       enum.TourDifficulty
-	TransportType    enum.TransportType
-	Status           enum.TourStatus
-	StatusUpdateTime time.Time
-	Tags             helper.ArrayString
-	Keypoints        []Keypoint   `gorm:"foreignKey:TourId"`
-	TourReviews      []TourReview `gorm:"foreignKey:TourId"`
-}
-
-// is it really needed
-func NewTour(name string, description string, price float64, difficulty enum.TourDifficulty,
-	tags helper.ArrayString, status enum.TourStatus, userId int, distance float64, duration int, transportType enum.TransportType,
-	statusUpdateTime time.Time, keyPoints []Keypoint, tourReviews []TourReview) *Tour {
-	tour := &Tour{
-		UserId:           userId,
-		Name:             name,
-		Description:      description,
-		Price:            price,
-		Duration:         duration,
-		Distance:         distance,
-		Difficulty:       difficulty,
-		Tags:             tags,
-		Status:           status,
-		TransportType:    transportType,
-		StatusUpdateTime: statusUpdateTime,
-		Keypoints:        keyPoints,
-		TourReviews:      tourReviews,
-	}
-
-	return tour
-}
-
-// usage???
-func (tour *Tour) CreateID(scope *gorm.DB) error {
-	tour.Id = 0
-	return nil
+	Id               int                 `bson:"_id,omitempty" json:"id"`
+	UserId           int                 `bson:"user_id,omitempty" json:"user_id"`
+	Name             string              `bson:"name,omitempty" json:"name"`
+	Description      string              `bson:"description,omitempty" json:"description"`
+	Price            float64             `bson:"price,omitempty" json:"price"`
+	Duration         int                 `bson:"duration,omitempty" json:"duration"`
+	Distance         float64             `bson:"distance,omitempty" json:"distance"`
+	Difficulty       enum.TourDifficulty `bson:"difficulty,omitempty" json:"difficulty"`
+	TransportType    enum.TransportType  `bson:"transport_type,omitempty" json:"transport_type"`
+	Status           enum.TourStatus     `bson:"status,omitempty" json:"status"`
+	StatusUpdateTime time.Time           `bson:"status_update_time" json:"status_update_time"`
+	Tags             helper.ArrayString  `bson:"tags,omitempty" json:"tags"`
+	Keypoints        []Keypoint          //`gorm:"foreignKey:TourId"`
+	TourReviews      []TourReview        //`gorm:"foreignKey:TourId"`
 }
 
 // use when creating
@@ -82,10 +53,12 @@ func (tour *Tour) Validate() error {
 // use when updating
 func (tour *Tour) ValidateUpdate(oldTour *Tour) error {
 	if tour.Status == enum.ARCHIVED && oldTour.Status != enum.PUBLISHED {
+		fmt.Println("Tour is not published yet")
 		return errors.New("Tour is not published yet")
 	}
-	//this stayed like this because collegues left tour update without keypoints
+	//this stayed like this because colleagues left tour update without keypoints
 	if len(oldTour.Keypoints) < 2 && tour.Status == enum.PUBLISHED {
+		fmt.Println("Not enough Key Points")
 		return errors.New("Not enough Key Points")
 	}
 	return nil

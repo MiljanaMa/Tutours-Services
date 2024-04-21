@@ -14,15 +14,12 @@ services:
         source: ./BACK/scripts/tutours-db-backup.sql
         target: /tmp/explorer-init.sql
       - type: bind
-        source: ./TOURS_MS/tours.sql
-        target: /tmp/tours-init.sql
-      - type: bind
         source: ./ENCOUNTERS-MS/encounters.sql
         target: /tmp/encounters-init.sql 
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: super
-      POSTGRES_MULTIPLE_DATABASES: tours,explorer,encounters
+      POSTGRES_MULTIPLE_DATABASES: explorer,encounters
       PGPORT: 5432
       PGUSER: postgres
     healthcheck:
@@ -86,14 +83,49 @@ services:
     networks:
       - database
     environment:
-      DB_USER: postgres
-      DB_PASSWORD: super
-      DB_PORT: 5432
-      DB_DATABASE: tours
-      DB_HOST: db
+      MONGODB_ADDR: "mongodb://mongo:27017"
     depends_on:
-      db:
+      mongo:
         condition: service_healthy
+
+  # NoSQL: MongoDB
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - database
+    # Docker healtcheck - checks if database is "alive"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - ./init/mongo_init.js:/docker-entrypoint-initdb.d/mongo_init.js:ro
+      - mongo_store:/data/db
+
+  # NoSQL: MognoExpress
+  mongo-express:
+    image: mongo-express
+    restart: always
+    networks:
+      - database
+    environment:
+      # hostname of mongo databse
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
+    volumes:
+      - mongo_express_data:/data/db
+
+volumes:
+  mongo_store:
+  mongo_express_data:
 
 networks:
   database:
