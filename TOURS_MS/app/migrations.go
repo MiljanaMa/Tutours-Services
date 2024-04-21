@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"time"
 
@@ -16,6 +17,22 @@ func InsertInfo(client *mongo.Client) {
 
 	// Access the "tourService" database and "tours" collection.
 	toursDatabase := client.Database("tourService")
+	// Retrieve the list of collections in the database.
+	collections, err := toursDatabase.ListCollectionNames(ctx, bson.D{})
+	if err != nil {
+		log.Println("Error listing collections:", err)
+	}
+
+	// Drop each collection.
+	for _, collectionName := range collections {
+		collection := toursDatabase.Collection(collectionName)
+		if err := collection.Drop(ctx); err != nil {
+			log.Printf("Error dropping collection %s: %v\n", collectionName, err)
+		} else {
+			log.Printf("Collection %s dropped successfully\n", collectionName)
+		}
+	}
+
 	toursCollection := toursDatabase.Collection("tours")
 	keypointsCollection := toursDatabase.Collection("keypoints")
 	counter := toursDatabase.Collection("counter")
@@ -38,7 +55,7 @@ func InsertInfo(client *mongo.Client) {
 		},
 		map[string]interface{}{
 			"_id":                2,
-			"user_id":            18,
+			"user_id":            16,
 			"name":               "Zlatibor Nature Escape2",
 			"description":        "Natural beauty of Zlatibor.",
 			"price":              1400,
@@ -53,7 +70,7 @@ func InsertInfo(client *mongo.Client) {
 	}
 
 	// Insert documents into MongoDB collection.
-	_, err := toursCollection.InsertMany(ctx, tours)
+	_, err = toursCollection.InsertMany(ctx, tours)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,6 +98,17 @@ func InsertInfo(client *mongo.Client) {
 			"image":       "image mary church",
 			"secret":      "Secret of Mary Church",
 		},
+		map[string]interface{}{
+			"_id":         3,
+			"tour_id":     1,
+			"name":        "Mary Church1",
+			"latitude":    45.2532995484197,
+			"longitude":   19.8297175642465,
+			"description": "The largest church in Novi Sad",
+			"position":    2,
+			"image":       "image mary church",
+			"secret":      "Secret of Mary Church",
+		},
 	}
 
 	// Insert documents into MongoDB collection.
@@ -103,7 +131,7 @@ func InsertInfo(client *mongo.Client) {
 		},
 		map[string]interface{}{
 			"_id":   3,
-			"value": 3,
+			"value": 4,
 			"name":  "keypoint",
 		},
 		map[string]interface{}{

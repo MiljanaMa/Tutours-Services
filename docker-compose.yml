@@ -14,15 +14,12 @@ services:
         source: ./BACK/scripts/tutours-db-backup.sql
         target: /tmp/explorer-init.sql
       - type: bind
-        source: ./TOURS_MS/tours.sql
-        target: /tmp/tours-init.sql
-      - type: bind
         source: ./ENCOUNTERS-MS/encounters.sql
         target: /tmp/encounters-init.sql 
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: super
-      POSTGRES_MULTIPLE_DATABASES: tours,explorer,encounters
+      POSTGRES_MULTIPLE_DATABASES: explorer,encounters
       PGPORT: 5432
       PGUSER: postgres
     healthcheck:
@@ -87,14 +84,7 @@ services:
       - database
     environment:
       MONGODB_ADDR: "mongodb://mongo:27017"
-      DB_USER: postgres
-      DB_PASSWORD: super
-      DB_PORT: 5432
-      DB_DATABASE: tours
-      DB_HOST: db
     depends_on:
-      db:
-        condition: service_healthy
       mongo:
         condition: service_healthy
 

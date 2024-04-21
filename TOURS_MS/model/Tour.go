@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 	"tours/model/enum"
 	"tours/model/helper"
@@ -52,10 +53,12 @@ func (tour *Tour) Validate() error {
 // use when updating
 func (tour *Tour) ValidateUpdate(oldTour *Tour) error {
 	if tour.Status == enum.ARCHIVED && oldTour.Status != enum.PUBLISHED {
+		fmt.Println("Tour is not published yet")
 		return errors.New("Tour is not published yet")
 	}
-	//this stayed like this because collegues left tour update without keypoints
+	//this stayed like this because colleagues left tour update without keypoints
 	if len(oldTour.Keypoints) < 2 && tour.Status == enum.PUBLISHED {
+		fmt.Println("Not enough Key Points")
 		return errors.New("Not enough Key Points")
 	}
 	return nil

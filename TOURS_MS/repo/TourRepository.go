@@ -84,6 +84,7 @@ func (repo *TourRepository) Update(tour *model.Tour) (model.Tour, error) {
 	if err != nil {
 		return *tour, err
 	}
+
 	err = tour.ValidateUpdate(&tourForUpdate)
 	if err != nil {
 		return *tour, err
@@ -106,6 +107,7 @@ func (repo *TourRepository) Update(tour *model.Tour) (model.Tour, error) {
 		"status_update_time": tour.StatusUpdateTime,
 		"name":               tour.Name,
 		"status":             tour.Status,
+		"transport_type":     tour.TransportType,
 	}}
 
 	result, err := toursCollection.UpdateOne(ctx, filter, update)
@@ -118,6 +120,7 @@ func (repo *TourRepository) Update(tour *model.Tour) (model.Tour, error) {
 	}
 	updatedTour, err := repo.GetById(tour.Id)
 	if err != nil {
+		repo.Logger.Println("Error fetching updated tour:", err)
 		return model.Tour{}, err
 	}
 
@@ -134,7 +137,28 @@ func (repo *TourRepository) Delete(tourId int) error {
 	if err != nil {
 		return err
 	}
-	repo.Logger.Printf("Documents deleted: %v\n", result.DeletedCount)
+	repo.Logger.Printf("Tours deleted: %v\n", result.DeletedCount)
+
+	//delete related keypoints
+	keypointsCollection := repo.getKeypoints()
+
+	filterKp := bson.D{{Key: "tour_id", Value: tourId}}
+	result, err = keypointsCollection.DeleteMany(ctx, filterKp)
+	if err != nil {
+		return err
+	}
+	repo.Logger.Printf("Keypoints deleted: %v\n", result.DeletedCount)
+
+	//delete related reviews
+	reviewsCollection := repo.getReviews()
+
+	filterR := bson.D{{Key: "tour_id", Value: tourId}}
+	result, err = reviewsCollection.DeleteMany(ctx, filterR)
+	if err != nil {
+		return err
+	}
+	repo.Logger.Printf("Reviews deleted: %v\n", result.DeletedCount)
+
 	return nil
 }
 
@@ -176,7 +200,7 @@ func (repo *TourRepository) GetAll(limit, page int) ([]model.Tour, error) {
 	return tours, nil
 }
 func (repo *TourRepository) GetById(id int) (model.Tour, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 55*time.Second)
 	defer cancel()
 
 	toursCollection := repo.getCollection()
@@ -187,6 +211,21 @@ func (repo *TourRepository) GetById(id int) (model.Tour, error) {
 	if err != nil {
 		return tour, err
 	}
+
+	//get related keypoints
+	keypointsCollection := repo.getKeypoints()
+	filterKp := bson.M{"tour_id": id}
+
+	var keypoints []model.Keypoint
+	keypointsCursor, err := keypointsCollection.Find(ctx, filterKp)
+	if err != nil {
+		return tour, err
+	}
+	defer keypointsCursor.Close(ctx)
+	if err := keypointsCursor.All(ctx, &keypoints); err != nil {
+		return tour, err
+	}
+	tour.Keypoints = keypoints
 
 	return tour, nil
 }
@@ -199,4 +238,14 @@ func (tr *TourRepository) getCounter() *mongo.Collection {
 	tourDatabase := tr.Cli.Database("tourService")
 	counter := tourDatabase.Collection("counter")
 	return counter
+}
+func (tr *TourRepository) getKeypoints() *mongo.Collection {
+	tourDatabase := tr.Cli.Database("tourService")
+	keypointsCollection := tourDatabase.Collection("keypoints")
+	return keypointsCollection
+}
+func (tr *TourRepository) getReviews() *mongo.Collection {
+	reviewDatabase := tr.Cli.Database("tourService")
+	reviewCollection := reviewDatabase.Collection("reviews")
+	return reviewCollection
 }
