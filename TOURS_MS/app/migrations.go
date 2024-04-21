@@ -106,6 +106,11 @@ func InsertInfo(client *mongo.Client) {
 			"value": 3,
 			"name":  "keypoint",
 		},
+		map[string]interface{}{
+			"_id":   4,
+			"value": 1,
+			"name":  "position",
+		},
 		// Add more counter documents as needed
 	}
 

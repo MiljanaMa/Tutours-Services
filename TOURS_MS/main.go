@@ -16,7 +16,7 @@ func main() {
 	app.Init()
 	client := app.InitDB()
 	storeLogger := log.New(os.Stdout, "[patient-store] ", log.LstdFlags)
-	//app.InsertInfo(client)
+	app.InsertInfo(client)
 
 	// Tours setup
 	tourRepo := &repo.TourRepository{Cli: client, Logger: storeLogger}
@@ -27,12 +27,12 @@ func main() {
 	keypointRepo := &repo.KeypointRepository{Cli: client, Logger: storeLogger}
 	keypointService := &service.KeypointService{KeypointRepository: keypointRepo}
 	keypointHandler := &handler.KeypointHandler{KeypointService: keypointService}
-	/*
-		// Tourist positions setup
-		touristPositionRepo := &repo.TouristPositionRepository{DatabaseConnection: db}
-		touristPositionService := &service.TouristPositionService{TouristPositionRepository: touristPositionRepo}
-		touristPositionHandler := &handler.TouristPositionHandler{TouristPositionService: touristPositionService}
-	*/
+
+	// Tourist positions setup
+	touristPositionRepo := &repo.TouristPositionRepository{Cli: client, Logger: storeLogger}
+	touristPositionService := &service.TouristPositionService{TouristPositionRepository: touristPositionRepo}
+	touristPositionHandler := &handler.TouristPositionHandler{TouristPositionService: touristPositionService}
+
 	// Tourist review setup
 	tourReviewRepo := &repo.TourReviewRepository{Cli: client, Logger: storeLogger}
 	tourReviewService := &service.TourReviewService{TourReviewRepository: tourReviewRepo}
@@ -42,7 +42,7 @@ func main() {
 
 	app.SetupTourRoutes(router, tourHandler)
 	app.SetupKeypointRoutes(router, keypointHandler)
-	//app.SetupTouristPositionRoutes(router, touristPositionHandler)
+	app.SetupTouristPositionRoutes(router, touristPositionHandler)
 	app.SetupTourReviewRoutes(router, tourReviewHandler)
 
 	log.Fatal(http.ListenAndServe(app.Port, router))

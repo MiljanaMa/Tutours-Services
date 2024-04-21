@@ -21,7 +21,7 @@ func (handler *KeypointHandler) GetById(writer http.ResponseWriter, req *http.Re
 	idStr := mux.Vars(req)["id"]
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(writer, "Invalid tour ID", http.StatusBadRequest)
+		http.Error(writer, "Invalid keypoint ID", http.StatusBadRequest)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (handler *KeypointHandler) Create(writer http.ResponseWriter, req *http.Req
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	review, err := handler.KeypointService.Create(&k)
+	keypoint, err := handler.KeypointService.Create(&k)
 	if err != nil {
 		log.Println("Error while creating keypoint")
 		http.Error(writer, err.Error(), http.StatusExpectationFailed)
@@ -102,7 +102,7 @@ func (handler *KeypointHandler) Create(writer http.ResponseWriter, req *http.Req
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(writer).Encode(review)
+	json.NewEncoder(writer).Encode(keypoint)
 }
 
 func (handler *KeypointHandler) Delete(writer http.ResponseWriter, req *http.Request) {
@@ -141,9 +141,15 @@ func (handler *KeypointHandler) Update(writer http.ResponseWriter, req *http.Req
 		return
 	}
 	updatedKeypoint, err := handler.KeypointService.Update(&keypoint)
-	jsonData, err := updatedKeypoint.MarshalJSON()
 	if err != nil {
 		log.Println("Error while updating a keypoint")
+		writer.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+
+	jsonData, err := updatedKeypoint.MarshalJSON()
+	if err != nil {
+		log.Println("Error while marshaling a keypoint")
 		writer.WriteHeader(http.StatusExpectationFailed)
 		return
 	}
