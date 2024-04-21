@@ -3,9 +3,10 @@ package app
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func InsertInfo(client *mongo.Client) {
@@ -16,12 +17,13 @@ func InsertInfo(client *mongo.Client) {
 	// Access the "tourService" database and "tours" collection.
 	toursDatabase := client.Database("tourService")
 	toursCollection := toursDatabase.Collection("tours")
+	keypointsCollection := toursDatabase.Collection("keypoints")
 	counter := toursDatabase.Collection("counter")
 
 	// Define the documents to insert.
 	tours := []interface{}{
 		map[string]interface{}{
-			"_id":                5,
+			"_id":                1,
 			"user_id":            16,
 			"name":               "Zlatibor Nature Escape",
 			"description":        "Discover the natural beauty of Zlatibor.",
@@ -35,7 +37,7 @@ func InsertInfo(client *mongo.Client) {
 			"tags":               []string{"nature", "escape", "Zlatibor"},
 		},
 		map[string]interface{}{
-			"_id":                6,
+			"_id":                2,
 			"user_id":            18,
 			"name":               "Zlatibor Nature Escape2",
 			"description":        "Natural beauty of Zlatibor.",
@@ -56,6 +58,37 @@ func InsertInfo(client *mongo.Client) {
 		log.Fatal(err)
 	}
 
+	keypoints := []interface{}{
+		map[string]interface{}{
+			"_id":         1,
+			"tour_id":     1,
+			"name":        "Danube Park",
+			"latitude":    45.25329954841971,
+			"longitude":   19.829717564246433,
+			"description": "An urban park in the downtown of Novi Sad",
+			"position":    1,
+			"image":       "image danube park",
+			"secret":      "Secret of Danube Park",
+		},
+		map[string]interface{}{
+			"_id":         2,
+			"tour_id":     2,
+			"name":        "Mary Church",
+			"latitude":    45.2532995484197,
+			"longitude":   19.8297175642465,
+			"description": "The largest church in Novi Sad",
+			"position":    1,
+			"image":       "image mary church",
+			"secret":      "Secret of Mary Church",
+		},
+	}
+
+	// Insert documents into MongoDB collection.
+	_, err = keypointsCollection.InsertMany(ctx, keypoints)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	fmt.Println("Documents inserted successfully.")
 	counterDocs := []interface{}{
 		map[string]interface{}{
@@ -67,6 +100,11 @@ func InsertInfo(client *mongo.Client) {
 			"_id":   2,
 			"value": 1,
 			"name":  "review",
+		},
+		map[string]interface{}{
+			"_id":   3,
+			"value": 3,
+			"name":  "keypoint",
 		},
 		// Add more counter documents as needed
 	}
