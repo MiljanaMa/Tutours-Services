@@ -111,7 +111,7 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  getRecommendedProfiles(): void { //recommended
+  getRecommendedProfiles(): void {
     this.service.getRecommendedProfiles().subscribe({
       next: (data: PagedResults<Profile>) => {
         this.profilesToFollow = data.results;
@@ -133,7 +133,7 @@ export class ProfileComponent implements OnInit {
   unfollow(followingId: number) {
     this.service.unfollow(followingId).subscribe({
       next: (data: PagedResults<Profile>) => {
-        this.following = data.results;
+        this.loadProfileFollowing();
         this.getRecommendedProfiles();
       },
       error: (err: any) => {
@@ -145,8 +145,8 @@ export class ProfileComponent implements OnInit {
   follow(followingId: number) {
     this.service.follow(followingId).subscribe({
       next: (data: PagedResults<Profile>) => {
-        this.following = data.results;
-        this.getRecommendedProfiles();
+        this.loadProfileFollowing();  
+        this.getRecommendedProfiles();  
       },
       error: (err: any) => {
         console.log(err);

@@ -84,7 +84,7 @@ func (repo *FollowerRepository) GetRecommendation(id int) ([]int, error) {
 		func(transcation neo4j.ManagedTransaction) (any, error) {
 			result, err := transcation.Run(ctx,
 				`MATCH (u1:User {id: $id})-[:Following]->(u2:User)-[:Following]->(u3:User)
-						WHERE NOT (u3)-[:Following]->(u1) AND u3.id <> $id
+						WHERE NOT (u1)-[:Following]->(u3) AND u3.id <> $id
 				 		RETURN DISTINCT u3.id as recommendationID`,
 				parameters)
 			if err != nil {

@@ -22,7 +22,9 @@ export class SingleBlogDisplayComponent implements OnInit{
     creationTime:new Date().toISOString().split('T')[0],
     rating: 'a'
   }
-  public images : string[]
+  public images : string[];
+  public hidden: boolean;
+  public error_text: string;
 
   constructor(private service: BlogService, private router: Router, private route: ActivatedRoute) {}
 
@@ -31,15 +33,25 @@ ngOnInit(): void {
     this.blogId = Number(params.get('id'));
 
     if(this.blogId !== 0){
-      this.service.getBlog(this.blogId).subscribe((res: Blog) => {
-        this.selectedBlog = res;
-        this.images = this.selectedBlog.imageLinks[0].split(',');
-        this.images.forEach((value, index, array) => {
-          if (value.includes('(') || value.includes(')')) {
-            array[index] = value.replace(/[()]/g, '');
-          }
-        });       
-      });
+      this.service.getBlog(this.blogId).subscribe({
+        next: (res: Blog) => {
+          this.hidden = false;
+          this.selectedBlog = res;
+          this.images = this.selectedBlog.imageLinks[0].split(',');
+          this.images.forEach((value, index, array) => {
+            if (value.includes('(') || value.includes(')')) {
+              array[index] = value.replace(/[()]/g, '');
+            }
+          });  
+        },
+        error: (err: any) => {
+          this.hidden = true;
+          this.error_text = "You are not following this blog creator.";
+          console.log(err);
+        }
+        
+
+      })
     }
   });
 }

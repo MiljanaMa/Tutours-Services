@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -30,9 +31,9 @@ func startServer(handler *handler.FollowersHandler) {
 }
 func initDB() neo4j.DriverWithContext {
 
-	uri := "bolt://localhost:7687"
-	user := "neo4j"
-	pass := "12345678"
+	uri := os.Getenv("NEO4J_DB")
+	user := os.Getenv("NEO4J_USERNAME")
+	pass := os.Getenv("NEO4J_PASS")
 	auth := neo4j.BasicAuth(user, pass, "")
 
 	driver, err := neo4j.NewDriverWithContext(uri, auth)
@@ -54,6 +55,60 @@ func CheckConnection(driver neo4j.DriverWithContext) {
 	}
 	fmt.Printf("Neo4J server address: %s \n", driver.Target().Host)
 }
+
+func cleanData(driver neo4j.DriverWithContext) error {
+
+	ctx := context.Background()
+	session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	_, err := session.ExecuteWrite(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			_, err := transaction.Run(
+				ctx,
+				`MATCH (n) DETACH DELETE n`,
+				nil)
+			return nil, err
+		})
+	return err
+}
+
+func migrateData(driver neo4j.DriverWithContext) error {
+
+	ctx := context.Background()
+	session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	_, err := session.ExecuteWrite(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			_, err := transaction.Run(
+				ctx,
+				`MERGE (u1: User {id: 1})
+				 MERGE (u2: User {id: 2})
+				 MERGE (u3: User {id: 3})
+				 MERGE (u4: User {id: 4})
+				 MERGE (u5: User {id: 5})
+				 MERGE (u6: User {id: 6})
+				 MERGE (u7: User {id: 7})
+				 MERGE (u8: User {id: 8})
+				 CREATE (u1) -[:Following]->(u2)
+				 CREATE (u1) -[:Following]->(u3)
+				 CREATE (u1) -[:Following]->(u6)
+				 CREATE (u3) -[:Following]->(u2)
+				 CREATE (u3) -[:Following]->(u4)
+				 CREATE (u3) -[:Following]->(u5)
+				 CREATE (u4) -[:Following]->(u1)
+				 CREATE (u6) -[:Following]->(u2)
+				 CREATE (u6) -[:Following]->(u7)
+				 CREATE (u6) -[:Following]->(u8)
+				 CREATE (u8) -[:Following]->(u1)
+				 `,
+				nil)
+			return nil, err
+		})
+	return err
+}
+
 func main() {
 	timeoutContext, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
@@ -66,6 +121,10 @@ func main() {
 	if driver == nil {
 		return
 	}
+
+	cleanData(driver)
+	migrateData(driver)
+
 	followerRepository := &repo.FollowerRepository{driver}
 	followerService := &service.FollowerService{followerRepository}
 	followerHandler := &handler.FollowersHandler{followerService}

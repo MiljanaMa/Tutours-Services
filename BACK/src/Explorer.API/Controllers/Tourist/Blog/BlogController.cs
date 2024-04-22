@@ -20,7 +20,8 @@ public class BlogController : BaseApiController
     }
     protected static HttpClient httpClient = new()
     {
-        BaseAddress = new Uri($"http://localhost:8095/followers/")
+        //BaseAddress = new Uri($"http://host.docker.internal:8095/followers/")
+        BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("FOLLOWER_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("FOLLOWER_PORT") ?? "8095"}/followers/")
     };
 
     [HttpGet]
@@ -50,7 +51,7 @@ public class BlogController : BaseApiController
             string responseContent = await response.Content.ReadAsStringAsync();
             bool isFollowing = bool.Parse(responseContent);
         
-            if (isFollowing)
+            if (isFollowing || id1 == id2)
             {
                 return CreateResponse(result);
             }
@@ -60,7 +61,6 @@ public class BlogController : BaseApiController
             }
             
         }
-       
         
         return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
     }

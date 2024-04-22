@@ -75,10 +75,6 @@ func (handler *FollowersHandler) GetRecommendation(writer http.ResponseWriter, r
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if len(result) == 0 {
-		writer.WriteHeader(http.StatusNotFound)
-		return
-	}
 
 	response, err := json.Marshal(result)
 	if err != nil {
@@ -129,10 +125,6 @@ func (handler *FollowersHandler) GetFollowings(writer http.ResponseWriter, req *
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if len(result) == 0 {
-		writer.WriteHeader(http.StatusNotFound)
-		return
-	}
 
 	response, err := json.Marshal(result)
 	if err != nil {
@@ -160,10 +152,6 @@ func (handler *FollowersHandler) GetFollowers(writer http.ResponseWriter, req *h
 	if error != nil {
 		fmt.Println(error)
 		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if len(result) == 0 {
-		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
 

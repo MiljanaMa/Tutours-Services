@@ -16,7 +16,11 @@ func (service *FollowerService) IsFollowing(id1, id2 int) (bool, error) {
 }
 
 func (service *FollowerService) GetRecommendations(id int) ([]int, error) {
-	return service.FollowerRepository.GetRecommendation(id)
+	recommendations, err := service.FollowerRepository.GetRecommendation(id)
+	if len(recommendations) == 0 {
+		return []int{}, err
+	}
+	return recommendations, err
 }
 
 func (service *FollowerService) Unfollow(id1, id2 int) error {
@@ -25,9 +29,17 @@ func (service *FollowerService) Unfollow(id1, id2 int) error {
 }
 
 func (service *FollowerService) GetFollowings(id int) ([]int, error) {
-	return service.FollowerRepository.GetFollowings(id)
+	followings, err := service.FollowerRepository.GetFollowings(id)
+	if len(followings) == 0 {
+		return []int{}, err
+	}
+	return followings, err
 }
 
 func (service *FollowerService) GetFollowers(id int) ([]int, error) {
-	return service.FollowerRepository.GetFollowers(id)
+	followers, err := service.FollowerRepository.GetFollowers(id)
+	if len(followers) == 0 {
+		return []int{}, err
+	}
+	return followers, err
 }

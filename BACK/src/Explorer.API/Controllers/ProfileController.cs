@@ -19,7 +19,8 @@ public class ProfileController : BaseApiController
 
     protected static HttpClient httpClient = new()
     {
-        BaseAddress = new Uri($"http://localhost:8095/followers/") //change to profile or not? followers it is then, because of followers microservice
+        //BaseAddress = new Uri($"http://host.docker.internal:8095/followers/")
+        BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("FOLLOWER_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("FOLLOWER_PORT") ?? "8095"}/followers/")
     };
 
     public ProfileController(IProfileService profileService, IUserService userService)
@@ -44,7 +45,7 @@ public class ProfileController : BaseApiController
     }
 
     [HttpGet("get-recommendations")]
-    public async Task<ActionResult<PagedResult<UserDto>>> GetRecommendations()
+    public async Task<ActionResult<PagedResult<PersonDto>>> GetRecommendations()
     {
         int id = User.PersonId();
         HttpResponseMessage response = await httpClient.GetAsync("get-recommendations/" + id);
@@ -53,23 +54,23 @@ public class ProfileController : BaseApiController
         {
             string json = response.Content.ReadAsStringAsync().Result;
             List<int> userIds = JsonSerializer.Deserialize<List<int>>(json);
-            List<UserDto> users = new List<UserDto>();
+            List<PersonDto> users = new List<PersonDto>();
             if (userIds.Count > 0)
             {
                 foreach (int u in userIds)
                 {
-                    users.Add(_userService.Get(u).Value);
+                    users.Add(_profileService.Get(u).Value);
                 }
             }
 
-            PagedResult<UserDto> result;
+            PagedResult<PersonDto> result;
             if (users.Count > 0)
             {
-                result = new PagedResult<UserDto>(users, users.Count);
+                result = new PagedResult<PersonDto>(users, users.Count);
             }
             else
             {
-                result = new PagedResult<UserDto>(new List<UserDto>(), 0);
+                result = new PagedResult<PersonDto>(new List<PersonDto>(), 0);
             }
 
             return Ok(result);
@@ -77,8 +78,9 @@ public class ProfileController : BaseApiController
         return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
     }
 
+    
     [HttpGet("followers")]
-    public async Task<ActionResult<PagedResult<UserDto>>> GetFollowers()
+    public async Task<ActionResult<PagedResult<PersonDto>>> GetFollowers()
     {
         int id = User.PersonId();
         HttpResponseMessage response = await httpClient.GetAsync("get-followers/" + id);
@@ -87,23 +89,23 @@ public class ProfileController : BaseApiController
         {
             string json = response.Content.ReadAsStringAsync().Result;
             List<int> userIds = JsonSerializer.Deserialize<List<int>>(json);
-            List<UserDto> users = new List<UserDto>();
+            List<PersonDto> users = new List<PersonDto>();
             if (userIds.Count > 0)
             {
                 foreach (int u in userIds)
                 {
-                    users.Add(_userService.Get(u).Value);
+                    users.Add(_profileService.Get(u).Value);
                 }
             }
 
-            PagedResult<UserDto> result;
+            PagedResult<PersonDto> result;
             if (users.Count > 0)
             {
-                result = new PagedResult<UserDto>(users, users.Count);
+                result = new PagedResult<PersonDto>(users, users.Count);
             }
             else
             {
-                result = new PagedResult<UserDto>(new List<UserDto>(), 0);
+                result = new PagedResult<PersonDto>(new List<PersonDto>(), 0);
             }
 
             return Ok(result);
@@ -112,7 +114,7 @@ public class ProfileController : BaseApiController
     }
 
     [HttpGet("following")]
-    public async Task<ActionResult<PagedResult<UserDto>>> GetFollowing()
+    public async Task<ActionResult<PagedResult<PersonDto>>> GetFollowing()
     {
         int id = User.PersonId();
         HttpResponseMessage response = await httpClient.GetAsync("get-followings/" + id);
@@ -122,29 +124,30 @@ public class ProfileController : BaseApiController
         {
             string json = response.Content.ReadAsStringAsync().Result;
             List<int> userIds = JsonSerializer.Deserialize<List<int>>(json);
-            List<UserDto> users = new List<UserDto>();
+            List<PersonDto> users = new List<PersonDto>();
             if (userIds.Count > 0)
             {
                 foreach (int u in userIds)
                 {
-                    users.Add(_userService.Get(u).Value);
+                    users.Add(_profileService.Get(u).Value);
                 }
             }
 
-            PagedResult<UserDto> result;
+            PagedResult<PersonDto> result;
             if (users.Count > 0)
             {
-                result = new PagedResult<UserDto>(users, users.Count);
+                result = new PagedResult<PersonDto>(users, users.Count);
             }
             else
             {
-                result = new PagedResult<UserDto>(new List<UserDto>(), 0);
+                result = new PagedResult<PersonDto>(new List<PersonDto>(), 0);
             }
 
             return Ok(result);
         }
         return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
     }
+    
 
     [HttpPut("{id:int}")]
     public ActionResult<PersonDto> Update(int id, [FromBody] PersonDto updatedPerson)
