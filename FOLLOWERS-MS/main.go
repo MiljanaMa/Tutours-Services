@@ -55,7 +55,7 @@ func CheckConnection(driver neo4j.DriverWithContext) {
 	fmt.Printf("Neo4J server address: %s \n", driver.Target().Host)
 }
 func main() {
-	timeoutContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	timeoutContext, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 
 	driver := initDB()

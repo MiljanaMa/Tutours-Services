@@ -31,6 +31,7 @@ public class ProfileController : BaseApiController
     [HttpGet("{userId:int}")]
     public ActionResult<AccountRegistrationDto> GetStakeholderProfile(long userId)
     {
+        Console.WriteLine("\n\n\naaa\n\n");
         var result = _profileService.GetProfile(userId);
         return CreateResponse(result);
     }
@@ -110,11 +111,12 @@ public class ProfileController : BaseApiController
         return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
     }
 
-    [HttpGet("followings")]
+    [HttpGet("following")]
     public async Task<ActionResult<PagedResult<UserDto>>> GetFollowing()
     {
         int id = User.PersonId();
         HttpResponseMessage response = await httpClient.GetAsync("get-followings/" + id);
+        Console.WriteLine("following 1");
 
         if (response.IsSuccessStatusCode)
         {
@@ -174,7 +176,7 @@ public class ProfileController : BaseApiController
     {
         if (_userService.Get(id).Value != null)
         {
-            HttpResponseMessage response = await httpClient.PostAsync("unfollow/" + User.PersonId() + "/" + id, null);
+            HttpResponseMessage response = await httpClient.DeleteAsync("unfollow/" + User.PersonId() + "/" + id);
 
             if (response.IsSuccessStatusCode)
             {
