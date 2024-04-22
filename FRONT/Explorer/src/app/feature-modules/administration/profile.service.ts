@@ -33,20 +33,20 @@ export class ProfileService {
     return this.http.get<PagedResults<Profile>>(`${environment.apiHost}profile/following`);
   }
 
-  unfollow(followingId: number): Observable<PagedResults<Profile>> {
-    return this.http.put<PagedResults<Profile>>(`${environment.apiHost}profile/unfollow`, followingId);
+  unfollow(followingId: number): Observable<any> {
+    return this.http.delete(`${environment.apiHost}profile/unfollow/${followingId}`);
   }
 
-  follow(followingId: number): Observable<PagedResults<Profile>> {
-    return this.http.put<PagedResults<Profile>>(`${environment.apiHost}profile/follow`, followingId);
+  follow(followingId: number): Observable<any> {
+    return this.http.post(`${environment.apiHost}profile/follow/${followingId}`, followingId);
   }
 
   updateProfile(userId: number, updatedProfile: Profile): Observable<Profile> {
     return this.http.put<Profile>(`${environment.apiHost}profile/${userId}`, updatedProfile);
   }
 
-  getProfiles(): Observable<PagedResults<Profile>> {
-    return this.http.get<PagedResults<Profile>>(environment.apiHost + `profile/not-followed`);
+  getRecommendedProfiles(): Observable<PagedResults<Profile>> {
+    return this.http.get<PagedResults<Profile>>(environment.apiHost + `profile/get-recommendations`);
   }
 
   getPreviewChats(): Observable<ChatMessage[]>{
