@@ -106,13 +106,11 @@ func (handler *TourHandler) Delete(writer http.ResponseWriter, req *http.Request
 
 	idStr := mux.Vars(req)["tourId"]
 	tourId, err := strconv.Atoi(idStr)
-
 	if err != nil {
 		log.Println("Error while parsing query params")
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
 	err = handler.TourService.Delete(tourId)
 
 	if err != nil {
@@ -161,10 +159,32 @@ func (handler *TourHandler) GetAllByAuthor(writer http.ResponseWriter, req *http
 	limit := 10
 	page := 1
 	tours, err := handler.TourService.GetAllByAuthorId(limit, page, authorId)
-	if err != nil {
-		http.Error(writer, "Failed to fetch tours", http.StatusInternalServerError)
+
+	writer.WriteHeader(http.StatusOK)
+
+	// Create a slice to hold the marshaled tour JSON strings
+	tourJSON := make([]json.RawMessage, len(tours))
+
+	// Marshal each tour individually
+	for i, tour := range tours {
+		jsonBytes, err := tour.MarshalJSON()
+		if err != nil {
+			http.Error(writer, "Failed to marshal tour", http.StatusInternalServerError)
+			return
+		}
+		tourJSON[i] = json.RawMessage(jsonBytes)
+	}
+
+	// Encode the marshaled tour JSON strings
+	if err := json.NewEncoder(writer).Encode(tourJSON); err != nil {
+		http.Error(writer, "Failed to encode tours", http.StatusInternalServerError)
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(tours)
+	/*
+		if err != nil {
+			http.Error(writer, "Failed to fetch tours", http.StatusInternalServerError)
+			return
+		}
+		writer.WriteHeader(http.StatusOK)
+		json.NewEncoder(writer).Encode(tours)*/
 }

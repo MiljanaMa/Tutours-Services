@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"tours/model"
@@ -25,7 +26,13 @@ func (handler *TourReviewHandler) GetAll(writer http.ResponseWriter, req *http.R
 
 func (handler *TourReviewHandler) Create(writer http.ResponseWriter, req *http.Request) {
 	var r model.TourReview
-	err_decode := json.NewDecoder(req.Body).Decode(&r)
+	body, err := io.ReadAll(req.Body)
+
+	if err != nil {
+		http.Error(writer, "Failed to read request body", http.StatusBadRequest)
+		return
+	}
+	err_decode := r.UnmarshalJSON(body)
 	if err_decode != nil {
 		log.Println(err_decode)
 		log.Println("Error while parsing json - create tourist review")
