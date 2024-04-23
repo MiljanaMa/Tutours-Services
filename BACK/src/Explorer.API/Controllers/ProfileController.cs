@@ -1,10 +1,12 @@
-﻿using Explorer.BuildingBlocks.Core.UseCases;
+﻿using Explorer.Blog.API.Dtos;
+using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
 using Explorer.Stakeholders.Infrastructure.Authentication;
 using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace Explorer.API.Controllers;
 
@@ -13,15 +15,24 @@ namespace Explorer.API.Controllers;
 public class ProfileController : BaseApiController
 {
     private readonly IProfileService _profileService;
+    private readonly IUserService _userService;
 
-    public ProfileController(IProfileService profileService)
+    protected static HttpClient httpClient = new()
+    {
+        //BaseAddress = new Uri($"http://host.docker.internal:8095/followers/")
+        BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("FOLLOWER_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("FOLLOWER_PORT") ?? "8095"}/followers/")
+    };
+
+    public ProfileController(IProfileService profileService, IUserService userService)
     {
         _profileService = profileService;
+        _userService = userService;
     }
 
     [HttpGet("{userId:int}")]
     public ActionResult<AccountRegistrationDto> GetStakeholderProfile(long userId)
     {
+        Console.WriteLine("\n\n\naaa\n\n");
         var result = _profileService.GetProfile(userId);
         return CreateResponse(result);
     }
@@ -33,26 +44,110 @@ public class ProfileController : BaseApiController
         return CreateResponse(result);
     }
 
-    [HttpGet("not-followed")]
-    public ActionResult<PagedResult<PersonDto>> GetNonFollowedProfiles([FromQuery] int page, [FromQuery] int pageSize)
+    [HttpGet("get-recommendations")]
+    public async Task<ActionResult<PagedResult<PersonDto>>> GetRecommendations()
     {
-        var result = _profileService.GetUserNonFollowedProfiles(page, pageSize, User.PersonId());
-        return CreateResponse(result);
+        int id = User.PersonId();
+        HttpResponseMessage response = await httpClient.GetAsync("get-recommendations/" + id);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string json = response.Content.ReadAsStringAsync().Result;
+            List<int> userIds = JsonSerializer.Deserialize<List<int>>(json);
+            List<PersonDto> users = new List<PersonDto>();
+            if (userIds.Count > 0)
+            {
+                foreach (int u in userIds)
+                {
+                    users.Add(_profileService.Get(u).Value);
+                }
+            }
+
+            PagedResult<PersonDto> result;
+            if (users.Count > 0)
+            {
+                result = new PagedResult<PersonDto>(users, users.Count);
+            }
+            else
+            {
+                result = new PagedResult<PersonDto>(new List<PersonDto>(), 0);
+            }
+
+            return Ok(result);
+        }
+        return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
     }
 
+    
     [HttpGet("followers")]
-    public ActionResult<PagedResult<PersonDto>> GetFollowers()
+    public async Task<ActionResult<PagedResult<PersonDto>>> GetFollowers()
     {
-        var result = _profileService.GetFollowers(User.PersonId());
-        return CreateResponse(result);
+        int id = User.PersonId();
+        HttpResponseMessage response = await httpClient.GetAsync("get-followers/" + id);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string json = response.Content.ReadAsStringAsync().Result;
+            List<int> userIds = JsonSerializer.Deserialize<List<int>>(json);
+            List<PersonDto> users = new List<PersonDto>();
+            if (userIds.Count > 0)
+            {
+                foreach (int u in userIds)
+                {
+                    users.Add(_profileService.Get(u).Value);
+                }
+            }
+
+            PagedResult<PersonDto> result;
+            if (users.Count > 0)
+            {
+                result = new PagedResult<PersonDto>(users, users.Count);
+            }
+            else
+            {
+                result = new PagedResult<PersonDto>(new List<PersonDto>(), 0);
+            }
+
+            return Ok(result);
+        }
+        return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
     }
 
     [HttpGet("following")]
-    public ActionResult<PagedResult<PersonDto>> GetFollowing()
+    public async Task<ActionResult<PagedResult<PersonDto>>> GetFollowing()
     {
-        var result = _profileService.GetFollowing(User.PersonId());
-        return CreateResponse(result);
+        int id = User.PersonId();
+        HttpResponseMessage response = await httpClient.GetAsync("get-followings/" + id);
+        Console.WriteLine("following 1");
+
+        if (response.IsSuccessStatusCode)
+        {
+            string json = response.Content.ReadAsStringAsync().Result;
+            List<int> userIds = JsonSerializer.Deserialize<List<int>>(json);
+            List<PersonDto> users = new List<PersonDto>();
+            if (userIds.Count > 0)
+            {
+                foreach (int u in userIds)
+                {
+                    users.Add(_profileService.Get(u).Value);
+                }
+            }
+
+            PagedResult<PersonDto> result;
+            if (users.Count > 0)
+            {
+                result = new PagedResult<PersonDto>(users, users.Count);
+            }
+            else
+            {
+                result = new PagedResult<PersonDto>(new List<PersonDto>(), 0);
+            }
+
+            return Ok(result);
+        }
+        return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
     }
+    
 
     [HttpPut("{id:int}")]
     public ActionResult<PersonDto> Update(int id, [FromBody] PersonDto updatedPerson)
@@ -63,32 +158,36 @@ public class ProfileController : BaseApiController
         return CreateResponse(result);
     }
 
-    [HttpPut("follow")]
-    public ActionResult<PagedResult<PersonDto>> Follow([FromBody] long followedId)
+    [HttpPost("follow/{id}")]
+    public async Task<IActionResult> Follow(int id)
     {
-        try
+        if (_userService.Get(id).Value != null)
         {
-            var result = _profileService.Follow(User.PersonId(), followedId);
-            return CreateResponse(result);
+            HttpResponseMessage response = await httpClient.PostAsync("follow/" + User.PersonId() + "/" + id, null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Ok();
+            }
+            return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
         }
-        catch (ArgumentException e)
-        {
-            return CreateResponse(Result.Fail(FailureCode.InvalidArgument).WithError(e.Message));
-        }
+        return NotFound();
     }
 
-    [HttpPut("unfollow")]
-    public ActionResult<PagedResult<PersonDto>> Unfollow([FromBody] long unfollowedId)
+    [HttpDelete("unfollow/{id}")]
+    public async Task<IActionResult> Unfollow(int id)
     {
-        try
+        if (_userService.Get(id).Value != null)
         {
-            var result = _profileService.Unfollow(User.PersonId(), unfollowedId);
-            return CreateResponse(result);
+            HttpResponseMessage response = await httpClient.DeleteAsync("unfollow/" + User.PersonId() + "/" + id);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Ok();
+            }
+            return BadRequest($"Error: {response.StatusCode} - {response.ReasonPhrase}");
         }
-        catch (ArgumentException e)
-        {
-            return CreateResponse(Result.Fail(FailureCode.InvalidArgument).WithError(e.Message));
-        }
+        return NotFound();
     }
 
     [HttpGet("canCreateEncounters")]
