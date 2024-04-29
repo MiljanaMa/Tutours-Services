@@ -53,7 +53,7 @@ export class TourComponent implements OnInit{
       next: (response: PagedResults<Tour>) => {
         this.tours = response.results;
       },
-      error: () => {
+      error: (error) => {
         
       }
     });

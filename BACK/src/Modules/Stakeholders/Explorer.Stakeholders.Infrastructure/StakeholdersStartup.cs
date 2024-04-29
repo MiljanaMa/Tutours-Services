@@ -68,7 +68,6 @@ public static class StakeholdersStartup
 
     private static void SetupInfrastructure(IServiceCollection services)
     {
-        services.AddHostedService<NewsletterBackgroundService>();
         services.AddScoped(typeof(ICrudRepository<Person>),
             typeof(CrudDatabaseRepository<Person, StakeholdersContext>));
         services.AddScoped(typeof(ICrudRepository<ClubJoinRequest>),

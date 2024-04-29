@@ -10,6 +10,8 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using System;
+using System.Runtime;
 
 namespace Explorer.API.Controllers.Author;
 
@@ -18,9 +20,10 @@ namespace Explorer.API.Controllers.Author;
 public class TourManagementController : BaseApiController
 {
     private readonly ITourService _tourService;
-    private static HttpClient httpClient = new()
+
+    protected static HttpClient httpClient = new()
     {
-        BaseAddress = new Uri(" http://localhost:8000/tours/"),
+        BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("TOUR_HOST") ?? "localhost"}:{Environment.GetEnvironmentVariable("TOUR_PORT") ?? "8000"}/tours/")
     };
 
     public TourManagementController(ITourService tourService)
@@ -32,7 +35,6 @@ public class TourManagementController : BaseApiController
     [Authorize(Roles = "author, tourist")]
     public async Task<ActionResult<PagedResult<TourDto>>> GetAll([FromQuery] int page, [FromQuery] int pageSize)
     {
-        //do job, but find more beautiful way
         var httpResponse = await httpClient.GetAsync($"?page={page}&pageSize={pageSize}");
 
         if (httpResponse.IsSuccessStatusCode)
@@ -57,7 +59,7 @@ public class TourManagementController : BaseApiController
             };
         }
     }
-
+    
     [AllowAnonymous]
     [HttpGet("{tourId:int}")]
     [Authorize(Roles = "author")]
@@ -140,7 +142,7 @@ public class TourManagementController : BaseApiController
             "application/json"
         );
 
-        var httpResponse = await httpClient.PutAsync(
+        var httpResponse = await httpClient.PostAsync(
         "update",
         jsonContent);
 
@@ -201,8 +203,6 @@ public class TourManagementController : BaseApiController
     public async Task<ActionResult<PagedResult<TourDto>>> GetByAuthor([FromQuery] int page, [FromQuery] int pageSize)
     {
         var authorId = User.PersonId();
-        //fix this to add paggination
-        //var httpResponse = await httpClient.GetAsync($"author?page={page}&pageSize={pageSize}&authorId={authorId}");
         var httpResponse = await httpClient.GetAsync($"author/{authorId}");
 
         if (httpResponse.IsSuccessStatusCode)

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"tours/app"
 	"tours/handler"
 	"tours/repo"
@@ -12,27 +13,28 @@ import (
 )
 
 func main() {
-
-	db := app.InitDB()
-	app.ExecuteMigrations(db)
+	app.Init()
+	client := app.InitDB()
+	storeLogger := log.New(os.Stdout, "[patient-store] ", log.LstdFlags)
+	app.InsertInfo(client)
 
 	// Tours setup
-	tourRepo := &repo.TourRepository{DatabaseConnection: db}
+	tourRepo := &repo.TourRepository{Cli: client, Logger: storeLogger}
 	tourService := &service.TourService{TourRepository: tourRepo}
 	tourHandler := &handler.TourHandler{TourService: tourService}
 
 	// Keypoints setup
-	keypointRepo := &repo.KeypointRepository{DatabaseConnection: db}
+	keypointRepo := &repo.KeypointRepository{Cli: client, Logger: storeLogger}
 	keypointService := &service.KeypointService{KeypointRepository: keypointRepo}
 	keypointHandler := &handler.KeypointHandler{KeypointService: keypointService}
 
 	// Tourist positions setup
-	touristPositionRepo := &repo.TouristPositionRepository{DatabaseConnection: db}
+	touristPositionRepo := &repo.TouristPositionRepository{Cli: client, Logger: storeLogger}
 	touristPositionService := &service.TouristPositionService{TouristPositionRepository: touristPositionRepo}
 	touristPositionHandler := &handler.TouristPositionHandler{TouristPositionService: touristPositionService}
 
 	// Tourist review setup
-	tourReviewRepo := &repo.TourReviewRepository{DatabaseConnection: db}
+	tourReviewRepo := &repo.TourReviewRepository{Cli: client, Logger: storeLogger}
 	tourReviewService := &service.TourReviewService{TourReviewRepository: tourReviewRepo}
 	tourReviewHandler := &handler.TourReviewHandler{TourReviewService: tourReviewService}
 

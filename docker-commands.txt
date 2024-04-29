@@ -1,0 +1,19 @@
+//Start
+docker compose up (--build)
+
+//Fisrt way for database creation (we don't use it)
+docker-compose -f docker-compose-migration.yml up
+
+//Commands for databases insert (your're position should be in exec in db container)
+psql -U postgres -d explorer -f /tmp/explorer-init.sql
+psql -U postgres -d tours -f /tmp/tours-init.sql
+psql -U postgres -d encounters -f /tmp/encounters-init.sql
+
+//End
+docker compose down
+
+//Clean all
+docker system prune -a
+docker volume prune
+
+//Note: If db_init.sh doesn't make tables in db container, try to change db_init.sh into lf (control characters)

@@ -4,6 +4,12 @@
 
 -- Dumped from database version 16.0 (Debian 16.0-1.pgdg120+1)
 -- Dumped by pg_dump version 16.0 (Debian 16.0-1.pgdg120+1)
+--CREATE DATABASE tours;
+--ALTER DATABASE tours OWNER TO postgres;
+
+-- Create explorer database
+--CREATE DATABASE explorer;
+--ALTER DATABASE explorer OWNER TO postgres;
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;

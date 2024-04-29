@@ -98,7 +98,29 @@ func (repo *EncounterRepository) GetByType(long float64, lat float64, encounterT
 
 func (repo *EncounterRepository) Delete(id int) error {
 	var encounter model.Encounter
-	if dbResult := repo.DatabaseConnection.Where("id = ?", id).Delete(&encounter); dbResult.Error != nil {
+	var completions []model.EncounterCompletion
+	if err := repo.DatabaseConnection.Where("encounter_id = ?", id).Find(&completions).Error; err != nil {
+		return err
+	}
+
+	// Delete related rows from the "encounter_completions" table
+	for _, completion := range completions {
+		if err := repo.DatabaseConnection.Delete(&completion).Error; err != nil {
+			return err
+		}
+	}
+	var keypoints []model.KeypointEncounter
+	if err := repo.DatabaseConnection.Where("encounter_id = ?", id).Find(&keypoints).Error; err != nil {
+		return err
+	}
+
+	// Delete related rows from the "encounter_completions" table
+	for _, keypointe := range keypoints {
+		if err := repo.DatabaseConnection.Delete(&keypointe).Error; err != nil {
+			return err
+		}
+	}
+	if dbResult := repo.DatabaseConnection.Where("id = ?", id).Select("TourReviews").Delete(&encounter); dbResult.Error != nil {
 		return dbResult.Error
 	}
 	return nil
