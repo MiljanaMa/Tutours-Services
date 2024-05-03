@@ -1,167 +1,99 @@
 package handler
 
 import (
+	"FOLLOWERS-MS/proto/follower"
 	"FOLLOWERS-MS/service"
-	"encoding/json"
+	"context"
 	"fmt"
-	"net/http"
-	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 type FollowersHandler struct {
+	follower.UnimplementedFollowerServiceServer
 	FollowerService *service.FollowerService
 }
 
-func (handler *FollowersHandler) Follow(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id1, err1 := strconv.Atoi(vars["id1"])
-	id2, err2 := strconv.Atoi(vars["id2"])
-	if err1 != nil || err2 != nil {
-		fmt.Println("Ids must be integers")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+func (handler *FollowersHandler) toInt64Array(intArray []int) []int64 {
+	result := make([]int64, len(intArray))
+	for i, e := range intArray {
+		result[i] = int64(e)
 	}
+	return result
+}
+
+func (handler *FollowersHandler) Follow(ctx context.Context, request *follower.MultiIdRequest) (*follower.EmptyResponse, error) {
+	id1 := int(request.Id1)
+	id2 := int(request.Id2)
+
 	var err = handler.FollowerService.Follow(id1, id2)
 	if err == nil {
-		fmt.Println("Successfully added connection between users")
-		writer.WriteHeader(http.StatusOK)
-		return
+		return &follower.EmptyResponse{}, nil
 	}
 	fmt.Println(err)
-	fmt.Println("Error creating connection between users")
-	writer.WriteHeader(http.StatusInternalServerError)
+	return &follower.EmptyResponse{}, err
 
 }
 
-func (handler *FollowersHandler) CheckIfFollowing(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id1, err1 := strconv.Atoi(vars["id1"])
-	id2, err2 := strconv.Atoi(vars["id2"])
-	if err1 != nil || err2 != nil {
-		fmt.Println("Ids must be integers")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
+func (handler *FollowersHandler) IsFollowing(ctx context.Context, request *follower.MultiIdRequest) (*follower.IsFollowingResponse, error) {
+
+	id1 := int(request.Id1)
+	id2 := int(request.Id2)
 
 	result, err := handler.FollowerService.IsFollowing(id1, id2)
 	if err != nil {
-		fmt.Println("Error checking")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+		fmt.Println(err)
+		return nil, err
 	}
-
-	response := []byte(strconv.FormatBool(result))
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	return &follower.IsFollowingResponse{IsFollowing: result}, nil
 }
 
-func (handler *FollowersHandler) GetRecommendation(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id, err := strconv.Atoi(vars["id"])
+func (handler *FollowersHandler) GetRecommendations(ctx context.Context, request *follower.Request) (*follower.MultiIdResponse, error) {
 
-	fmt.Println("DA")
-	if err != nil {
-		fmt.Println("Id must be integer")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	id := int(request.Id)
+	result, err := handler.FollowerService.GetRecommendations(id)
 
-	result, error := handler.FollowerService.GetRecommendations(id)
-
-	if error != nil {
-		fmt.Println(error)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	response, err := json.Marshal(result)
 	if err != nil {
 		fmt.Println(err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+		return nil, err
 	}
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+
+	return &follower.MultiIdResponse{Ids: handler.toInt64Array(result)}, nil
 }
 
-func (handler *FollowersHandler) Unfollow(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id1, err1 := strconv.Atoi(vars["id1"])
-	id2, err2 := strconv.Atoi(vars["id2"])
-	if err1 != nil || err2 != nil {
-		fmt.Println("Ids must be integers")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
+func (handler *FollowersHandler) Unfollow(ctx context.Context, request *follower.MultiIdRequest) (*follower.EmptyResponse, error) {
+	id1 := int(request.Id1)
+	id2 := int(request.Id2)
+
 	var err = handler.FollowerService.Unfollow(id1, id2)
 	if err == nil {
-		fmt.Println("Successfully deleted connection between users")
-		writer.WriteHeader(http.StatusOK)
-		return
+		return &follower.EmptyResponse{}, nil
 	}
 	fmt.Println(err)
-	fmt.Println("Error deleting connection between users")
-	writer.WriteHeader(http.StatusInternalServerError)
+	return nil, err
 
 }
 
-func (handler *FollowersHandler) GetFollowings(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id, err := strconv.Atoi(vars["id"])
+func (handler *FollowersHandler) GetFollowing(ctx context.Context, request *follower.Request) (*follower.MultiIdResponse, error) {
 
-	if err != nil {
-		fmt.Println("Id must be integer")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	id := int(request.Id)
 
-	result, error := handler.FollowerService.GetFollowings(id)
+	result, err := handler.FollowerService.GetFollowings(id)
 
-	if error != nil {
-		fmt.Println(error)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	response, err := json.Marshal(result)
 	if err != nil {
 		fmt.Println(err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+		return nil, err
 	}
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	return &follower.MultiIdResponse{Ids: handler.toInt64Array(result)}, nil
 }
 
-func (handler *FollowersHandler) GetFollowers(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id, err := strconv.Atoi(vars["id"])
+func (handler *FollowersHandler) GetFollowers(ctx context.Context, request *follower.Request) (*follower.MultiIdResponse, error) {
+	id := int(request.Id)
 
-	if err != nil {
-		fmt.Println("Id must be integer")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	result, err := handler.FollowerService.GetFollowers(id)
 
-	result, error := handler.FollowerService.GetFollowers(id)
-
-	if error != nil {
-		fmt.Println(error)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	response, err := json.Marshal(result)
 	if err != nil {
 		fmt.Println(err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+		return nil, err
 	}
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+
+	return &follower.MultiIdResponse{Ids: handler.toInt64Array(result)}, nil
 }
