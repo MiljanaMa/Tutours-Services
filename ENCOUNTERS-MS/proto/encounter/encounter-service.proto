@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package encounter;
+
+option go_package = "ENCOUNTER-MS/proto/encounter";
+
+service EncounterService{
+
+    rpc GetApproved(EmptyRequest) returns(EncountersResponse){} // translated
+    rpc GetTouristCreated(EmptyRequest) returns(EncountersResponse){} // translated
+    rpc GetByUser(UserIdRequest) returns(EncountersResponse){} // translated
+    rpc GetApprovedByStatus(StatusRequest) returns(EncountersResponse){}
+    rpc GetNearby(UserIdRequest) returns(EncountersResponse){} // translated
+    rpc GetNearbyByType(UserIdRequest) returns (EncountersResponse){} // translated
+
+    rpc CreateEncounter(Encounter) returns (Encounter){} // translated
+
+    rpc UpdateEncounter(Encounter) returns (Encounter){}
+    rpc Approve(Encounter) returns (EmptyResponse){} // translated
+    rpc Decline(Encounter) returns (EmptyResponse){} // translated
+
+    rpc DeleteEncounter(IdRequest) returns (EmptyResponse){} // translated
+
+
+}
+
+message EmptyRequest{}
+message EmptyResponse{}
+
+message EncountersResponse{
+    repeated Encounter Encounters = 1;
+}
+
+message IdRequest{
+    int64 Id = 1;
+}
+message UserIdRequest{
+    int64 UserId = 1;
+}
+message StatusRequest{
+    EncounterStatus Status = 1;
+}
+message Encounter{
+    int64 Id = 1;
+    int64 UserId  = 2;
+    string Name = 3;
+    string Description = 4;
+    float Latitude = 5;
+    float Longitude = 6;
+    int64 Xp = 7;
+    EncounterStatus Status = 8;
+    EncounterType Type = 9;
+    float Range = 10;
+    string Image = 11;
+    float ImageLatitude = 12;
+    float ImageLongitude = 13;
+    int64 PeopleCount = 14;
+    EncounterApprovalStatus ApprovalStatus = 15;
+}
+
+enum EncounterStatus {
+    ACTIVE = 0;
+    DRAFT = 1;
+    ARCHIVED = 2;
+}
+
+enum EncounterApprovalStatus {
+    PENDING = 0;
+    SYSTEM_APPROVED = 1;
+    ADMIN_APPROVED = 2;
+    DECLINED = 3;
+}
+
+enum EncounterType {
+    SOCIAL = 0;
+    LOCATION = 1;
+    MISC = 2;
+}
+

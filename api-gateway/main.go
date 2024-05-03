@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api-gateway/proto/encounter"
 	"api-gateway/proto/follower"
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -14,7 +15,7 @@ import (
 )
 
 func main() {
-	conn, err := grpc.DialContext(
+	conn1, err := grpc.DialContext(
 		context.Background(),
 		"0.0.0.0:8095",
 		grpc.WithBlock(),
@@ -23,10 +24,30 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	defer conn1.Close()
+
+	conn2, err := grpc.DialContext(
+		context.Background(),
+		"0.0.0.0:8096",
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer conn2.Close()
 
 	gwmux := runtime.NewServeMux()
-	client := follower.NewFollowerServiceClient(conn)
-	err = follower.RegisterFollowerServiceHandlerClient(context.Background(), gwmux, client)
+
+	client1 := follower.NewFollowerServiceClient(conn1)
+	err = follower.RegisterFollowerServiceHandlerClient(context.Background(), gwmux, client1)
+	if err != nil {
+		log.Fatalln(err)
+
+	}
+
+	client2 := encounter.NewEncounterServiceClient(conn2)
+	err = encounter.RegisterEncounterServiceHandlerClient(context.Background(), gwmux, client2)
 	if err != nil {
 		log.Fatalln(err)
 	}
