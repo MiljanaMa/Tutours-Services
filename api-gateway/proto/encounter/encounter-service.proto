@@ -1,0 +1,200 @@
+syntax = "proto3";
+
+package encounter;
+
+option go_package = "api-gateway/proto/encounter";
+
+import "google/api/annotations.proto";
+import "google/api/timestamp.proto";
+
+service EncounterService{
+
+  rpc GetApproved(EmptyRequest) returns(EncountersResponse){
+    option (google.api.http) = {
+      get:"/encounters"
+    };
+  }
+  rpc GetTouristCreated(EmptyRequest) returns(EncountersResponse){
+    option (google.api.http) = {
+      get:"/encounters/tourist-created"
+    };
+  }
+  rpc GetByUser(UserIdRequest) returns(EncountersResponse){
+    option (google.api.http) = {
+      get:"/encounters/by-user/{UserId}"
+    };
+  }
+  rpc GetApprovedByStatus(StatusRequest) returns(EncountersResponse){
+    option (google.api.http) = {
+      get:"/encounters/by-status/{Status}"
+    };
+  }
+  rpc GetNearby(UserIdRequest) returns(EncountersResponse){
+    option (google.api.http) = {
+      get:"/encounters/nearby/{UserId}"
+    };
+  }
+  rpc GetNearbyByType(UserIdRequest) returns (EncountersResponse){
+    option (google.api.http) = {
+      get:"/encounters/nearby-by-type/{UserId}"
+    };
+  }
+
+  rpc CreateEncounter(Encounter) returns (Encounter){
+    option(google.api.http) = {
+      post:"/encounters"
+      body:"*"
+    };
+  }
+
+  rpc UpdateEncounter(Encounter) returns (Encounter){
+    option (google.api.http) = {
+      put:"/encounters"
+      body:"*"
+    };
+  }
+  rpc Approve(Encounter) returns (EmptyResponse){
+    option (google.api.http) = {
+      put:"/encounters/approve"
+      body:"*"
+    };
+  }
+  rpc Decline(Encounter) returns (EmptyResponse){
+    option (google.api.http) = {
+      put:"/encounters/decline"
+      body:"*"
+    };
+  }
+
+  rpc DeleteEncounter(IdRequest) returns (EmptyResponse){
+    option (google.api.http) = {
+      delete:"/encounters/{Id}"
+    };
+  }
+
+
+}
+
+service EncounterCompletionService{
+  rpc GetEncounterCompletionByUser(UserIdRequest) returns(EncounterCompletionsResponse){
+    option(google.api.http) = {
+      get: "/tourist/encounter/{UserId}"
+    };
+  }
+  rpc FinishEncounter(UserAndIdRequest) returns(EncounterCompletion){
+    option(google.api.http) = {
+      put: "/tourist/encounter/finishEncounter/{Id}/{UserId}"
+      body: "*"
+    };
+  }
+}
+
+service KeypointEncounterService{
+  rpc GetByKeypoint(IdRequest) returns(KeypointEncounterResponse){
+    option(google.api.http) = {
+      get: "/keypointencounter/{Id}"
+    };
+  }
+  rpc Create(KeypointEncounter) returns(KeypointEncounter){
+    option(google.api.http) = {
+      post: "/keypointencounter/create"
+      body: "*"
+    };
+  }
+  rpc Update(KeypointEncounter) returns(KeypointEncounter){
+    option(google.api.http) = {
+      put: "/keypointencounter/update"
+      body:"*"
+    };
+  }
+  rpc Delete(IdRequest) returns(EmptyResponse){
+    option(google.api.http) = {delete: "/keypointencounter/delete/{Id}"};
+  }
+}
+
+message EmptyRequest{}
+message EmptyResponse{}
+
+message EncountersResponse{
+  repeated Encounter Encounters = 1;
+}
+message EncounterCompletionsResponse{
+  repeated EncounterCompletion EncounterCompletions = 1;
+}
+message KeypointEncounterResponse{
+  repeated KeypointEncounter KeypointEncounters = 1;
+}
+
+message IdRequest{
+  int64 Id = 1;
+}
+message UserIdRequest{
+  int64 UserId = 1;
+}
+message UserAndIdRequest{
+  int64 UserId = 1;
+  int64 Id = 2;
+}
+
+message StatusRequest{
+  EncounterStatus Status = 1;
+}
+
+message KeypointEncounter{
+  int64 Id = 1;
+  int64 EncounterId = 2;
+  Encounter Encounter = 3;
+  int64 KeyPointId = 4;
+  bool IsRequired = 5;
+}
+message EncounterCompletion{
+  int64 Id = 1;
+  int64 UserId = 2;
+  int64 EncounterId = 3;
+  google.protobuf.Timestamp LastUpdatedAt = 4;
+  int64 Xp = 5;
+  EncounterCompletionStatus Status = 6;
+  Encounter Encounter = 7;
+}
+message Encounter{
+  int64 Id = 1;
+  int64 UserId  = 2;
+  string Name = 3;
+  string Description = 4;
+  float Latitude = 5;
+  float Longitude = 6;
+  int64 Xp = 7;
+  EncounterStatus Status = 8;
+  EncounterType Type = 9;
+  float Range = 10;
+  string Image = 11;
+  float ImageLatitude = 12;
+  float ImageLongitude = 13;
+  int64 PeopleCount = 14;
+  EncounterApprovalStatus ApprovalStatus = 15;
+}
+
+enum EncounterStatus {
+  ACTIVE = 0;
+  DRAFT = 1;
+  ARCHIVED = 2;
+}
+
+enum EncounterApprovalStatus {
+  PENDING = 0;
+  SYSTEM_APPROVED = 1;
+  ADMIN_APPROVED = 2;
+  DECLINED = 3;
+}
+
+enum EncounterType {
+  SOCIAL = 0;
+  LOCATION = 1;
+  MISC = 2;
+}
+enum EncounterCompletionStatus{
+  STARTED = 0;
+  FAILED = 1;
+  COMPLETED = 2;
+  PROGRESSING = 3;
+}

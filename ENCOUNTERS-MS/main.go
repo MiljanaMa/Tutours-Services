@@ -3,28 +3,34 @@ package main
 import (
 	"ENCOUNTERS-MS/handler"
 	"ENCOUNTERS-MS/model"
+	"ENCOUNTERS-MS/proto/encounter"
 	"ENCOUNTERS-MS/repo"
 	"ENCOUNTERS-MS/service"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func initDB() *gorm.DB {
-	connectionUrl :=
-		"user=" + os.Getenv("DB_USER_E") +
-			" password=" + os.Getenv("DB_PASSWORD_E") +
-			" host=" + os.Getenv("DB_HOST_E") +
-			" search_path=public" +
-			" dbname=" + os.Getenv("DB_DATABASE_E") +
-			" port=" + os.Getenv("DB_PORT_E") +
-			" sslmode=disable"
-	//connectionUrl := "postgres://postgres:super@localhost:5432"
+	/*connectionUrl :=
+	"user=" + os.Getenv("DB_USER_E") +
+		" password=" + os.Getenv("DB_PASSWORD_E") +
+		" host=" + os.Getenv("DB_HOST_E") +
+		" search_path=public" +
+		" dbname=" + os.Getenv("DB_DATABASE_E") +
+		" port=" + os.Getenv("DB_PORT_E") +
+		" sslmode=disable"*/
+	connectionUrl := "postgres://postgres:super@localhost:5432"
 	database, err := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{SkipDefaultTransaction: true})
 
 	if err != nil {
@@ -66,28 +72,9 @@ func MigrateDatabase(database *gorm.DB) {
 func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.EncounterCompletionHandler, keypointEncHandler *handler.KeypointEncounterHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	//ENCOUNTER
-	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET")                                            // tested
-	router.HandleFunc("/encounters/tourist-created-encounters", handler.GetTouristCreatedEncounters).Methods("GET") // tested
-	router.HandleFunc("/encounters/nearby/{userId}", handler.GetNearby).Methods("GET")                              // tested
-	router.HandleFunc("/encounters/nearby-by-type/{userId}", handler.GetNearbyByType).Methods("GET")                // tested
-	router.HandleFunc("/encounters/get-by-user/{userId}", handler.GetByUser).Methods("GET")                         // tested
-	router.HandleFunc("/encounters/get-approved-by-status/{status}", handler.GetApprovedByStatus).Methods("GET")    // tested
-	router.HandleFunc("/encounters", handler.Create).Methods("POST")                                                // tested
-	router.HandleFunc("/encounters", handler.Update).Methods("PUT")                                                 // tested
-	router.HandleFunc("/encounters/approve", handler.Approve).Methods("PUT")
-	router.HandleFunc("/encounters/decline", handler.Decline).Methods("PUT")
-	router.HandleFunc("/encounters/{id}", handler.Delete).Methods("DELETE") // tested
-
-	//ENCOUNTER COMPLETION
-	router.HandleFunc("/tourist/encounter/{id}", handlerCompletion.GetPagedByUser).Methods("GET")
-	router.HandleFunc("/tourist/encounter/finishEncounter/{id}", handlerCompletion.FinishEncounter).Methods("GET")
-
 	//KEYPOINT ENCOUNTER
-	router.HandleFunc("/keypointencounter/{keypointid}", keypointEncHandler.GetPagedByKeypoint).Methods("GET")
-	router.HandleFunc("/keypointencounter/create", keypointEncHandler.Create).Methods("POST")
-	router.HandleFunc("/keypointencounter/update", keypointEncHandler.Update).Methods("PUT")
-	router.HandleFunc("/keypointencounter/delete", keypointEncHandler.Delete).Methods("DELETE")
+	//router.HandleFunc("/keypointencounter/update", keypointEncHandler.Update).Methods("PUT")
+	//router.HandleFunc("/keypointencounter/delete", keypointEncHandler.Delete).Methods("DELETE")
 
 	fmt.Println("Server is starting...")
 	log.Fatal(http.ListenAndServe(":8083", router))
@@ -102,15 +89,48 @@ func main() {
 
 	encounterRepo := &repo.EncounterRepository{db}
 	encounterService := &service.EncounterService{encounterRepo}
-	encounterHandler := &handler.EncounterHandler{encounterService}
+	encounterHandler := &handler.EncounterHandler{EncounterService: encounterService}
 
 	completionRepo := &repo.EncounterCompletionRepository{db}
 	completionService := &service.EncounterCompletionService{completionRepo}
-	completionHandler := &handler.EncounterCompletionHandler{completionService}
+	completionHandler := &handler.EncounterCompletionHandler{EncounterCompletionService: completionService}
 
 	keypointEncRepo := &repo.KeypointEncounterRepository{db}
 	keypointEncService := &service.KeypointEncounterService{keypointEncRepo}
-	keypointEncHandler := &handler.KeypointEncounterHandler{keypointEncService}
+	keypointEncHandler := &handler.KeypointEncounterHandler{KeypointEncounterService: keypointEncService}
 
-	startServer(encounterHandler, completionHandler, keypointEncHandler)
+	lis, err := net.Listen("tcp", ":8096")
+	fmt.Println("Running gRPC on port 8096")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer func(listener net.Listener) {
+		err := listener.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(lis)
+
+	grpcServer := grpc.NewServer()
+	reflection.Register(grpcServer)
+	fmt.Println("Registered gRPC server")
+
+	encounter.RegisterEncounterServiceServer(grpcServer, encounterHandler)
+	encounter.RegisterEncounterCompletionServiceServer(grpcServer, completionHandler)
+	encounter.RegisterKeypointEncounterServiceServer(grpcServer, keypointEncHandler)
+
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalln(err)
+		}
+	}()
+	fmt.Println("Serving gRPC")
+
+	stopCh := make(chan os.Signal)
+	signal.Notify(stopCh, syscall.SIGTERM)
+
+	<-stopCh
+
+	grpcServer.Stop()
 }

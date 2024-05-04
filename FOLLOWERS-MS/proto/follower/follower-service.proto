@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package follower;
+
+option go_package = "FOLLOWERS-MS/proto/follower";
+
+service FollowerService{
+  rpc Follow(MultiIdRequest) returns (EmptyResponse){}
+  rpc IsFollowing(MultiIdRequest) returns (IsFollowingResponse){}
+  rpc GetRecommendations(Request) returns (MultiIdResponse){}
+  rpc Unfollow(MultiIdRequest) returns (EmptyResponse){}
+  rpc GetFollowing(Request) returns (MultiIdResponse){}
+  rpc GetFollowers(Request) returns (MultiIdResponse){}
+}
+message MultiIdRequest{
+  int64 id1 = 1;
+  int64 id2 = 2;
+}
+
+message Request{
+  int64 id = 1;
+}
+
+message EmptyResponse{}
+
+message IsFollowingResponse{
+  bool isFollowing = 1;
+}
+message MultiIdResponse{
+  repeated int64 ids =1 ;
+}
+
+
