@@ -46,9 +46,15 @@ func main() {
 
 	}
 
-	client2 := encounter.NewEncounterServiceClient(conn2)
-	err = encounter.RegisterEncounterServiceHandlerClient(context.Background(), gwmux, client2)
-	if err != nil {
+	client2_1 := encounter.NewEncounterServiceClient(conn2)
+	client2_2 := encounter.NewEncounterCompletionServiceClient(conn2)
+	client2_3 := encounter.NewKeypointEncounterServiceClient(conn2)
+
+	err1 := encounter.RegisterEncounterServiceHandlerClient(context.Background(), gwmux, client2_1)
+	err2 := encounter.RegisterEncounterCompletionServiceHandlerClient(context.Background(), gwmux, client2_2)
+	err3 := encounter.RegisterKeypointEncounterServiceHandlerClient(context.Background(), gwmux, client2_3)
+
+	if err1 != nil || err2 != nil || err3 != nil {
 		log.Fatalln(err)
 	}
 

@@ -1,64 +1,72 @@
 package handler
 
 import (
+	"ENCOUNTERS-MS/model"
+	"ENCOUNTERS-MS/proto/encounter"
 	"ENCOUNTERS-MS/service"
-	"encoding/json"
-	"fmt"
-	"net/http"
+	"context"
+	"strconv"
 
-	"github.com/gorilla/mux"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type EncounterCompletionHandler struct {
+	encounter.UnimplementedEncounterCompletionServiceServer
 	EncounterCompletionService *service.EncounterCompletionService
 }
 
-func (handler *EncounterCompletionHandler) GetPagedByUser(writer http.ResponseWriter, req *http.Request) {
-	userId := mux.Vars(req)["id"]
+func mapToRPCStatus(status model.EncounterCompletionStatus) encounter.EncounterCompletionStatus {
+	switch status {
+	case model.CompletionStatusStarted:
+		return encounter.EncounterCompletionStatus_STARTED
+	case model.CompletionStatusProgressing:
+		return encounter.EncounterCompletionStatus_PROGRESSING
+	case model.CompletionStatusCompleted:
+		return encounter.EncounterCompletionStatus_COMPLETED
+	default:
+		return encounter.EncounterCompletionStatus_FAILED
+	}
+}
+func modelToRPC(completion *model.EncounterCompletion) *encounter.EncounterCompletion {
+	return &encounter.EncounterCompletion{
+		Id:            int64(completion.Id),
+		UserId:        int64(completion.UserId),
+		EncounterId:   int64(completion.EncounterId),
+		LastUpdatedAt: timestamppb.New(completion.LastUpdatedAt),
+		Xp:            int64(completion.Xp),
+		Status:        mapToRPCStatus(completion.Status),
+		Encounter:     ModelToRPC(completion.Encounter),
+	}
+}
+func toRPCCompletions(encounters []*model.EncounterCompletion) *encounter.EncounterCompletionsResponse {
+	result := make([]*encounter.EncounterCompletion, len(encounters))
+	for i, e := range encounters {
+		result[i] = modelToRPC(e)
+	}
+	return &encounter.EncounterCompletionsResponse{EncounterCompletions: result}
+}
+
+func (handler *EncounterCompletionHandler) GetEncounterCompletionByUser(ctx context.Context, request *encounter.UserIdRequest) (*encounter.EncounterCompletionsResponse, error) {
+	userId := strconv.Itoa(int(request.UserId))
 
 	encounterCompletions, err := handler.EncounterCompletionService.GetPagedByUser(userId)
 
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Can't find any encounter completions"))
-		return
+		return nil, err
 	}
 
-	jsonData, err := json.Marshal(encounterCompletions)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Failed to parse JSON"))
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(jsonData)
+	return toRPCCompletions(encounterCompletions), nil
 }
+func (handler *EncounterCompletionHandler) FinishEncounter(ctx context.Context, request *encounter.UserAndIdRequest) (*encounter.EncounterCompletion, error) {
 
-func (handler *EncounterCompletionHandler) FinishEncounter(writer http.ResponseWriter, req *http.Request) {
-	fmt.Println("aaaaaaaaaaaaaaa")
-
-	encounterId := "f47ac10b-58cc-4372-a567-0e02b2c3d479" //mora se menjati na frontu sve ili ovde da je id tipa int a ne uuid
-	vars := mux.Vars(req)
-	userId := vars["id"]
+	encounterId := strconv.Itoa(int(request.Id))
+	userId := strconv.Itoa(int(request.UserId))
 
 	result, err := handler.EncounterCompletionService.FinishEncounter(userId, encounterId)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte(fmt.Sprintf("Error finishing encounter: %s", err)))
-		return
+		return nil, err
 	}
 
-	jsonData, err := json.Marshal(result)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Failed to parse JSON"))
-		return
-	}
-	fmt.Println(string(jsonData))
+	return modelToRPC(result), nil
 
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(jsonData)
 }

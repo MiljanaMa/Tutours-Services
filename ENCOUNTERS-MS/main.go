@@ -72,15 +72,9 @@ func MigrateDatabase(database *gorm.DB) {
 func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.EncounterCompletionHandler, keypointEncHandler *handler.KeypointEncounterHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	//ENCOUNTER COMPLETION
-	router.HandleFunc("/tourist/encounter/{id}", handlerCompletion.GetPagedByUser).Methods("GET")
-	router.HandleFunc("/tourist/encounter/finishEncounter/{id}", handlerCompletion.FinishEncounter).Methods("GET")
-
 	//KEYPOINT ENCOUNTER
-	router.HandleFunc("/keypointencounter/{keypointid}", keypointEncHandler.GetPagedByKeypoint).Methods("GET")
-	router.HandleFunc("/keypointencounter/create", keypointEncHandler.Create).Methods("POST")
-	router.HandleFunc("/keypointencounter/update", keypointEncHandler.Update).Methods("PUT")
-	router.HandleFunc("/keypointencounter/delete", keypointEncHandler.Delete).Methods("DELETE")
+	//router.HandleFunc("/keypointencounter/update", keypointEncHandler.Update).Methods("PUT")
+	//router.HandleFunc("/keypointencounter/delete", keypointEncHandler.Delete).Methods("DELETE")
 
 	fmt.Println("Server is starting...")
 	log.Fatal(http.ListenAndServe(":8083", router))
@@ -99,11 +93,11 @@ func main() {
 
 	completionRepo := &repo.EncounterCompletionRepository{db}
 	completionService := &service.EncounterCompletionService{completionRepo}
-	_ = &handler.EncounterCompletionHandler{completionService}
+	completionHandler := &handler.EncounterCompletionHandler{EncounterCompletionService: completionService}
 
 	keypointEncRepo := &repo.KeypointEncounterRepository{db}
 	keypointEncService := &service.KeypointEncounterService{keypointEncRepo}
-	_ = &handler.KeypointEncounterHandler{keypointEncService}
+	keypointEncHandler := &handler.KeypointEncounterHandler{KeypointEncounterService: keypointEncService}
 
 	lis, err := net.Listen("tcp", ":8096")
 	fmt.Println("Running gRPC on port 8096")
@@ -123,6 +117,9 @@ func main() {
 	fmt.Println("Registered gRPC server")
 
 	encounter.RegisterEncounterServiceServer(grpcServer, encounterHandler)
+	encounter.RegisterEncounterCompletionServiceServer(grpcServer, completionHandler)
+	encounter.RegisterKeypointEncounterServiceServer(grpcServer, keypointEncHandler)
+
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Fatalln(err)

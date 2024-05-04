@@ -79,7 +79,7 @@ func inverseEncounterApprovalStatus(status encounter.EncounterApprovalStatus) mo
 	}
 }
 
-func modelToRPC(e *model.Encounter) *encounter.Encounter {
+func ModelToRPC(e *model.Encounter) *encounter.Encounter {
 	return &encounter.Encounter{
 		Id:             int64(e.Id),
 		UserId:         int64(e.UserId),
@@ -121,7 +121,7 @@ func rpcToModel(e *encounter.Encounter) *model.Encounter {
 func toRPCEncounters(encounters []*model.Encounter) *encounter.EncountersResponse {
 	result := make([]*encounter.Encounter, len(encounters))
 	for i, e := range encounters {
-		result[i] = modelToRPC(e)
+		result[i] = ModelToRPC(e)
 	}
 	return &encounter.EncountersResponse{Encounters: result}
 }
@@ -176,7 +176,7 @@ func (handler *EncounterHandler) CreateEncounter(ctx context.Context, request *e
 		return nil, err
 	}
 
-	return modelToRPC(res), nil
+	return ModelToRPC(res), nil
 
 }
 
@@ -240,5 +240,5 @@ func (handler *EncounterHandler) UpdateEncounter(ctx context.Context, request *e
 	if err != nil {
 		return nil, err
 	}
-	return modelToRPC(e), nil
+	return ModelToRPC(e), nil
 }
