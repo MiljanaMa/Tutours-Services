@@ -19,7 +19,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: super
-      POSTGRES_MULTIPLE_DATABASES: explorer,encounters
+      POSTGRES_MULTIPLE_DATABASES: explorer,encounters, stakeholders
       PGPORT: 5432
       PGUSER: postgres
     healthcheck:
@@ -57,6 +57,8 @@ services:
           condition: service_started
       encounter:
           condition: service_started
+      stakeholder:
+          condition: service_started
       
 
   encounter:
@@ -72,6 +74,24 @@ services:
       DB_PASSWORD_E: super
       DB_PORT_E: 5432
       DB_DATABASE_E: encounters
+      DB_HOST_E: db
+    depends_on:
+      db:
+        condition: service_healthy
+
+  stakeholder:
+    build: 
+      context: ./STAKEHOLDERS_MS
+    restart: on-failure
+    ports:
+      - "8097:8097"
+    networks:
+      - database
+    environment:
+      DB_USER_E: postgres
+      DB_PASSWORD_E: super
+      DB_PORT_E: 5432
+      DB_DATABASE_E: stakeholders
       DB_HOST_E: db
     depends_on:
       db:
