@@ -3,6 +3,7 @@ package middleware
 import (
 	"api-gateway/utils"
 	"context"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"strings"
@@ -29,7 +30,11 @@ func JwtMiddleware(next http.Handler, protectedPaths []*utils.Path) http.Handler
 
 		// Parse and validate JWT token
 		token, err := jwt.ParseWithClaims(tokenString, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			// Return the key for validation
+			return []byte(getEnv("JWT_KEY", "explorer_secret_key")), nil
 		})
 		if err != nil || !token.Valid {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)
@@ -58,6 +63,10 @@ func JwtMiddleware(next http.Handler, protectedPaths []*utils.Path) http.Handler
 		// Call the next handler
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+func getEnv(key, fallback string) string {
+	// Dummy function for illustration
+	return fallback
 }
 
 func isProtectedPath(path string, protectedPaths []*utils.Path) (bool, string) {

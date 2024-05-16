@@ -94,7 +94,7 @@ func main() {
 	}
 	handler := middleware.JwtMiddleware(gwmux, utils.GetProtectedPaths())
 	gwServer := &http.Server{Addr: ":44333", Handler: handler}
-	gwServer.Handler = enableCors(gwmux)
+	gwServer.Handler = addCorsMiddleware(gwmux)
 	go func() {
 		log.Println("Starting HTTP server on port 44333")
 		if err := gwServer.ListenAndServe(); err != nil {

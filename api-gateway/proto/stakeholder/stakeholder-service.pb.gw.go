@@ -71,7 +71,7 @@ func RegisterStakeholderServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/stakeholder.StakeholderService/Login", runtime.WithHTTPPathPattern("/users/login"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/stakeholder.StakeholderService/Login", runtime.WithHTTPPathPattern("/api/users/login"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -135,7 +135,7 @@ func RegisterStakeholderServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/stakeholder.StakeholderService/Login", runtime.WithHTTPPathPattern("/users/login"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/stakeholder.StakeholderService/Login", runtime.WithHTTPPathPattern("/api/users/login"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -155,7 +155,7 @@ func RegisterStakeholderServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_StakeholderService_Login_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "login"}, ""))
+	pattern_StakeholderService_Login_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "users", "login"}, ""))
 )
 
 var (

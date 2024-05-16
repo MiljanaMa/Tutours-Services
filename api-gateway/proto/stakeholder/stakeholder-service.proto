@@ -9,7 +9,7 @@ import "google/api/annotations.proto";
 service StakeholderService{
   rpc Login(Credentials) returns(AuthenticationTokens){
     option (google.api.http) = {
-      post:"/users/login"
+      post:"/api/users/login"
       body: "*"
     };
   }

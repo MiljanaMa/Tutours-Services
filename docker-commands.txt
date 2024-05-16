@@ -18,3 +18,5 @@ docker system prune -a
 docker volume prune
 
 //Note: If db_init.sh doesn't make tables in db container, try to change db_init.sh into lf (control characters)
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MCwianRpIjoiYTVkZDIxYTktZWM1OS00N2VkLThjMTctNjUyMjM2Y2I2Yzc3IiwicGVyc29uSWQiOjAsInJvbGUiOjAsInVzZXJuYW1lIjoiIn0.meJAmf6O8Dzy8HD2SsI-DFIL4FTnoChS74VpKAtjAZc
