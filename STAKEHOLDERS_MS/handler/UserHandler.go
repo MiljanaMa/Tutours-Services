@@ -1,15 +1,53 @@
 package handler
 
 import (
-	"encoding/json"
-	"io"
-	"log"
-	"net/http"
+	"context"
+	"fmt"
 	"stakeholder/model"
+	"stakeholder/proto/stakeholder"
 	"stakeholder/service"
-	"strings"
 )
 
+type StakeholderHandler struct {
+	stakeholder.UnimplementedStakeholderServiceServer
+	UserService *service.UserService
+}
+
+func ModelToRPC(e *model.Credentials) *stakeholder.Credentials {
+	return &stakeholder.Credentials{
+		Username: e.Username,
+		Password: e.Password,
+	}
+}
+func rpcToModel(e *stakeholder.Credentials) model.Credentials {
+	return model.Credentials{
+		Username: e.Username,
+		Password: e.Password,
+	}
+}
+func ModelToRPCToken(e *model.AuthenticationTokens) *stakeholder.AuthenticationTokens {
+	return &stakeholder.AuthenticationTokens{
+		Id:          e.Id,
+		AccessToken: e.AccessToken,
+	}
+}
+func rpcToModelToken(e *stakeholder.AuthenticationTokens) *model.AuthenticationTokens {
+	return &model.AuthenticationTokens{
+		Id:          e.Id,
+		AccessToken: e.AccessToken,
+	}
+}
+func (handler *StakeholderHandler) Login(ctx context.Context, request *stakeholder.Credentials) (*stakeholder.AuthenticationTokens, error) {
+	fmt.Println("aa" + request.Username)
+	token, err := handler.UserService.Login(rpcToModel(request))
+	if err != nil {
+		return nil, err
+	}
+	return ModelToRPCToken(&token), nil
+
+}
+
+/*
 type UserHandler struct {
 	UserService *service.UserService
 }
@@ -60,3 +98,4 @@ func (handler *UserHandler) ValidateToken(writer http.ResponseWriter, req *http.
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusNoContent)
 }
+*/

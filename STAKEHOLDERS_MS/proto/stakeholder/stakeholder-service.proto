@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package stakeholder;
+
+option go_package = "STAKEHOLDERS_MS/proto/stakeholder";
+
+service StakeholderService{
+  rpc Login(Credentials) returns(AuthenticationTokens){}
+
+}
+message Credentials{
+  string Username = 1;
+  string Password  = 2;
+}
+message AuthenticationTokens{
+  string Id = 1;
+  string AccessToken  = 2;
+}

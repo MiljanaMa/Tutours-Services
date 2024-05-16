@@ -24,15 +24,17 @@ func (service *UserService) Login(credentials model.Credentials) (model.Authenti
 		return tokens, err
 	}
 	if credentials.Password != user.Password {
-		return tokens, fmt.Errorf("Authentication failed: %w", ErrNotFound)
+		return tokens, fmt.Errorf("Authentication failed1: %w", ErrNotFound)
 	}
+	fmt.Println("1" + credentials.Password)
+	fmt.Println("2" + user.Password)
 	if user.IsBlocked {
-		return tokens, fmt.Errorf("Authentication failed: %w", ErrForbidden)
+		return tokens, fmt.Errorf("Authentication failed2: %w", ErrForbidden)
 	}
-	if !user.IsEnabled {
-		return tokens, fmt.Errorf("Authentication failed: %w", ErrForbidden)
+	/*if !user.IsEnabled {
+		return tokens, fmt.Errorf("Authentication failed3: %w", ErrForbidden)
 	}
-
+	*/
 	var person model.Person
 	person, err = service.UserRepository.GetPerson(user.Id)
 	if err != nil {
