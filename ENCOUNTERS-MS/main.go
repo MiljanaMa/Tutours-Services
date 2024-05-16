@@ -22,15 +22,15 @@ import (
 )
 
 func initDB() *gorm.DB {
-	/*connectionUrl :=
-	"user=" + os.Getenv("DB_USER_E") +
-		" password=" + os.Getenv("DB_PASSWORD_E") +
-		" host=" + os.Getenv("DB_HOST_E") +
-		" search_path=public" +
-		" dbname=" + os.Getenv("DB_DATABASE_E") +
-		" port=" + os.Getenv("DB_PORT_E") +
-		" sslmode=disable"*/
-	connectionUrl := "postgres://postgres:super@localhost:5432"
+	connectionUrl :=
+		"user=" + os.Getenv("DB_USER_E") +
+			" password=" + os.Getenv("DB_PASSWORD_E") +
+			" host=" + os.Getenv("DB_HOST_E") +
+			" search_path=public" +
+			" dbname=" + os.Getenv("DB_DATABASE_E") +
+			" port=" + os.Getenv("DB_PORT_E") +
+			" sslmode=disable"
+	//connectionUrl := "postgres://postgres:super@localhost:5432"
 	database, err := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{SkipDefaultTransaction: true})
 
 	if err != nil {
@@ -99,8 +99,8 @@ func main() {
 	keypointEncService := &service.KeypointEncounterService{keypointEncRepo}
 	keypointEncHandler := &handler.KeypointEncounterHandler{KeypointEncounterService: keypointEncService}
 
-	lis, err := net.Listen("tcp", ":8096")
-	fmt.Println("Running gRPC on port 8096")
+	lis, err := net.Listen("tcp", ":8092")
+	fmt.Println("Running gRPC on port 8092")
 	if err != nil {
 		log.Fatalln(err)
 	}

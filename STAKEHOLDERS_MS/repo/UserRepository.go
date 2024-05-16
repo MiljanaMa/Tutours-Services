@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"fmt"
 	"gorm.io/gorm"
 	"stakeholder/model"
 )
@@ -11,6 +12,7 @@ type UserRepository struct {
 
 func (repo *UserRepository) GetActiveByUsername(username string) (model.User, error) {
 	var user model.User
+	fmt.Println("username " + username)
 	dbResult := repo.DatabaseConnection.Where("username = ?", username).Find(&user)
 	if dbResult.Error != nil {
 		return user, dbResult.Error
