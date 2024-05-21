@@ -47,6 +47,33 @@ service TourService{
 
 }
 
+service TouristPositionService{
+
+  rpc GetById(IdRequest) returns(TouristPosition){
+    option (google.api.http) = {
+      get:"/positions/get/{Id}"
+    };
+  }
+  rpc GetByUserId(IdRequest) returns(TouristPosition){
+    option (google.api.http) = {
+      get:"/positions/getByUser/{Id}"
+    };
+  }
+  rpc Create(TouristPosition) returns(TouristPosition){
+    option(google.api.http) = {
+      post:"/positions/create"
+      body:"*"
+    };
+  }
+  rpc Update(TouristPosition) returns(TouristPosition){
+    option(google.api.http) = {
+      post:"/positions/update"
+      body:"*"
+    };
+  }
+
+}
+
 message EmptyRequest{}
 message EmptyResponse{}
 
@@ -76,6 +103,16 @@ message Keypoint{
   string Image = 8;
   string Secret = 9;
 }
+
+message TouristPosition{
+  int64 Id = 1;
+  int64 UserId = 2;
+  float Latitude = 3;
+  float Longitude = 4;
+  google.protobuf.Timestamp UpdatedAt = 5;
+}
+
+
 message Tour{
   int64 Id = 1;
   int64 UserId  = 2;

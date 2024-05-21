@@ -3,10 +3,12 @@ package main
 import (
 	"api-gateway/middleware"
 	"api-gateway/proto/encounter"
+	"api-gateway/proto/follower"
 	"api-gateway/proto/stakeholder"
 	"api-gateway/proto/tour"
 	"api-gateway/utils"
 	"context"
+	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -17,81 +19,82 @@ import (
 	"syscall"
 )
 
+var (
+	conn1 *grpc.ClientConn
+	conn2 *grpc.ClientConn
+	conn3 *grpc.ClientConn
+	conn4 *grpc.ClientConn
+	err   error
+)
+
+func dialGRPC(address string) *grpc.ClientConn {
+	conn, err := grpc.DialContext(
+		context.Background(),
+		address,
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return conn
+}
+
 func main() {
-	/*conn1, err := grpc.DialContext(
-		context.Background(),
-		"follower:8095",
-		grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer conn1.Close()*/
 
-	conn2, err := grpc.DialContext(
-		context.Background(),
-		"encounter:8092",
-		grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer conn2.Close()
-
-	conn3, err := grpc.DialContext(
-		context.Background(),
-		"tour:8000",
-		grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer conn3.Close()
-	conn4, err := grpc.DialContext(
-		context.Background(),
-		"stakeholder:8099",
-		grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer conn4.Close()
+	//conn1 = dialGRPC("follower:8095")
+	//conn2 = dialGRPC("encounter:8092")
+	conn3 = dialGRPC("tour:8000")
+	//conn4 = dialGRPC("stakeholder:8099")
 
 	gwmux := runtime.NewServeMux()
 
-	/*client1 := follower.NewFollowerServiceClient(conn1)
-	err = follower.RegisterFollowerServiceHandlerClient(context.Background(), gwmux, client1)
-	if err != nil {
-		log.Fatalln(err)
+	if conn1 != nil {
+		client1 := follower.NewFollowerServiceClient(conn1)
+		err = follower.RegisterFollowerServiceHandlerClient(context.Background(), gwmux, client1)
+		if err != nil {
+			log.Fatalln(err)
 
-	}*/
-	client2_1 := encounter.NewEncounterServiceClient(conn2)
-	client2_2 := encounter.NewEncounterCompletionServiceClient(conn2)
-	client2_3 := encounter.NewKeypointEncounterServiceClient(conn2)
-
-	err1 := encounter.RegisterEncounterServiceHandlerClient(context.Background(), gwmux, client2_1)
-	err2 := encounter.RegisterEncounterCompletionServiceHandlerClient(context.Background(), gwmux, client2_2)
-	err3 := encounter.RegisterKeypointEncounterServiceHandlerClient(context.Background(), gwmux, client2_3)
-
-	if err1 != nil || err2 != nil || err3 != nil {
-		log.Fatalln(err)
+		}
 	}
-	client3_1 := tour.NewTourServiceClient(conn3)
-	err3_1 := tour.RegisterTourServiceHandlerClient(context.Background(), gwmux, client3_1)
-	if err3_1 != nil {
-		log.Fatalln(err3_1)
 
-	}
-	client4 := stakeholder.NewStakeholderServiceClient(conn4)
-	err4 := stakeholder.RegisterStakeholderServiceHandlerClient(context.Background(), gwmux, client4)
-	if err4 != nil {
-		log.Fatalln(err4)
+	if conn2 != nil {
+		client2_1 := encounter.NewEncounterServiceClient(conn2)
+		client2_2 := encounter.NewEncounterCompletionServiceClient(conn2)
+		client2_3 := encounter.NewKeypointEncounterServiceClient(conn2)
 
+		err1 := encounter.RegisterEncounterServiceHandlerClient(context.Background(), gwmux, client2_1)
+		err2 := encounter.RegisterEncounterCompletionServiceHandlerClient(context.Background(), gwmux, client2_2)
+		err3 := encounter.RegisterKeypointEncounterServiceHandlerClient(context.Background(), gwmux, client2_3)
+
+		if err1 != nil || err2 != nil || err3 != nil {
+			log.Fatalln(err)
+		}
 	}
+
+	if conn3 != nil {
+
+		client3_1 := tour.NewTourServiceClient(conn3)
+		client3_2 := tour.NewTouristPositionServiceClient(conn3)
+
+		err3_1 := tour.RegisterTourServiceHandlerClient(context.Background(), gwmux, client3_1)
+		err3_2 := tour.RegisterTouristPositionServiceHandlerClient(context.Background(), gwmux, client3_2)
+
+		if err3_1 != nil || err3_2 != nil {
+			log.Fatalln(err)
+
+		}
+	}
+	if conn3 != nil {
+		client4 := stakeholder.NewStakeholderServiceClient(conn4)
+		err4 := stakeholder.RegisterStakeholderServiceHandlerClient(context.Background(), gwmux, client4)
+		if err4 != nil {
+			log.Fatalln(err4)
+
+		}
+	}
+
 	handler := middleware.JwtMiddleware(gwmux, utils.GetProtectedPaths())
 	gwServer := &http.Server{Addr: ":44333", Handler: handler}
 	gwServer.Handler = addCorsMiddleware(gwmux)

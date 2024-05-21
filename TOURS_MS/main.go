@@ -26,6 +26,11 @@ func main() {
 	tourRepo := &repo.TourRepository{Cli: client, Logger: storeLogger}
 	tourService := &service.TourService{TourRepository: tourRepo}
 	tourHandler := &handler.TourHandler{TourService: tourService}
+
+	touristPositionRepo := &repo.TouristPositionRepository{Cli: client, Logger: storeLogger}
+	touristPositionService := &service.TouristPositionService{TouristPositionRepository: touristPositionRepo}
+	touristPositionHandler := &handler.TouristPositionHandler{TouristPositionService: touristPositionService}
+
 	lis, err := net.Listen("tcp", ":8000")
 	fmt.Println("Running gRPC on port 8000")
 	if err != nil {
@@ -44,6 +49,7 @@ func main() {
 	fmt.Println("Registered gRPC server")
 
 	tour.RegisterTourServiceServer(grpcServer, tourHandler)
+	tour.RegisterTouristPositionServiceServer(grpcServer, touristPositionHandler)
 
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
@@ -63,11 +69,6 @@ func main() {
 		keypointRepo := &repo.KeypointRepository{Cli: client, Logger: storeLogger}
 		keypointService := &service.KeypointService{KeypointRepository: keypointRepo}
 		keypointHandler := &handler.KeypointHandler{KeypointService: keypointService}
-
-		// Tourist positions setup
-		touristPositionRepo := &repo.TouristPositionRepository{Cli: client, Logger: storeLogger}
-		touristPositionService := &service.TouristPositionService{TouristPositionRepository: touristPositionRepo}
-		touristPositionHandler := &handler.TouristPositionHandler{TouristPositionService: touristPositionService}
 
 		// Tourist review setup
 		tourReviewRepo := &repo.TourReviewRepository{Cli: client, Logger: storeLogger}

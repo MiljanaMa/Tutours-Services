@@ -13,6 +13,13 @@ service TourService{
     rpc Update(Tour) returns (Tour){}
     rpc Delete(IdRequest) returns (EmptyResponse){}
 }
+service TouristPositionService{
+    rpc GetById(IdRequest) returns(TouristPosition){}
+    rpc GetByUserId(IdRequest) returns(TouristPosition){}
+    rpc Create(TouristPosition) returns(TouristPosition){}
+    rpc Update(TouristPosition) returns(TouristPosition){}
+}
+
 
 message EmptyRequest{}
 message EmptyResponse{}
@@ -59,6 +66,14 @@ message Tour{
     TourDifficulty TourDifficulty = 10;
     repeated string Tags = 11;
     google.protobuf.Timestamp StatusUpdateTime = 12;
+}
+
+message TouristPosition{
+    int64 Id = 1;
+    int64 UserId = 2;
+    float Latitude = 3;
+    float Longitude = 4;
+    google.protobuf.Timestamp UpdatedAt = 5;
 }
 
 enum TourStatus {
