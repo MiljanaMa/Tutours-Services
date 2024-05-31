@@ -21,6 +21,7 @@ service EncounterService{
 
 service EncounterCompletionService{
     rpc GetEncounterCompletionByUser(UserIdRequest) returns(EncounterCompletionsResponse){}
+    rpc StartEncounter(IdRequest) returns(EncounterCompletion){}
     rpc FinishEncounter(UserAndIdRequest) returns(EncounterCompletion){}
 }
 
@@ -116,5 +117,6 @@ enum EncounterCompletionStatus{
     FAILED = 1;
     COMPLETED = 2;
     PROGRESSING = 3;
+    AWAITING = 4;
 }
 

@@ -5,7 +5,11 @@ import (
 	"ENCOUNTERS-MS/proto/encounter"
 	"ENCOUNTERS-MS/service"
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -23,6 +27,8 @@ func mapToRPCStatus(status model.EncounterCompletionStatus) encounter.EncounterC
 		return encounter.EncounterCompletionStatus_PROGRESSING
 	case model.CompletionStatusCompleted:
 		return encounter.EncounterCompletionStatus_COMPLETED
+	case model.CompletionStatusAwaitingFinish:
+		return encounter.EncounterCompletionStatus_AWAITING
 	default:
 		return encounter.EncounterCompletionStatus_FAILED
 	}
@@ -59,8 +65,8 @@ func (handler *EncounterCompletionHandler) GetEncounterCompletionByUser(ctx cont
 }
 func (handler *EncounterCompletionHandler) FinishEncounter(ctx context.Context, request *encounter.UserAndIdRequest) (*encounter.EncounterCompletion, error) {
 
-	encounterId := strconv.Itoa(int(request.Id))
-	userId := strconv.Itoa(int(request.UserId))
+	encounterId := int(request.Id)
+	userId := int(request.UserId)
 
 	result, err := handler.EncounterCompletionService.FinishEncounter(userId, encounterId)
 	if err != nil {
@@ -69,4 +75,35 @@ func (handler *EncounterCompletionHandler) FinishEncounter(ctx context.Context, 
 
 	return modelToRPC(result), nil
 
+}
+func (handler *EncounterCompletionHandler) StartEncounter(ctx context.Context, request *encounter.IdRequest) (*encounter.EncounterCompletion, error) {
+	bearer_token := ctx.Value("token")
+	if bearer_token == nil {
+		return nil, fmt.Errorf("No token provided\n")
+	}
+	jwt := strings.TrimPrefix(bearer_token.(string), "Bearer ")
+	parts := strings.Split(jwt, ".")
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("Bad format\n")
+	}
+	jwt_decoded, err := base64.RawURLEncoding.DecodeString(parts[1])
+
+	if err != nil {
+		return nil, err
+	}
+
+	var claims map[string]interface{}
+	if err := json.Unmarshal(jwt_decoded, &claims); err != nil {
+		return nil, err
+	}
+	personID, ok := claims["personId"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("Cannot parse id")
+	}
+	encounterCompletion, err := handler.EncounterCompletionService.StartEncounter(int(personID), int(request.Id))
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return modelToRPC(encounterCompletion), nil
 }

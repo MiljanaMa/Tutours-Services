@@ -27,3 +27,8 @@ func (repo *UserRepository) GetPerson(id int) (model.Person, error) {
 	}
 	return person, nil
 }
+
+func (repo *UserRepository) Update(user model.Person) error {
+	dbResult := repo.DatabaseConnection.Save(user)
+	return dbResult.Error
+}

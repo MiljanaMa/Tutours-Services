@@ -2,11 +2,12 @@ package util
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/google/uuid"
 	"os"
 	"stakeholder/model"
 	"strconv"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 )
 
 type JwtGenerator struct {
@@ -35,6 +36,7 @@ func (jwtGen *JwtGenerator) GenerateAccessToken(user *model.User, personID int) 
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	fmt.Println(jwtGen.Key)
 	jwtString, err := token.SignedString([]byte(jwtGen.Key))
 	if err != nil {
 		return authToken, fmt.Errorf("failed to generate access token: %v", err)

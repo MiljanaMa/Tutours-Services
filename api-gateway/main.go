@@ -9,14 +9,15 @@ import (
 	"api-gateway/utils"
 	"context"
 	"fmt"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -45,8 +46,13 @@ func main() {
 
 	//conn1 = dialGRPC("follower:8095")
 	//conn2 = dialGRPC("encounter:8092")
-	conn3 = dialGRPC("tour:8000")
+	//conn3 = dialGRPC("tour:8000")
 	//conn4 = dialGRPC("stakeholder:8099")
+
+	//conn1 = dialGRPC(":8095")
+	conn2 = dialGRPC(":8092")
+	//conn3 = dialGRPC(":8000")
+	conn4 = dialGRPC(":8099")
 
 	gwmux := runtime.NewServeMux()
 
@@ -60,19 +66,19 @@ func main() {
 	}
 
 	if conn2 != nil {
-		client2_1 := encounter.NewEncounterServiceClient(conn2)
-		client2_2 := encounter.NewEncounterCompletionServiceClient(conn2)
-		client2_3 := encounter.NewKeypointEncounterServiceClient(conn2)
 
-		err1 := encounter.RegisterEncounterServiceHandlerClient(context.Background(), gwmux, client2_1)
-		err2 := encounter.RegisterEncounterCompletionServiceHandlerClient(context.Background(), gwmux, client2_2)
-		err3 := encounter.RegisterKeypointEncounterServiceHandlerClient(context.Background(), gwmux, client2_3)
+		client1 := encounter.NewEncounterServiceClient(conn2)
+		client2 := encounter.NewEncounterCompletionServiceClient(conn2)
+		client3 := encounter.NewKeypointEncounterServiceClient(conn2)
+
+		err1 := encounter.RegisterEncounterServiceHandlerClient(context.Background(), gwmux, client1)
+		err2 := encounter.RegisterEncounterCompletionServiceHandlerClient(context.Background(), gwmux, client2)
+		err3 := encounter.RegisterKeypointEncounterServiceHandlerClient(context.Background(), gwmux, client3)
 
 		if err1 != nil || err2 != nil || err3 != nil {
 			log.Fatalln(err)
 		}
 	}
-
 	if conn3 != nil {
 
 		client3_1 := tour.NewTourServiceClient(conn3)
@@ -86,7 +92,7 @@ func main() {
 
 		}
 	}
-	if conn3 != nil {
+	if conn4 != nil {
 		client4 := stakeholder.NewStakeholderServiceClient(conn4)
 		err4 := stakeholder.RegisterStakeholderServiceHandlerClient(context.Background(), gwmux, client4)
 		if err4 != nil {

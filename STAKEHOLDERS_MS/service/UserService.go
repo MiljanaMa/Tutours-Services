@@ -59,3 +59,15 @@ func (service *UserService) ValidateToken(token string) (jwt.Claims, error) {
 	}
 	return claims, nil
 }
+
+func (service *UserService) AddXp(userId, xp int) error {
+	user, err := service.UserRepository.GetPerson(userId)
+	if err != nil {
+		return err
+	}
+	if user.XP+xp > 300 {
+		return fmt.Errorf("Exceeded XP of 300")
+	}
+	user.XP += xp
+	return service.UserRepository.Update(user)
+}

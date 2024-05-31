@@ -2,7 +2,6 @@ package repo
 
 import (
 	"ENCOUNTERS-MS/model"
-
 	"gorm.io/gorm"
 )
 
@@ -20,6 +19,13 @@ func (repo *EncounterRepository) GetApproved() ([]*model.Encounter, error) {
 	}
 
 	return encounters, nil
+}
+func (repo *EncounterRepository) GetById(id int) (*model.Encounter, error) {
+	var encounter model.Encounter
+	if err := repo.DatabaseConnection.First(&encounter, id).Error; err != nil {
+		return nil, err
+	}
+	return &encounter, nil
 }
 
 func (repo *EncounterRepository) Create(encounter *model.Encounter) (*model.Encounter, error) {

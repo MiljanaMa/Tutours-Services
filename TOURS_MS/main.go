@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"os"
@@ -14,6 +12,9 @@ import (
 	"tours/proto/tour"
 	"tours/repo"
 	"tours/service"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {

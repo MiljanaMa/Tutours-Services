@@ -2,8 +2,6 @@ package repo
 
 import (
 	"ENCOUNTERS-MS/model"
-	"fmt"
-
 	"gorm.io/gorm"
 )
 
@@ -23,19 +21,44 @@ func (repo *EncounterCompletionRepository) GetPagedByUser(userId string) ([]*mod
 	return encounterCompletions, nil
 }
 
-func (repo *EncounterCompletionRepository) GetByUserAndEncounter(userId string, encounterId string) (*model.EncounterCompletion, error) {
+func (repo *EncounterCompletionRepository) GetByUserAndEncounter(userId, encounterId int) (*model.EncounterCompletion, error) {
 	var foundEnounterCompletion *model.EncounterCompletion
-	dbResult := repo.DatabaseConnection.Where(" encounter_id = ? ", encounterId).Preload("Encounter").Find(&foundEnounterCompletion)
+	dbResult := repo.DatabaseConnection.Where("user_id = ? AND encounter_id = ?", userId, encounterId).
+		Preload("Encounter").
+		First(&foundEnounterCompletion)
 
 	if dbResult.Error != nil {
-		return foundEnounterCompletion, dbResult.Error
+		return nil, dbResult.Error
 	}
-
-	fmt.Println(string(foundEnounterCompletion.Status))
 	return foundEnounterCompletion, nil
+}
+
+func (repo *EncounterCompletionRepository) HasUserStartedEncounter(userId, encounterId int) bool {
+	var foundEnounterCompletion *model.EncounterCompletion
+	dbResult := repo.DatabaseConnection.Where("user_id = ? AND encounter_id = ? AND status = ?", userId, encounterId, "STARTED").
+		Preload("Encounter").
+		First(&foundEnounterCompletion)
+
+	if dbResult.Error != nil {
+		return false
+	}
+	return true
+}
+
+func (repo *EncounterCompletionRepository) GetById(id int) (*model.EncounterCompletion, error) {
+	var encounter model.EncounterCompletion
+	if err := repo.DatabaseConnection.First(&encounter, id).Error; err != nil {
+		return nil, err
+	}
+	return &encounter, nil
 }
 
 func (repo *EncounterCompletionRepository) Update(encounterCompletion *model.EncounterCompletion) error {
 	dbResult := repo.DatabaseConnection.Save(encounterCompletion)
 	return dbResult.Error
+}
+
+func (repo *EncounterCompletionRepository) Create(encounterCompletion *model.EncounterCompletion) (*model.EncounterCompletion, error) {
+	res := repo.DatabaseConnection.Create(&encounterCompletion)
+	return encounterCompletion, res.Error
 }
