@@ -127,7 +127,6 @@ func toRPCEncounters(encounters []*model.Encounter) *encounter.EncountersRespons
 }
 
 func (handler *EncounterHandler) GetApproved(ctx context.Context, request *encounter.EmptyRequest) (*encounter.EncountersResponse, error) {
-
 	encounters, err := handler.EncounterService.GetApproved()
 	if err != nil {
 		return nil, err

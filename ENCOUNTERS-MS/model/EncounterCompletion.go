@@ -7,10 +7,11 @@ import (
 type EncounterCompletionStatus string
 
 const (
-	CompletionStatusStarted     EncounterCompletionStatus = "STARTED"
-	CompletionStatusFailed      EncounterCompletionStatus = "FAILED"
-	CompletionStatusCompleted   EncounterCompletionStatus = "COMPLETED"
-	CompletionStatusProgressing EncounterCompletionStatus = "PROGRESSING"
+	CompletionStatusStarted        EncounterCompletionStatus = "STARTED"
+	CompletionStatusFailed         EncounterCompletionStatus = "FAILED"
+	CompletionStatusAwaitingFinish EncounterCompletionStatus = "AWAITING"
+	CompletionStatusCompleted      EncounterCompletionStatus = "COMPLETED"
+	CompletionStatusProgressing    EncounterCompletionStatus = "PROGRESSING"
 )
 
 type EncounterCompletion struct {

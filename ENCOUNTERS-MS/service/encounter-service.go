@@ -3,6 +3,7 @@ package service
 import (
 	"ENCOUNTERS-MS/model"
 	"ENCOUNTERS-MS/repo"
+	"ENCOUNTERS-MS/service/utils"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -30,6 +31,9 @@ func (service *EncounterService) GetApprovedByStatus(status model.EncounterStatu
 	}
 	return nil, fmt.Errorf("Couldn't find any.")
 
+}
+func (service *EncounterService) GetById(id int) (*model.Encounter, error) {
+	return service.EncounterRepo.GetById(id)
 }
 
 func (service *EncounterService) GetByUser(userId int) ([]*model.Encounter, error) {
@@ -126,7 +130,7 @@ func findInVicinity(encountersPtr *[]*model.Encounter, lat, long float64) []*mod
 
 	var results []*model.Encounter
 	for _, e := range encounters {
-		if distance := CalculateDistance(e.Latitude, e.Longitude, lat, long); distance <= e.Range {
+		if distance := utils.CalculateDistance(e.Latitude, e.Longitude, lat, long); distance <= e.Range {
 			fmt.Println(distance, e.Range)
 			results = append(results, e)
 		}

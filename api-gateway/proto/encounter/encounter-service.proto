@@ -81,6 +81,11 @@ service EncounterCompletionService{
       get: "/tourist/encounter/{UserId}"
     };
   }
+  rpc StartEncounter(IdRequest) returns (EncounterCompletion){
+    option(google.api.http) = {
+      post: "/tourist/encounter/start/{Id}"
+    };
+  }
   rpc FinishEncounter(UserAndIdRequest) returns(EncounterCompletion){
     option(google.api.http) = {
       put: "/tourist/encounter/finishEncounter/{Id}/{UserId}"
@@ -197,4 +202,5 @@ enum EncounterCompletionStatus{
   FAILED = 1;
   COMPLETED = 2;
   PROGRESSING = 3;
+  AWAITING = 4;
 }

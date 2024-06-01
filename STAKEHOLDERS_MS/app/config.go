@@ -16,6 +16,6 @@ func Init() {
 			" dbname=" + os.Getenv("DB_DATABASE_S") +
 			" port=" + os.Getenv("DB_PORT_S") +
 			" sslmode=disable"
-	//ConnectionString = "host=localhost user=postgres password=super dbname=stakeholders port=5432 sslmode=disable"
+	ConnectionString = "host=localhost user=postgres password=super dbname=stakeholders port=5432 sslmode=disable"
 	Port = ":8097"
 }

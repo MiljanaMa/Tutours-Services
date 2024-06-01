@@ -480,6 +480,7 @@ var EncounterService_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	EncounterCompletionService_GetEncounterCompletionByUser_FullMethodName = "/encounter.EncounterCompletionService/GetEncounterCompletionByUser"
+	EncounterCompletionService_StartEncounter_FullMethodName               = "/encounter.EncounterCompletionService/StartEncounter"
 	EncounterCompletionService_FinishEncounter_FullMethodName              = "/encounter.EncounterCompletionService/FinishEncounter"
 )
 
@@ -488,6 +489,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EncounterCompletionServiceClient interface {
 	GetEncounterCompletionByUser(ctx context.Context, in *UserIdRequest, opts ...grpc.CallOption) (*EncounterCompletionsResponse, error)
+	StartEncounter(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*EncounterCompletion, error)
 	FinishEncounter(ctx context.Context, in *UserAndIdRequest, opts ...grpc.CallOption) (*EncounterCompletion, error)
 }
 
@@ -508,6 +510,15 @@ func (c *encounterCompletionServiceClient) GetEncounterCompletionByUser(ctx cont
 	return out, nil
 }
 
+func (c *encounterCompletionServiceClient) StartEncounter(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*EncounterCompletion, error) {
+	out := new(EncounterCompletion)
+	err := c.cc.Invoke(ctx, EncounterCompletionService_StartEncounter_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *encounterCompletionServiceClient) FinishEncounter(ctx context.Context, in *UserAndIdRequest, opts ...grpc.CallOption) (*EncounterCompletion, error) {
 	out := new(EncounterCompletion)
 	err := c.cc.Invoke(ctx, EncounterCompletionService_FinishEncounter_FullMethodName, in, out, opts...)
@@ -522,6 +533,7 @@ func (c *encounterCompletionServiceClient) FinishEncounter(ctx context.Context, 
 // for forward compatibility
 type EncounterCompletionServiceServer interface {
 	GetEncounterCompletionByUser(context.Context, *UserIdRequest) (*EncounterCompletionsResponse, error)
+	StartEncounter(context.Context, *IdRequest) (*EncounterCompletion, error)
 	FinishEncounter(context.Context, *UserAndIdRequest) (*EncounterCompletion, error)
 	mustEmbedUnimplementedEncounterCompletionServiceServer()
 }
@@ -532,6 +544,9 @@ type UnimplementedEncounterCompletionServiceServer struct {
 
 func (UnimplementedEncounterCompletionServiceServer) GetEncounterCompletionByUser(context.Context, *UserIdRequest) (*EncounterCompletionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEncounterCompletionByUser not implemented")
+}
+func (UnimplementedEncounterCompletionServiceServer) StartEncounter(context.Context, *IdRequest) (*EncounterCompletion, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartEncounter not implemented")
 }
 func (UnimplementedEncounterCompletionServiceServer) FinishEncounter(context.Context, *UserAndIdRequest) (*EncounterCompletion, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinishEncounter not implemented")
@@ -568,6 +583,24 @@ func _EncounterCompletionService_GetEncounterCompletionByUser_Handler(srv interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EncounterCompletionService_StartEncounter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EncounterCompletionServiceServer).StartEncounter(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EncounterCompletionService_StartEncounter_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EncounterCompletionServiceServer).StartEncounter(ctx, req.(*IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _EncounterCompletionService_FinishEncounter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserAndIdRequest)
 	if err := dec(in); err != nil {
@@ -596,6 +629,10 @@ var EncounterCompletionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetEncounterCompletionByUser",
 			Handler:    _EncounterCompletionService_GetEncounterCompletionByUser_Handler,
+		},
+		{
+			MethodName: "StartEncounter",
+			Handler:    _EncounterCompletionService_StartEncounter_Handler,
 		},
 		{
 			MethodName: "FinishEncounter",

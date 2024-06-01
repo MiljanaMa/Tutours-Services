@@ -5,16 +5,20 @@ import (
 	"ENCOUNTERS-MS/model"
 	"ENCOUNTERS-MS/proto/encounter"
 	"ENCOUNTERS-MS/repo"
+	saga "ENCOUNTERS-MS/saga/messaging"
+	"ENCOUNTERS-MS/saga/messaging/nats"
 	"ENCOUNTERS-MS/service"
+	"context"
 	"fmt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"gorm.io/driver/postgres"
@@ -30,7 +34,7 @@ func initDB() *gorm.DB {
 			" dbname=" + os.Getenv("DB_DATABASE_E") +
 			" port=" + os.Getenv("DB_PORT_E") +
 			" sslmode=disable"
-	//connectionUrl := "postgres://postgres:super@localhost:5432"
+	connectionUrl = "postgres://postgres:super@localhost:5432"
 	database, err := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{SkipDefaultTransaction: true})
 
 	if err != nil {
@@ -69,15 +73,19 @@ func MigrateDatabase(database *gorm.DB) {
 		migrator.CreateTable(&model.KeypointEncounter{})
 	}
 }
-func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.EncounterCompletionHandler, keypointEncHandler *handler.KeypointEncounterHandler) {
-	router := mux.NewRouter().StrictSlash(true)
 
-	//KEYPOINT ENCOUNTER
-	//router.HandleFunc("/keypointencounter/update", keypointEncHandler.Update).Methods("PUT")
-	//router.HandleFunc("/keypointencounter/delete", keypointEncHandler.Delete).Methods("DELETE")
+func JWTInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 
-	fmt.Println("Server is starting...")
-	log.Fatal(http.ListenAndServe(":8083", router))
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.InvalidArgument, "missing metadata")
+	}
+	token, ok := md["authorization"]
+	if !ok || len(token) == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "missing JWT token")
+	}
+
+	return handler(context.WithValue(ctx, "token", token[0]), req)
 }
 func main() {
 
@@ -91,13 +99,27 @@ func main() {
 	encounterService := &service.EncounterService{encounterRepo}
 	encounterHandler := &handler.EncounterHandler{EncounterService: encounterService}
 
-	completionRepo := &repo.EncounterCompletionRepository{db}
-	completionService := &service.EncounterCompletionService{completionRepo}
-	completionHandler := &handler.EncounterCompletionHandler{EncounterCompletionService: completionService}
-
 	keypointEncRepo := &repo.KeypointEncounterRepository{db}
 	keypointEncService := &service.KeypointEncounterService{keypointEncRepo}
 	keypointEncHandler := &handler.KeypointEncounterHandler{KeypointEncounterService: keypointEncService}
+
+	completionRepo := &repo.EncounterCompletionRepository{db}
+
+	queueGroup := "encounter_service"
+	command := "encounter.finish.command"
+	reply := "encounter.finish.reply"
+
+	commandPublisher := initPublisher(command)
+	replySubscriber := initSubscriber(reply, queueGroup)
+	orchestrator := initOrchestrator(commandPublisher, replySubscriber)
+
+	completionService := initService(completionRepo, encounterService, orchestrator)
+
+	commandSubscriber := initSubscriber(command, queueGroup)
+	replyPublisher := initPublisher(reply)
+	initFinishOrderHandler(completionService, replyPublisher, commandSubscriber)
+
+	completionHandler := &handler.EncounterCompletionHandler{EncounterCompletionService: completionService}
 
 	lis, err := net.Listen("tcp", ":8092")
 	fmt.Println("Running gRPC on port 8092")
@@ -112,7 +134,9 @@ func main() {
 		}
 	}(lis)
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(JWTInterceptor))
+
 	reflection.Register(grpcServer)
 	fmt.Println("Registered gRPC server")
 
@@ -133,4 +157,36 @@ func main() {
 	<-stopCh
 
 	grpcServer.Stop()
+}
+func initSubscriber(subject, queueGroup string) saga.Subscriber {
+	subscriber, err := nats.NewSubscriber(subject, queueGroup)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return subscriber
+}
+
+func initPublisher(subject string) saga.Publisher {
+	publisher, err := nats.NewPublisher(subject)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return publisher
+}
+
+func initOrchestrator(publisher saga.Publisher, subscriber saga.Subscriber) *service.FinishEncounterOrchestrator {
+	orchestrator, err := service.NewFinishOrderOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return orchestrator
+}
+func initService(repository *repo.EncounterCompletionRepository, encounterService *service.EncounterService, orchestrator *service.FinishEncounterOrchestrator) *service.EncounterCompletionService {
+	return service.NewEncounterCompletionService(repository, encounterService, orchestrator)
+}
+func initFinishOrderHandler(service *service.EncounterCompletionService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := handler.NewFinishEncounterCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
