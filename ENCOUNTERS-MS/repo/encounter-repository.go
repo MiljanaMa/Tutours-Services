@@ -2,6 +2,10 @@ package repo
 
 import (
 	"ENCOUNTERS-MS/model"
+	"context"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +13,11 @@ type EncounterRepository struct {
 	DatabaseConnection *gorm.DB
 }
 
-func (repo *EncounterRepository) GetApproved() ([]*model.Encounter, error) {
+func (repo *EncounterRepository) GetApproved(ctx context.Context) ([]*model.Encounter, error) {
+	tracer := otel.Tracer("encounter-repo")
+	ctx, span := tracer.Start(ctx, "GetApproved Repo")
+	defer span.End()
+
 	var encounters []*model.Encounter
 	dbResult := repo.DatabaseConnection.Where("approval_status IN (?)",
 		[]string{"SYSTEM_APPROVED", "ADMIN_APPROVED"}).Find(&encounters)
@@ -17,7 +25,7 @@ func (repo *EncounterRepository) GetApproved() ([]*model.Encounter, error) {
 	if dbResult.Error != nil {
 		return encounters, dbResult.Error
 	}
-
+	span.SetAttributes(attribute.Int("number_of_encounters", len(encounters)))
 	return encounters, nil
 }
 func (repo *EncounterRepository) GetById(id int) (*model.Encounter, error) {

@@ -3,7 +3,7 @@ version: "3.9"
 x-logging: &fluent-bit
   driver: fluentd
   options:
-    fluentd-address: 172.21.0.4:24224
+    fluentd-address: 172.23.0.6:24224
 
 services:
   nats:
@@ -12,6 +12,7 @@ services:
     restart: on-failure
     networks:
       - database
+      - monitoring
     ports:
       - "4222:4222"
 
@@ -21,6 +22,7 @@ services:
     restart: always
     networks:
       - database
+      - monitoring
     ports:
       - "5432:5432"
     volumes:
@@ -58,6 +60,7 @@ services:
       - db
     networks:
       - database
+      - monitoring
     ports:
       - "44333:44333"
     expose:
@@ -73,6 +76,7 @@ services:
       - "8092:8092"
     networks:
       - database
+      - monitoring
     environment:
       DB_USER_E: postgres
       DB_PASSWORD_E: super
@@ -102,6 +106,7 @@ services:
       - "8099:8099"
     networks:
       - database
+      - monitoring
     environment:
       DB_USER_S: postgres
       DB_PASSWORD_S: super
@@ -124,3 +129,5 @@ services:
 networks:
   database:
     driver: bridge
+  monitoring:
+    external: true 

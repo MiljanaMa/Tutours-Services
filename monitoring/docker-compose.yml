@@ -37,6 +37,13 @@ services:
     networks:
       - monitoring
 
+  jaeger:
+    image: jaegertracing/all-in-one:1.34
+    ports:
+      - "9000:16686"
+    networks:
+      - monitoring
+
 volumes:
   grafana:
     name: grafana

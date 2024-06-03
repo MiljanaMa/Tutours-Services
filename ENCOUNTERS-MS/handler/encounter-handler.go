@@ -5,6 +5,8 @@ import (
 	"ENCOUNTERS-MS/proto/encounter"
 	"ENCOUNTERS-MS/service"
 	"context"
+
+	"go.opentelemetry.io/otel"
 )
 
 type EncounterHandler struct {
@@ -127,7 +129,11 @@ func toRPCEncounters(encounters []*model.Encounter) *encounter.EncountersRespons
 }
 
 func (handler *EncounterHandler) GetApproved(ctx context.Context, request *encounter.EmptyRequest) (*encounter.EncountersResponse, error) {
-	encounters, err := handler.EncounterService.GetApproved()
+	tracer := otel.Tracer("encounter-handler")
+	ctx, span := tracer.Start(ctx, "GetApproved")
+	defer span.End()
+
+	encounters, err := handler.EncounterService.GetApproved(ctx)
 	if err != nil {
 		return nil, err
 	}

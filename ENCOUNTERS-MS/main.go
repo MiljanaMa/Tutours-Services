@@ -16,6 +16,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/sdk/resource"
+	"go.opentelemetry.io/otel/sdk/trace"
+
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -88,7 +95,34 @@ func JWTInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServer
 
 	return handler(context.WithValue(ctx, "token", token[0]), req)
 }
+
+func initTracer() (*trace.TracerProvider, error) {
+
+	endpoint := "http://jaeger:14268/api/traces"
+
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(endpoint)))
+	if err != nil {
+		return nil, err
+	}
+
+	tp := trace.NewTracerProvider(
+		trace.WithBatcher(exp),
+		trace.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String("encounters-ms"),
+		)),
+	)
+	otel.SetTracerProvider(tp)
+	return tp, nil
+}
+
 func main() {
+
+	tp, err := initTracer()
+	if err != nil {
+		log.Fatalf("failed to initialize tracer: %v", err)
+	}
+	defer func() { _ = tp.Shutdown(context.Background()) }()
 
 	db := initDB()
 
