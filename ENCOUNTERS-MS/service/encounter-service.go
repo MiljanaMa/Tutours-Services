@@ -4,20 +4,27 @@ import (
 	"ENCOUNTERS-MS/model"
 	"ENCOUNTERS-MS/repo"
 	"ENCOUNTERS-MS/service/utils"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
+
+	"go.opentelemetry.io/otel"
 )
 
 type EncounterService struct {
 	EncounterRepo *repo.EncounterRepository
 }
 
-func (service *EncounterService) GetApproved() ([]*model.Encounter, error) {
+func (service *EncounterService) GetApproved(ctx context.Context) ([]*model.Encounter, error) {
+	tracer := otel.Tracer("encounter-service")
+	ctx, span := tracer.Start(ctx, "GetApproved Service")
+	defer span.End()
 
-	if encounters, err := service.EncounterRepo.GetApproved(); err == nil {
+	if encounters, err := service.EncounterRepo.GetApproved(ctx); err == nil {
+		fmt.Printf("Fetched %d encounters\n", len(encounters))
 		return encounters, nil
 	}
 

@@ -5,6 +5,7 @@ docker compose up (--build)
 docker-compose -f docker-compose-migration.yml up
 
 //Commands for databases insert (your're position should be in exec in db container)
+
 psql -U postgres -d explorer -f /tmp/explorer-init.sql
 psql -U postgres -d tours -f /tmp/tours-init.sql
 psql -U postgres -d encounters -f /tmp/encounters-init.sql
@@ -20,3 +21,16 @@ docker volume prune
 //Note: If db_init.sh doesn't make tables in db container, try to change db_init.sh into lf (control characters)
 
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MCwianRpIjoiYTVkZDIxYTktZWM1OS00N2VkLThjMTctNjUyMjM2Y2I2Yzc3IiwicGVyc29uSWQiOjAsInJvbGUiOjAsInVzZXJuYW1lIjoiIn0.meJAmf6O8Dzy8HD2SsI-DFIL4FTnoChS74VpKAtjAZc
+
+// praska 
+docker exec -it db bash 
+psql -U postgres -d encounters -f /docker-entrypoint-initdb.d/encounters_init.sql
+psql -U postgres -d stakeholders -f /docker-entrypoint-initdb.d/stakeholders_init.sql
+
+
+grpcurl -import-path=/Users/strahinja/Desktop/soa/Tutours-Services/ENCOUNTERS-MS/proto -proto=/Users/strahinja/Desktop/soa/Tutours-Services/ENCOUNTERS-MS/proto/encounter/encounter-service.proto -plaintext -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwianRpIjoiZmM3YjExMzctZjdjOS00NGI0LTk0ZTEtOWUzNTNjMmUyMzJjIiwicGVyc29uSWQiOjEsInJvbGUiOjAsInVzZXJuYW1lIjoidXNlcjEifQ.bOoggrE08CSh7i-iaP_c01yTeeudcOlRQ3TaFRGBsxw' -d '{}' localhost:8092 encounter.EncounterService/GetApproved
+
+
+// Change IP for logging 
+
+10566 - dashboard

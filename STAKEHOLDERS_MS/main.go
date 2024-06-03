@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"os"
@@ -16,6 +14,9 @@ import (
 	"stakeholder/saga/messaging/nats"
 	"stakeholder/service"
 	"syscall"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -28,8 +29,8 @@ func main() {
 	userService := &service.UserService{UserRepository: userRepo}
 
 	queueGroup := "stakeholder_service"
-	command := "encounter.finish.command"
-	reply := "encounter.finish.reply"
+	command := os.Getenv("FINISH_ENCOUNTER_COMMAND_SUBJECT")
+	reply := os.Getenv("FINISH_ENCOUNTER_REPLY_SUBJECT")
 
 	commandSubscriber := initSubscriber(command, queueGroup)
 	replyPublisher := initPublisher(reply)

@@ -45,14 +45,14 @@ func dialGRPC(address string) *grpc.ClientConn {
 func main() {
 
 	//conn1 = dialGRPC("follower:8095")
-	//conn2 = dialGRPC("encounter:8092")
+	conn2 = dialGRPC("encounter:8092")
 	//conn3 = dialGRPC("tour:8000")
-	//conn4 = dialGRPC("stakeholder:8099")
+	conn4 = dialGRPC("stakeholder:8099")
 
 	//conn1 = dialGRPC(":8095")
-	conn2 = dialGRPC(":8092")
+	//conn2 = dialGRPC(":8092")
 	//conn3 = dialGRPC(":8000")
-	conn4 = dialGRPC(":8099")
+	//conn4 = dialGRPC(":8099")
 
 	gwmux := runtime.NewServeMux()
 
