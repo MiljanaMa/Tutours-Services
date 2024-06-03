@@ -32,3 +32,5 @@ grpcurl -import-path=/Users/strahinja/Desktop/soa/Tutours-Services/ENCOUNTERS-MS
 
 
 // Change IP for logging 
+
+10566 - dashboard
