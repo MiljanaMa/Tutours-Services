@@ -5,6 +5,10 @@ docker compose up (--build)
 docker-compose -f docker-compose-migration.yml up
 
 //Commands for databases insert (your're position should be in exec in db container)
+docker exec -it db bash 
+psql -U postgres -d encounters -f /docker-entrypoint-initdb.d/encounters_init.sql
+psql -U postgres -d stakeholders -f /docker-entrypoint-initdb.d/stakeholders_init.sql
+
 psql -U postgres -d explorer -f /tmp/explorer-init.sql
 psql -U postgres -d tours -f /tmp/tours-init.sql
 psql -U postgres -d encounters -f /tmp/encounters-init.sql

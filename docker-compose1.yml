@@ -66,6 +66,10 @@ services:
       DB_PORT_E: 5432
       DB_DATABASE_E: encounters
       DB_HOST_E: db
+      NATS_HOST: nats 
+      NATS_PORT: 4222 
+      FINISH_ENCOUNTER_COMMAND_SUBJECT: encounter.finish.command  
+      FINISH_ENCOUNTER_REPLY_SUBJECT: encounter.finish.reply 
     depends_on:
       db:
         condition: service_healthy
@@ -84,6 +88,10 @@ services:
       DB_PORT_S: 5432
       DB_DATABASE_S: stakeholders
       DB_HOST_S: db
+      NATS_HOST: nats 
+      NATS_PORT: 4222 
+      FINISH_ENCOUNTER_COMMAND_SUBJECT: encounter.finish.command  
+      FINISH_ENCOUNTER_REPLY_SUBJECT: encounter.finish.reply 
     depends_on:
       db:
         condition: service_healthy

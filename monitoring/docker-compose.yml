@@ -1,0 +1,46 @@
+services: 
+  loki:
+    image: grafana/loki:main-5206e3a
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:8.5.3
+    ports:
+      - "3000:3000"
+    environment:
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      GF_LOG_FILTERS: rendering:debug
+    volumes:
+      - grafana:/var/lib/grafana
+      - ./grafana:/etc/grafana/provisioning
+    networks:
+      - monitoring
+
+  renderer:
+    image: grafana/grafana-image-renderer:3.4.2
+    environment:
+      ENABLE_METRICS: "true"
+    networks:
+      - monitoring
+
+  fluent-bit:
+    image: grafana/fluent-bit-plugin-loki:main-5206e3a-amd64
+    environment:
+      - LOKI_URL=http://loki:3100/loki/api/v1/push
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - monitoring
+
+volumes:
+  grafana:
+    name: grafana
+
+networks:
+  monitoring:
+    name: monitoring

@@ -10,14 +10,15 @@ import (
 	"ENCOUNTERS-MS/service"
 	"context"
 	"fmt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 	"log"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -34,9 +35,9 @@ func initDB() *gorm.DB {
 			" dbname=" + os.Getenv("DB_DATABASE_E") +
 			" port=" + os.Getenv("DB_PORT_E") +
 			" sslmode=disable"
-	connectionUrl = "postgres://postgres:super@localhost:5432"
+	//connectionUrl = "postgres://postgres:super@localhost:5432"
 	database, err := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{SkipDefaultTransaction: true})
-
+	fmt.Println("Initializing DB with connection URL:", connectionUrl)
 	if err != nil {
 		log.Fatal(err)
 		return nil
@@ -106,8 +107,8 @@ func main() {
 	completionRepo := &repo.EncounterCompletionRepository{db}
 
 	queueGroup := "encounter_service"
-	command := "encounter.finish.command"
-	reply := "encounter.finish.reply"
+	command := os.Getenv("FINISH_ENCOUNTER_COMMAND_SUBJECT")
+	reply := os.Getenv("FINISH_ENCOUNTER_REPLY_SUBJECT")
 
 	commandPublisher := initPublisher(command)
 	replySubscriber := initSubscriber(reply, queueGroup)
@@ -159,10 +160,12 @@ func main() {
 	grpcServer.Stop()
 }
 func initSubscriber(subject, queueGroup string) saga.Subscriber {
+
 	subscriber, err := nats.NewSubscriber(subject, queueGroup)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	fmt.Printf("Initializing subscriber with subject: %s and queue: %s\n", subject, queueGroup)
 	return subscriber
 }
 
@@ -171,6 +174,7 @@ func initPublisher(subject string) saga.Publisher {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	fmt.Printf("Initializing publisher with subject: %s\n", subject)
 	return publisher
 }
 
@@ -179,6 +183,7 @@ func initOrchestrator(publisher saga.Publisher, subscriber saga.Subscriber) *ser
 	if err != nil {
 		log.Fatalln(err)
 	}
+	fmt.Println("Saga orchestrator intialized")
 	return orchestrator
 }
 func initService(repository *repo.EncounterCompletionRepository, encounterService *service.EncounterService, orchestrator *service.FinishEncounterOrchestrator) *service.EncounterCompletionService {

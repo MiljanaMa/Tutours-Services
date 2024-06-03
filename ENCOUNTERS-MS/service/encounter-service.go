@@ -18,6 +18,7 @@ type EncounterService struct {
 func (service *EncounterService) GetApproved() ([]*model.Encounter, error) {
 
 	if encounters, err := service.EncounterRepo.GetApproved(); err == nil {
+		fmt.Printf("Fetched %d encounters\n", len(encounters))
 		return encounters, nil
 	}
 
