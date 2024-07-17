@@ -9,6 +9,7 @@ import (
 	"log"
 	"time"
 	"tours/model"
+	"tours/model/helper"
 )
 
 type TourRepository struct {
@@ -36,6 +37,7 @@ func (pr *TourRepository) Ping() {
 }
 
 func (repo *TourRepository) Create(tour *model.Tour) (model.Tour, error) {
+	tour.Tags = helper.ArrayString{"aaa"}
 	err := tour.Validate()
 	if err != nil {
 		return *tour, err

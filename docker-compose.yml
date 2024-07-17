@@ -15,11 +15,14 @@ services:
         target: /tmp/explorer-init.sql
       - type: bind
         source: ./ENCOUNTERS-MS/encounters.sql
-        target: /tmp/encounters-init.sql 
+        target: /tmp/encounters-init.sql
+      - type: bind
+        source: ./STAKEHOLDERS_MS/stakeholders.sql
+        target: /tmp/stakeholders-init.sql 
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: super
-      POSTGRES_MULTIPLE_DATABASES: explorer,encounters
+      POSTGRES_MULTIPLE_DATABASES: explorer,encounters,stakeholders
       PGPORT: 5432
       PGUSER: postgres
     healthcheck:
@@ -29,42 +32,32 @@ services:
       retries: 5
       start_period: 30s
 
-  monolit:
+  api-gateway:
+    image: api-gateway
+    container_name: api-gateway
+    hostname: api-gateway
     build:
-      context: ./BACK
-      target: final
+      context: ./api-gateway/
+      dockerfile: Dockerfile
+    restart: always
+    environment: 
+      TOUR_SERVICE_ADDRESS: tour-service:8000
+      GATEWAY_ADDRESS: ":44333"
+    depends_on:
+      - tour
     networks:
       - database
     ports:
-      - "44333:80"
-    restart: on-failure
-    environment:
-      DATABASE_HOST: db
-      DATABASE_PORT: 5432
-      DATABASE_PASSWORD: super
-      DATABASE_USER: postgres
-      DATABASE_SCHEMA: explorer
-      TOUR_HOST: tour
-      TOUR_PORT: 8000
-      ENCOUNTER_HOST: encounter
-      ENCOUNTER_PORT: 8083
-      FOLLOWER_HOST: follower
-      FOLLOWER_PORT: 8095
-    depends_on:
-      db:
-          condition: service_healthy
-      tour:
-          condition: service_started
-      encounter:
-          condition: service_started
-      
+      - "44333:44333"
+    expose:
+      - "8000:8000"
 
   encounter:
     build: 
       context: ./ENCOUNTERS-MS
     restart: on-failure
     ports:
-      - "8083:8083"
+      - "8092:8092"
     networks:
       - database
     environment:
@@ -73,6 +66,24 @@ services:
       DB_PORT_E: 5432
       DB_DATABASE_E: encounters
       DB_HOST_E: db
+    depends_on:
+      db:
+        condition: service_healthy
+
+  stakeholder:
+    build: 
+      context: ./STAKEHOLDERS_MS
+    restart: on-failure
+    ports:
+      - "8099:8099"
+    networks:
+      - database
+    environment:
+      DB_USER_S: postgres
+      DB_PASSWORD_S: super
+      DB_PORT_S: 5432
+      DB_DATABASE_S: stakeholders
+      DB_HOST_S: db
     depends_on:
       db:
         condition: service_healthy
@@ -90,50 +101,6 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
-
-
-  follower:
-    build:
-      context: ./FOLLOWERS-MS
-    restart: on-failure
-    networks:
-      - database
-    ports:
-      - "8095:8095"
-    environment:
-      - NEO4J_DB=bolt://neo4j:7687
-      - NEO4J_USERNAME=neo4j
-      - NEO4J_PASS=12345678
-    depends_on:
-      neo4j:
-        condition: service_healthy
-
-   # NoSQL: Neo4J DB
-  neo4j:
-    image: neo4j
-    restart: always
-    networks:
-      - database
-    ports:
-      # bolt
-      - "7687:7687"
-      # http
-      - "7474:7474"
-      # https
-      - "7473:7473"
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "echo RETURN 1 | cypher-shell -a bolt://neo4j:7687 -u neo4j -p 12345678 || exit 1",
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    environment:
-      - NEO4J_AUTH=neo4j/12345678
-    volumes:
-      - neo4j_data:/data
   
   # NoSQL: MongoDB
   mongo:
@@ -171,7 +138,6 @@ services:
       - mongo_express_data:/data/db
 
 volumes:
-  neo4j_data:
   mongo_store:
   mongo_express_data:
 

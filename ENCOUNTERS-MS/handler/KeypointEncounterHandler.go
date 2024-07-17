@@ -2,115 +2,83 @@ package handler
 
 import (
 	"ENCOUNTERS-MS/model"
+	"ENCOUNTERS-MS/proto/encounter"
 	"ENCOUNTERS-MS/service"
-	"encoding/json"
-	"fmt"
-	"net/http"
-
-	"github.com/gorilla/mux"
+	"context"
+	"strconv"
 )
 
 type KeypointEncounterHandler struct {
+	encounter.UnimplementedKeypointEncounterServiceServer
 	KeypointEncounterService *service.KeypointEncounterService
 }
 
-func (handler *KeypointEncounterHandler) GetPagedByKeypoint(writer http.ResponseWriter, req *http.Request) {
-	fmt.Println("test 1")
-	keypointId := mux.Vars(req)["keypointid"]
+func keyPointToRPC(keypointEncounter *model.KeypointEncounter) *encounter.KeypointEncounter {
+	return &encounter.KeypointEncounter{
+		Id:          int64(keypointEncounter.Id),
+		EncounterId: int64(keypointEncounter.EncounterId),
+		Encounter:   ModelToRPC(keypointEncounter.Encounter),
+		KeyPointId:  int64(keypointEncounter.KeyPointId),
+		IsRequired:  keypointEncounter.IsRequired,
+	}
+}
+func rpcToKeyPoint(keypointEncounter *encounter.KeypointEncounter) *model.KeypointEncounter {
+	return &model.KeypointEncounter{
+		Id:          int(keypointEncounter.Id),
+		EncounterId: int(keypointEncounter.EncounterId),
+		Encounter:   rpcToModel(keypointEncounter.Encounter),
+		KeyPointId:  int(keypointEncounter.KeyPointId),
+		IsRequired:  keypointEncounter.IsRequired,
+	}
+}
+func toRPCKeypoints(keypoints []*model.KeypointEncounter) *encounter.KeypointEncounterResponse {
+	result := make([]*encounter.KeypointEncounter, len(keypoints))
+	for i, e := range keypoints {
+		result[i] = keyPointToRPC(e)
+	}
+	return &encounter.KeypointEncounterResponse{KeypointEncounters: result}
+}
 
-	fmt.Println("test 2")
-
+func (handler *KeypointEncounterHandler) GetByKeypoint(ctx context.Context, request *encounter.IdRequest) (*encounter.KeypointEncounterResponse, error) {
+	keypointId := strconv.Itoa(int(request.Id))
 	result, err := handler.KeypointEncounterService.GetPagedByKeypoint(keypointId)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Error fetching paged results"))
-		return
+		return nil, err
 	}
 
-	jsonData, err := json.Marshal(result)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Failed to parse JSON"))
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(jsonData)
+	return toRPCKeypoints(result), nil
 }
 
-func (handler *KeypointEncounterHandler) Create(writer http.ResponseWriter, req *http.Request) {
-	fmt.Println("test create 1")
+func (handler *KeypointEncounterHandler) Create(ctx context.Context, request *encounter.KeypointEncounter) (*encounter.KeypointEncounter, error) {
 
-	var keypointEncounter model.KeypointEncounter
-	err := json.NewDecoder(req.Body).Decode(&keypointEncounter)
+	keypointEncounter := rpcToKeyPoint(request)
+
+	result, err := handler.KeypointEncounterService.Create(keypointEncounter)
+
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write([]byte("Invalid request body"))
-		return
-	}
-	fmt.Println("test create 2")
-
-	//prebaci vars := mux.Vars(req)
-	//userId := vars["id"]
-	//keypointEncounter.Encounter.UserId = userId prebaci
-
-	result, err := handler.KeypointEncounterService.Create(&keypointEncounter)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte(fmt.Sprintf("Error creating keypoint encounter: %s", err)))
-		return
+		return nil, err
 	}
 
-	jsonData, err := json.Marshal(result)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Failed to parse JSON"))
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(jsonData)
+	return keyPointToRPC(result), nil
 }
 
-func (handler *KeypointEncounterHandler) Update(writer http.ResponseWriter, req *http.Request) {
-	var keypointEncounter model.KeypointEncounter
-	err := json.NewDecoder(req.Body).Decode(&keypointEncounter)
-	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write([]byte("Invalid request body"))
-		return
-	}
+func (handler *KeypointEncounterHandler) Update(ctx context.Context, request *encounter.KeypointEncounter) (*encounter.KeypointEncounter, error) {
+	keypointEncounter := rpcToKeyPoint(request)
 
-	result, err := handler.KeypointEncounterService.Update(&keypointEncounter)
+	result, err := handler.KeypointEncounterService.Update(keypointEncounter)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte(fmt.Sprintf("Error updating keypoint encounter: %s", err)))
-		return
+		return nil, err
 	}
-
-	jsonData, err := json.Marshal(result)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Failed to parse JSON"))
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(jsonData)
+	return keyPointToRPC(result), nil
 }
 
-func (handler *KeypointEncounterHandler) Delete(writer http.ResponseWriter, req *http.Request) {
-	id := req.URL.Query().Get("id")
+func (handler *KeypointEncounterHandler) Delete(ctx context.Context, request *encounter.IdRequest) (*encounter.EmptyResponse, error) {
+	id := strconv.Itoa(int(request.Id))
 
 	err := handler.KeypointEncounterService.Delete(id)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte(fmt.Sprintf("Error deleting keypoint encounter: %s", err)))
-		return
+		return nil, err
 	}
 
-	writer.WriteHeader(http.StatusNoContent)
+	return &encounter.EmptyResponse{}, nil
 }

@@ -1,18 +1,208 @@
 package handler
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"strconv"
+	"context"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"tours/model"
+	"tours/model/enum"
+	"tours/proto/tour"
 	"tours/service"
-
-	"github.com/gorilla/mux"
 )
 
+type TourHandler struct {
+	tour.UnimplementedTourServiceServer
+	TourService *service.TourService
+}
+
+func mapTransportType(tourType enum.TransportType) tour.TransportType {
+	switch tourType {
+	case 0:
+		return tour.TransportType_WALK
+	case 1:
+		return tour.TransportType_BIKE
+	case 2:
+		return tour.TransportType_CAR
+	default:
+		return tour.TransportType_BOAT
+	}
+}
+func mapTourStatus(status enum.TourStatus) tour.TourStatus {
+	switch status {
+	case 0:
+		return tour.TourStatus_DRAFT
+	case 1:
+		return tour.TourStatus_PUBLISHED
+	case 2:
+		return tour.TourStatus_ARCHIVED
+	case 3:
+		return tour.TourStatus_DISABLED
+	case 4:
+		return tour.TourStatus_CUSTOM
+	default:
+		return tour.TourStatus_CAMPAIGN
+	}
+
+}
+func mapTourDifficulty(difficulty enum.TourDifficulty) tour.TourDifficulty {
+	switch difficulty {
+	case 0:
+		return tour.TourDifficulty_EASY
+	case 1:
+		return tour.TourDifficulty_MEDIUM
+	case 2:
+		return tour.TourDifficulty_HARD
+	default:
+		return tour.TourDifficulty_EXTREME
+	}
+}
+
+func inverseTransportType(transportType tour.TransportType) enum.TransportType {
+	switch transportType {
+	case tour.TransportType_WALK:
+		return 0
+	case tour.TransportType_BIKE:
+		return 1
+	case tour.TransportType_CAR:
+		return 2
+	default:
+		return 3
+	}
+}
+func inverseTourStatus(status tour.TourStatus) enum.TourStatus {
+	switch status {
+	case tour.TourStatus_DRAFT:
+		return 0
+	case tour.TourStatus_PUBLISHED:
+		return 1
+	case tour.TourStatus_ARCHIVED:
+		return 2
+	case tour.TourStatus_DISABLED:
+		return 3
+	case tour.TourStatus_CUSTOM:
+		return 4
+	default:
+		return 5
+	}
+}
+func inverseTourDifficulty(status tour.TourDifficulty) enum.TourDifficulty {
+	switch status {
+	case tour.TourDifficulty_EASY:
+		return 0
+	case tour.TourDifficulty_MEDIUM:
+		return 1
+	case tour.TourDifficulty_HARD:
+		return 2
+	default:
+		return 3
+	}
+}
+
+func ModelToRPC(e *model.Tour) *tour.Tour {
+	return &tour.Tour{
+		Id:             int64(e.Id),
+		UserId:         int64(e.UserId),
+		Name:           e.Name,
+		Description:    e.Description,
+		Price:          float32(e.Price),
+		Duration:       int64(e.Duration),
+		Distance:       float32(e.Distance),
+		Status:         mapTourStatus(e.Status),
+		TransportType:  mapTransportType(e.TransportType),
+		TourDifficulty: mapTourDifficulty(e.Difficulty),
+		//Tags:          e.Image,
+		StatusUpdateTime: timestamppb.New(e.StatusUpdateTime),
+	}
+}
+func rpcToModel(e *tour.Tour) *model.Tour {
+	return &model.Tour{
+		Id:            int(e.Id),
+		UserId:        int(e.UserId),
+		Name:          e.Name,
+		Description:   e.Description,
+		Price:         float64(e.Price),
+		Duration:      int(e.Duration),
+		Distance:      float64(e.Distance),
+		Status:        inverseTourStatus(e.Status),
+		TransportType: inverseTransportType(e.TransportType),
+		Difficulty:    inverseTourDifficulty(e.TourDifficulty),
+		//Tags:          e.Image,
+		//StatusUpdateTime: timestamppb.New(e.StatusUpdateTime),
+	}
+}
+
+func toRPCtours(tours []model.Tour) *tour.ToursResponse {
+	result := make([]*tour.Tour, len(tours))
+	for i, e := range tours {
+		result[i] = ModelToRPC(&e)
+	}
+	return &tour.ToursResponse{Tours: result}
+}
+
+func (handler *TourHandler) GetAll(ctx context.Context, request *tour.EmptyRequest) (*tour.ToursResponse, error) {
+
+	tours, err := handler.TourService.GetAll(10, 10)
+	if err != nil {
+		return nil, err
+	}
+	return toRPCtours(tours), nil
+
+}
+func (handler *TourHandler) GetById(ctx context.Context, request *tour.IdRequest) (*tour.Tour, error) {
+	id := int(request.Id)
+
+	res, err := handler.TourService.GetById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return ModelToRPC(&res), nil
+}
+
+func (handler *TourHandler) Create(ctx context.Context, request *tour.Tour) (*tour.Tour, error) {
+	e := rpcToModel(request)
+
+	res, err := handler.TourService.Create(e)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ModelToRPC(&res), nil
+
+}
+
+func (handler *TourHandler) Delete(ctx context.Context, request *tour.IdRequest) (*tour.EmptyResponse, error) {
+	id := int(request.Id)
+
+	if err := handler.TourService.Delete(id); err != nil {
+		return nil, err
+	}
+
+	return &tour.EmptyResponse{}, nil
+}
+
+func (handler *TourHandler) GetAllByAuthor(ctx context.Context, request *tour.UserIdRequest) (*tour.ToursResponse, error) {
+	userId := int(request.UserId)
+
+	tours, err := handler.TourService.GetAllByAuthorId(10, 10, userId)
+	if err != nil {
+		return nil, err
+	}
+	return toRPCtours(tours), nil
+
+}
+
+func (handler *TourHandler) Update(ctx context.Context, request *tour.Tour) (*tour.Tour, error) {
+	e := rpcToModel(request)
+
+	_, err := handler.TourService.Update(e)
+	if err != nil {
+		return nil, err
+	}
+	return ModelToRPC(e), nil
+}
+
+/*
 type TourHandler struct {
 	TourService *service.TourService
 }
@@ -180,11 +370,5 @@ func (handler *TourHandler) GetAllByAuthor(writer http.ResponseWriter, req *http
 		http.Error(writer, "Failed to encode tours", http.StatusInternalServerError)
 		return
 	}
-	/*
-		if err != nil {
-			http.Error(writer, "Failed to fetch tours", http.StatusInternalServerError)
-			return
-		}
-		writer.WriteHeader(http.StatusOK)
-		json.NewEncoder(writer).Encode(tours)*/
 }
+*/

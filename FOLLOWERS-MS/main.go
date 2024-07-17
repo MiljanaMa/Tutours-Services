@@ -2,38 +2,30 @@ package main
 
 import (
 	"FOLLOWERS-MS/handler"
+	"FOLLOWERS-MS/proto/follower"
 	"FOLLOWERS-MS/repo"
 	"FOLLOWERS-MS/service"
 	"context"
 	"fmt"
-	"log"
-	"net/http"
-	"os"
-	"time"
-
-	"github.com/gorilla/mux"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+	"log"
+	"net"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
-func startServer(handler *handler.FollowersHandler) {
-
-	router := mux.NewRouter().StrictSlash(true)
-	url := "/followers/"
-	router.HandleFunc(url+"follow/{id1}/{id2}", handler.Follow).Methods("POST")
-	router.HandleFunc(url+"check-if-following/{id1}/{id2}", handler.CheckIfFollowing).Methods("GET")
-	router.HandleFunc(url+"get-recommendations/{id}", handler.GetRecommendation).Methods("GET")
-	router.HandleFunc(url+"unfollow/{id1}/{id2}", handler.Unfollow).Methods("DELETE")
-	router.HandleFunc(url+"get-followings/{id}", handler.GetFollowings).Methods("GET")
-	router.HandleFunc(url+"get-followers/{id}", handler.GetFollowers).Methods("GET")
-
-	fmt.Println("Starting server")
-	log.Fatal(http.ListenAndServe(":8095", router))
-}
 func initDB() neo4j.DriverWithContext {
 
-	uri := os.Getenv("NEO4J_DB")
+	/*uri := os.Getenv("NEO4J_DB")
 	user := os.Getenv("NEO4J_USERNAME")
-	pass := os.Getenv("NEO4J_PASS")
+	pass := os.Getenv("NEO4J_PASS")*/
+	uri := "bolt://localhost:7687"
+	user := "neo4j"
+	pass := "12345678"
 	auth := neo4j.BasicAuth(user, pass, "")
 
 	driver, err := neo4j.NewDriverWithContext(uri, auth)
@@ -127,7 +119,37 @@ func main() {
 
 	followerRepository := &repo.FollowerRepository{driver}
 	followerService := &service.FollowerService{followerRepository}
-	followerHandler := &handler.FollowersHandler{followerService}
+	followerHandler := &handler.FollowersHandler{FollowerService: followerService}
 
-	startServer(followerHandler)
+	//startServer(followerHandler)
+	lis, err := net.Listen("tcp", ":8095")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer func(listener net.Listener) {
+		err := listener.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(lis)
+
+	grpcServer := grpc.NewServer()
+	reflection.Register(grpcServer)
+
+	follower.RegisterFollowerServiceServer(grpcServer, followerHandler)
+
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalln(err)
+		}
+	}()
+
+	stopCh := make(chan os.Signal)
+	signal.Notify(stopCh, syscall.SIGTERM)
+
+	<-stopCh
+
+	grpcServer.Stop()
+
 }

@@ -3,14 +3,32 @@ package main
 import (
 	"ENCOUNTERS-MS/handler"
 	"ENCOUNTERS-MS/model"
+	"ENCOUNTERS-MS/proto/encounter"
 	"ENCOUNTERS-MS/repo"
+	saga "ENCOUNTERS-MS/saga/messaging"
+	"ENCOUNTERS-MS/saga/messaging/nats"
 	"ENCOUNTERS-MS/service"
+	"context"
 	"fmt"
 	"log"
-	"net/http"
+	"net"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/gorilla/mux"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/sdk/resource"
+	"go.opentelemetry.io/otel/sdk/trace"
+
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -24,9 +42,9 @@ func initDB() *gorm.DB {
 			" dbname=" + os.Getenv("DB_DATABASE_E") +
 			" port=" + os.Getenv("DB_PORT_E") +
 			" sslmode=disable"
-	//connectionUrl := "postgres://postgres:super@localhost:5432"
+	//connectionUrl = "postgres://postgres:super@localhost:5432"
 	database, err := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{SkipDefaultTransaction: true})
-
+	fmt.Println("Initializing DB with connection URL:", connectionUrl)
 	if err != nil {
 		log.Fatal(err)
 		return nil
@@ -63,36 +81,48 @@ func MigrateDatabase(database *gorm.DB) {
 		migrator.CreateTable(&model.KeypointEncounter{})
 	}
 }
-func startServer(handler *handler.EncounterHandler, handlerCompletion *handler.EncounterCompletionHandler, keypointEncHandler *handler.KeypointEncounterHandler) {
-	router := mux.NewRouter().StrictSlash(true)
 
-	//ENCOUNTER
-	router.HandleFunc("/encounters", handler.GetApproved).Methods("GET")                                            // tested
-	router.HandleFunc("/encounters/tourist-created-encounters", handler.GetTouristCreatedEncounters).Methods("GET") // tested
-	router.HandleFunc("/encounters/nearby/{userId}", handler.GetNearby).Methods("GET")                              // tested
-	router.HandleFunc("/encounters/nearby-by-type/{userId}", handler.GetNearbyByType).Methods("GET")                // tested
-	router.HandleFunc("/encounters/get-by-user/{userId}", handler.GetByUser).Methods("GET")                         // tested
-	router.HandleFunc("/encounters/get-approved-by-status/{status}", handler.GetApprovedByStatus).Methods("GET")    // tested
-	router.HandleFunc("/encounters", handler.Create).Methods("POST")                                                // tested
-	router.HandleFunc("/encounters", handler.Update).Methods("PUT")                                                 // tested
-	router.HandleFunc("/encounters/approve", handler.Approve).Methods("PUT")
-	router.HandleFunc("/encounters/decline", handler.Decline).Methods("PUT")
-	router.HandleFunc("/encounters/{id}", handler.Delete).Methods("DELETE") // tested
+func JWTInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 
-	//ENCOUNTER COMPLETION
-	router.HandleFunc("/tourist/encounter/{id}", handlerCompletion.GetPagedByUser).Methods("GET")
-	router.HandleFunc("/tourist/encounter/finishEncounter/{id}", handlerCompletion.FinishEncounter).Methods("GET")
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.InvalidArgument, "missing metadata")
+	}
+	token, ok := md["authorization"]
+	if !ok || len(token) == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "missing JWT token")
+	}
 
-	//KEYPOINT ENCOUNTER
-	router.HandleFunc("/keypointencounter/{keypointid}", keypointEncHandler.GetPagedByKeypoint).Methods("GET")
-	router.HandleFunc("/keypointencounter/create", keypointEncHandler.Create).Methods("POST")
-	router.HandleFunc("/keypointencounter/update", keypointEncHandler.Update).Methods("PUT")
-	router.HandleFunc("/keypointencounter/delete", keypointEncHandler.Delete).Methods("DELETE")
-
-	fmt.Println("Server is starting...")
-	log.Fatal(http.ListenAndServe(":8083", router))
+	return handler(context.WithValue(ctx, "token", token[0]), req)
 }
+
+func initTracer() (*trace.TracerProvider, error) {
+
+	endpoint := "http://jaeger:14268/api/traces"
+
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(endpoint)))
+	if err != nil {
+		return nil, err
+	}
+
+	tp := trace.NewTracerProvider(
+		trace.WithBatcher(exp),
+		trace.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String("encounters-ms"),
+		)),
+	)
+	otel.SetTracerProvider(tp)
+	return tp, nil
+}
+
 func main() {
+
+	tp, err := initTracer()
+	if err != nil {
+		log.Fatalf("failed to initialize tracer: %v", err)
+	}
+	defer func() { _ = tp.Shutdown(context.Background()) }()
 
 	db := initDB()
 
@@ -102,15 +132,100 @@ func main() {
 
 	encounterRepo := &repo.EncounterRepository{db}
 	encounterService := &service.EncounterService{encounterRepo}
-	encounterHandler := &handler.EncounterHandler{encounterService}
-
-	completionRepo := &repo.EncounterCompletionRepository{db}
-	completionService := &service.EncounterCompletionService{completionRepo}
-	completionHandler := &handler.EncounterCompletionHandler{completionService}
+	encounterHandler := &handler.EncounterHandler{EncounterService: encounterService}
 
 	keypointEncRepo := &repo.KeypointEncounterRepository{db}
 	keypointEncService := &service.KeypointEncounterService{keypointEncRepo}
-	keypointEncHandler := &handler.KeypointEncounterHandler{keypointEncService}
+	keypointEncHandler := &handler.KeypointEncounterHandler{KeypointEncounterService: keypointEncService}
 
-	startServer(encounterHandler, completionHandler, keypointEncHandler)
+	completionRepo := &repo.EncounterCompletionRepository{db}
+
+	queueGroup := "encounter_service"
+	command := os.Getenv("FINISH_ENCOUNTER_COMMAND_SUBJECT")
+	reply := os.Getenv("FINISH_ENCOUNTER_REPLY_SUBJECT")
+
+	commandPublisher := initPublisher(command)
+	replySubscriber := initSubscriber(reply, queueGroup)
+	orchestrator := initOrchestrator(commandPublisher, replySubscriber)
+
+	completionService := initService(completionRepo, encounterService, orchestrator)
+
+	commandSubscriber := initSubscriber(command, queueGroup)
+	replyPublisher := initPublisher(reply)
+	initFinishOrderHandler(completionService, replyPublisher, commandSubscriber)
+
+	completionHandler := &handler.EncounterCompletionHandler{EncounterCompletionService: completionService}
+
+	lis, err := net.Listen("tcp", ":8092")
+	fmt.Println("Running gRPC on port 8092")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer func(listener net.Listener) {
+		err := listener.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(lis)
+
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(JWTInterceptor))
+
+	reflection.Register(grpcServer)
+	fmt.Println("Registered gRPC server")
+
+	encounter.RegisterEncounterServiceServer(grpcServer, encounterHandler)
+	encounter.RegisterEncounterCompletionServiceServer(grpcServer, completionHandler)
+	encounter.RegisterKeypointEncounterServiceServer(grpcServer, keypointEncHandler)
+
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalln(err)
+		}
+	}()
+	fmt.Println("Serving gRPC")
+
+	stopCh := make(chan os.Signal)
+	signal.Notify(stopCh, syscall.SIGTERM)
+
+	<-stopCh
+
+	grpcServer.Stop()
+}
+func initSubscriber(subject, queueGroup string) saga.Subscriber {
+
+	subscriber, err := nats.NewSubscriber(subject, queueGroup)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Printf("Initializing subscriber with subject: %s and queue: %s\n", subject, queueGroup)
+	return subscriber
+}
+
+func initPublisher(subject string) saga.Publisher {
+	publisher, err := nats.NewPublisher(subject)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Printf("Initializing publisher with subject: %s\n", subject)
+	return publisher
+}
+
+func initOrchestrator(publisher saga.Publisher, subscriber saga.Subscriber) *service.FinishEncounterOrchestrator {
+	orchestrator, err := service.NewFinishOrderOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println("Saga orchestrator intialized")
+	return orchestrator
+}
+func initService(repository *repo.EncounterCompletionRepository, encounterService *service.EncounterService, orchestrator *service.FinishEncounterOrchestrator) *service.EncounterCompletionService {
+	return service.NewEncounterCompletionService(repository, encounterService, orchestrator)
+}
+func initFinishOrderHandler(service *service.EncounterCompletionService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := handler.NewFinishEncounterCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }

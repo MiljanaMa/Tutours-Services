@@ -37,8 +37,8 @@ type Encounter struct {
 	Type           EncounterType
 	Range          float64
 	Image          string
-	ImageLatitude  *float64
-	ImageLongitude *float64
+	ImageLatitude  float64
+	ImageLongitude float64
 	PeopleCount    int
 	ApprovalStatus EncounterApprovalStatus
 }

@@ -1,0 +1,201 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    networks:
+      - database
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db_init.sh:/docker-entrypoint-initdb.d/db_init.sh
+      - type: bind
+        source: ./BACK/scripts/tutours-db-backup.sql
+        target: /tmp/explorer-init.sql
+      - type: bind
+        source: ./ENCOUNTERS-MS/encounters.sql
+        target: /tmp/encounters-init.sql
+      - type: bind
+        source: ./STAKEHOLDERS_MS/stakeholders.sql
+        target: /tmp/stakeholders-init.sql 
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: super
+      POSTGRES_MULTIPLE_DATABASES: explorer,encounters,stakeholders
+      PGPORT: 5432
+      PGUSER: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 10s
+      timeout: 20s
+      retries: 5
+      start_period: 30s
+
+  api-gateway:
+    image: api-gateway
+    container_name: api-gateway
+    hostname: api-gateway
+    build:
+      context: ./api-gateway/
+      dockerfile: Dockerfile
+    restart: always
+    environment: 
+      TOUR_SERVICE_ADDRESS: tour-service:8000
+      GATEWAY_ADDRESS: ":44333"
+    depends_on:
+      - tour
+    networks:
+      - database
+    ports:
+      - "44333:44333"
+    expose:
+      - "8000:8000"
+
+  encounter:
+    build: 
+      context: ./ENCOUNTERS-MS
+    restart: on-failure
+    ports:
+      - "8092:8092"
+    networks:
+      - database
+    environment:
+      DB_USER_E: postgres
+      DB_PASSWORD_E: super
+      DB_PORT_E: 5432
+      DB_DATABASE_E: encounters
+      DB_HOST_E: db
+      NATS_HOST: nats 
+      NATS_PORT: 4222 
+      FINISH_ENCOUNTER_COMMAND_SUBJECT: encounter.finish.command  
+      FINISH_ENCOUNTER_REPLY_SUBJECT: encounter.finish.reply 
+    depends_on:
+      db:
+        condition: service_healthy
+
+  stakeholder:
+    build: 
+      context: ./STAKEHOLDERS_MS
+    restart: on-failure
+    ports:
+      - "8099:8099"
+    networks:
+      - database
+    environment:
+      DB_USER_S: postgres
+      DB_PASSWORD_S: super
+      DB_PORT_S: 5432
+      DB_DATABASE_S: stakeholders
+      DB_HOST_S: db
+      NATS_HOST: nats 
+      NATS_PORT: 4222 
+      FINISH_ENCOUNTER_COMMAND_SUBJECT: encounter.finish.command  
+      FINISH_ENCOUNTER_REPLY_SUBJECT: encounter.finish.reply 
+    depends_on:
+      db:
+        condition: service_healthy
+      
+  tour:
+    build: 
+      context: ./TOURS_MS
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    networks:
+      - database
+    environment:
+      MONGODB_ADDR: "mongodb://mongo:27017"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+
+  follower:
+    build:
+      context: ./FOLLOWERS-MS
+    restart: on-failure
+    networks:
+      - database
+    ports:
+      - "8095:8095"
+    environment:
+      - NEO4J_DB=bolt://neo4j:7687
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASS=12345678
+    depends_on:
+      neo4j:
+        condition: service_healthy
+
+   # NoSQL: Neo4J DB
+  neo4j:
+    image: neo4j
+    restart: always
+    networks:
+      - database
+    ports:
+      # bolt
+      - "7687:7687"
+      # http
+      - "7474:7474"
+      # https
+      - "7473:7473"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "echo RETURN 1 | cypher-shell -a bolt://neo4j:7687 -u neo4j -p 12345678 || exit 1",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    environment:
+      - NEO4J_AUTH=neo4j/12345678
+    volumes:
+      - neo4j_data:/data
+  
+  # NoSQL: MongoDB
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - database
+    # Docker healtcheck - checks if database is "alive"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - ./init/mongo_init.js:/docker-entrypoint-initdb.d/mongo_init.js:ro
+      - mongo_store:/data/db
+
+  # NoSQL: MognoExpress
+  mongo-express:
+    image: mongo-express
+    restart: always
+    networks:
+      - database
+    environment:
+      # hostname of mongo databse
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
+    volumes:
+      - mongo_express_data:/data/db
+
+volumes:
+  neo4j_data:
+  mongo_store:
+  mongo_express_data:
+
+
+networks:
+  database:
+    name: database
+    driver: bridge

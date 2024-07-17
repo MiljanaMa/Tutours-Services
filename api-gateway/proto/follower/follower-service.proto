@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package follower;
+
+option go_package = "api-gateway/proto/follower";
+import "google/api/annotations.proto";
+
+service FollowerService{
+  rpc Follow(MultiIdRequest) returns (EmptyResponse){
+    option(google.api.http) = {
+      post: "/followers/follow/{id1}/{id2}"
+      body: "*"
+    };
+  }
+  rpc IsFollowing(MultiIdRequest) returns (IsFollowingResponse){
+    option(google.api.http) = {
+      get: "/followers/is-following/{id1}/{id2}"
+    };
+  }
+  rpc GetRecommendations(Request) returns (MultiIdResponse){
+    option(google.api.http) = {
+      get: "/followers/recommendations/{id}"
+    };
+  }
+  rpc Unfollow(MultiIdRequest) returns (EmptyResponse){
+    option(google.api.http) = {
+      delete: "/followers/unfollow/{id1}/{id2}"
+    };
+  }
+  rpc GetFollowing(Request) returns (MultiIdResponse){
+    option(google.api.http) = {
+      get: "/followers/following/{id}"
+    };
+  }
+  rpc GetFollowers(Request) returns (MultiIdResponse){
+    option(google.api.http) = {
+      get: "/followers/followers/{id}"
+    };
+  }
+}
+message MultiIdRequest{
+  int64 id1 = 1;
+  int64 id2 = 2;
+}
+
+message Request{
+  int64 id = 1;
+}
+
+message EmptyResponse{}
+
+message IsFollowingResponse{
+  bool isFollowing = 1;
+}
+message MultiIdResponse{
+  repeated int64 ids =1 ;
+}
+
+

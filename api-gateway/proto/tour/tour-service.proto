@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package tour;
+
+option go_package = "api-gateway/proto/tour";
+
+import "google/api/annotations.proto";
+import "google/api/timestamp.proto";
+
+service TourService{
+
+  rpc GetAll(EmptyRequest) returns(ToursResponse){
+    option (google.api.http) = {
+      get:"/tours"
+    };
+  }
+  rpc GetAllByAuthor(UserIdRequest) returns(ToursResponse){
+    option (google.api.http) = {
+      get:"/tours/author/{UserId}"
+    };
+  }
+  rpc GetById(IdRequest) returns(Tour){
+    option (google.api.http) = {
+      get:"/tours/{Id}"
+    };
+  }
+  rpc Create(Tour) returns (Tour){
+    option(google.api.http) = {
+      post:"/tours/create"
+      body:"*"
+    };
+  }
+
+  rpc Update(Tour) returns (Tour){
+    option (google.api.http) = {
+      put:"/tours/update"
+      body:"*"
+    };
+  }
+
+  rpc Delete(IdRequest) returns (EmptyResponse){
+    option (google.api.http) = {
+      delete:"/tours/delete/{Id}"
+    };
+  }
+
+
+}
+
+service TouristPositionService{
+
+  rpc GetById(IdRequest) returns(TouristPosition){
+    option (google.api.http) = {
+      get:"/positions/get/{Id}"
+    };
+  }
+  rpc GetByUserId(IdRequest) returns(TouristPosition){
+    option (google.api.http) = {
+      get:"/positions/getByUser/{Id}"
+    };
+  }
+  rpc Create(TouristPosition) returns(TouristPosition){
+    option(google.api.http) = {
+      post:"/positions/create"
+      body:"*"
+    };
+  }
+  rpc Update(TouristPosition) returns(TouristPosition){
+    option(google.api.http) = {
+      post:"/positions/update"
+      body:"*"
+    };
+  }
+
+}
+
+message EmptyRequest{}
+message EmptyResponse{}
+
+message ToursResponse{
+  repeated Tour Tours = 1;
+}
+
+message IdRequest{
+  int64 Id = 1;
+}
+message UserIdRequest{
+  int64 UserId = 1;
+}
+message UserAndIdRequest{
+  int64 UserId = 1;
+  int64 Id = 2;
+}
+
+message Keypoint{
+  int64 Id = 1;
+  int64 TourId = 2;
+  string Name = 3;
+  float Latitude = 4;
+  float Longitude = 5;
+  string Description = 6;
+  int32 Position = 7;
+  string Image = 8;
+  string Secret = 9;
+}
+
+message TouristPosition{
+  int64 Id = 1;
+  int64 UserId = 2;
+  float Latitude = 3;
+  float Longitude = 4;
+  google.protobuf.Timestamp UpdatedAt = 5;
+}
+
+
+message Tour{
+  int64 Id = 1;
+  int64 UserId  = 2;
+  string Name = 3;
+  string Description = 4;
+  float Price = 5;
+  int64 Duration = 6;
+  float Distance = 7;
+  TourStatus Status = 8;
+  TransportType TransportType = 9;
+  TourDifficulty TourDifficulty = 10;
+  repeated string Tags = 11;
+  google.protobuf.Timestamp StatusUpdateTime = 12;
+}
+
+enum TourStatus {
+  DRAFT = 0;
+  PUBLISHED = 1;
+  ARCHIVED = 2;
+  DISABLED = 3;
+  CUSTOM = 4;
+  CAMPAIGN = 5;
+}
+
+enum TourDifficulty {
+  EASY = 0;
+  MEDIUM = 1;
+  HARD = 2;
+  EXTREME = 3;
+}
+
+enum TransportType {
+  WALK = 0;
+  BIKE = 1;
+  CAR = 2;
+  BOAT = 3;
+}
