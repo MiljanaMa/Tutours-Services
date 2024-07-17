@@ -1,15 +1,22 @@
 # Tutours-Services
-# Overview
-Welcome to our microservices-based project! This project is structured following the principles of microservice architecture, and it employs Docker for containerization.  
+
+## Academic Context:
+* Project for the Service-Oriented Architecture class
+* Faculty of Technical Sciences
+* Computer Science and Automation
+* Applied Computer Science and Informatics
+  
+## Overview
+The repository contains a project that is structured following the principles of microservice architecture, and it employs Docker for containerization.  
 
 Each service within this project uses a different type of database to meet specific requirements:  
-  -Tour Service: Uses MongoDB  
-  -Encounter Service: Uses PostgreSQL  
-  -Follower Service: Uses MongoDB  
+  * Tour Service: Uses MongoDB  
+  * Encounter Service: Uses PostgreSQL  
+  * Follower Service: Uses MongoDB  
 
 Additionally, the Saga pattern is implemented to manage transactions across the Tour and Encounter services. All services communicate via gRPC.  
 
-# Monitoring and Observability
+## Monitoring and Observability
 
 1. Monitoring  
   Prometheus: For real-time monitoring of the services, collecting metrics, and alerting.
